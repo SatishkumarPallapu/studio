@@ -1,57 +1,59 @@
+'use client';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { FileText, Bell, Calendar, Carrot, LineChart, Combine, Droplets, Landmark, Leaf, ShoppingBasket, ThermometerSun, User, Bot, CloudSun } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
-
-const dashboardCards = [
-  {
-    title: 'Weather',
-    description: 'Current & 3-day forecast.',
-    href: '/weather',
-    icon: <CloudSun className="w-8 h-8 text-primary" />,
-    imageId: 'weather-alerts',
-  },
-  {
-    title: 'Soil Moisture',
-    description: 'Live moisture reading from sensors.',
-    href: '/moisture-monitor',
-    icon: <Droplets className="w-8 h-8 text-primary" />,
-    imageId: 'iot-dashboard',
-  },
-  {
-    title: 'Active Crop: Tomato',
-    description: 'Flowering stage, 45 days remaining.',
-    href: '/crop-dashboard',
-    icon: <Carrot className="w-8 h-8 text-primary" />,
-    imageId: 'crop-recommendation',
-  },
-  {
-    title: 'Smart Subsidy Highlights',
-    description: 'Top 3 schemes for your district.',
-    href: '/subsidies',
-    icon: <Bell className="w-8 h-8 text-primary" />,
-    imageId: 'subsidy-alerts',
-  },
-  {
-    title: 'AI Smart Tips & Alerts',
-    description: 'Rain expected, adjust watering. Soil is acidic.',
-    href: '/chat',
-    icon: <Bot className="w-8 h-8 text-primary" />,
-    imageId: 'reminders',
-  },
-];
-
+import { useLanguage } from '@/contexts/language-context';
 
 export default function DashboardPage() {
+  const { translations } = useLanguage();
+  const dashboardCards = [
+    {
+      title: translations.dashboard.weather.title,
+      description: translations.dashboard.weather.description,
+      href: '/weather',
+      icon: <CloudSun className="w-8 h-8 text-primary" />,
+      imageId: 'weather-alerts',
+    },
+    {
+      title: translations.dashboard.soilMoisture.title,
+      description: translations.dashboard.soilMoisture.description,
+      href: '/moisture-monitor',
+      icon: <Droplets className="w-8 h-8 text-primary" />,
+      imageId: 'iot-dashboard',
+    },
+    {
+      title: translations.dashboard.activeCrop.title,
+      description: translations.dashboard.activeCrop.description,
+      href: '/crop-dashboard',
+      icon: <Carrot className="w-8 h-8 text-primary" />,
+      imageId: 'crop-recommendation',
+    },
+    {
+      title: translations.dashboard.subsidyHighlights.title,
+      description: translations.dashboard.subsidyHighlights.description,
+      href: '/subsidies',
+      icon: <Bell className="w-8 h-8 text-primary" />,
+      imageId: 'subsidy-alerts',
+    },
+    {
+      title: translations.dashboard.smartTips.title,
+      description: translations.dashboard.smartTips.description,
+      href: '/chat',
+      icon: <Bot className="w-8 h-8 text-primary" />,
+      imageId: 'reminders',
+    },
+  ];
+
   return (
     <div className="space-y-6">
       <div className="text-center md:text-left">
         <h1 className="text-3xl font-bold font-headline tracking-tight">
-            శుభోదయం సతీష్ గారు 👋 | మీ పంట స్థితి
+            {translations.dashboard.greeting}
         </h1>
-        <p className="text-muted-foreground">Welcome back, here's your farm's command center.</p>
+        <p className="text-muted-foreground">{translations.dashboard.welcome}</p>
       </div>
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         {dashboardCards.map((feature) => {
@@ -78,7 +80,7 @@ export default function DashboardPage() {
               </CardHeader>
               <CardContent className="mt-auto">
                 <Button asChild className="w-full bg-primary hover:bg-primary/90">
-                  <Link href={feature.href}>View Details</Link>
+                  <Link href={feature.href}>{translations.dashboard.viewDetails}</Link>
                 </Button>
               </CardContent>
             </Card>

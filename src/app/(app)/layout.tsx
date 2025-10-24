@@ -11,6 +11,9 @@ import {
   User,
 } from 'lucide-react';
 import { Icons } from '@/components/icons';
+import { LanguageProvider, useLanguage } from '@/contexts/language-context';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+
 
 const bottomNavItems = [
   { href: '/dashboard', icon: Home, label: 'Home' },
@@ -35,18 +38,21 @@ const mainNavItems = [
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="flex min-h-screen w-full flex-col bg-muted/40">
-      <AppHeader />
-      <main className="flex-1 p-4 sm:px-6 sm:py-0 md:gap-8 mb-16">
-        {children}
-      </main>
-      <BottomNavBar />
-    </div>
+    <LanguageProvider>
+        <div className="flex min-h-screen w-full flex-col bg-muted/40">
+        <AppHeader />
+        <main className="flex-1 p-4 sm:px-6 sm:py-0 md:gap-8 mb-16">
+            {children}
+        </main>
+        <BottomNavBar />
+        </div>
+    </LanguageProvider>
   );
 }
 
 function AppHeader() {
   const pathname = usePathname();
+  const { language, setLanguage, translations } = useLanguage();
   const currentNavItem = mainNavItems.find(item => pathname.startsWith(item.href));
   const title = currentNavItem ? currentNavItem.label : 'AI Rythu Mitra';
 
@@ -56,9 +62,21 @@ function AppHeader() {
         <Icons.logo className="h-6 w-6" />
         <span className="">AI Rythu Mitra</span>
       </Link>
-
-      <div className="relative flex-1 md:grow-0">
-        <h1 className="font-semibold text-xl font-headline hidden sm:block">{title}</h1>
+      
+      <div className="flex items-center gap-4">
+        <Select onValueChange={setLanguage} defaultValue={language}>
+            <SelectTrigger className="w-[150px]">
+                <SelectValue placeholder="Language" />
+            </SelectTrigger>
+            <SelectContent>
+                <SelectItem value="en">English</SelectItem>
+                <SelectItem value="te">Telugu (తెలుగు)</SelectItem>
+                <SelectItem value="hi">Hindi (हिन्दी)</SelectItem>
+            </SelectContent>
+        </Select>
+        <div className="relative flex-1 md:grow-0">
+            <h1 className="font-semibold text-xl font-headline hidden sm:block">{title}</h1>
+        </div>
       </div>
     </header>
   );
