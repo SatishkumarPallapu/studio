@@ -9,6 +9,7 @@ import {
   Sprout,
   Droplets,
   User,
+  ShoppingCart,
 } from 'lucide-react';
 import { Icons } from '@/components/icons';
 import { LanguageProvider, useLanguage } from '@/contexts/language-context';
@@ -18,7 +19,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 const bottomNavItems = [
   { href: '/dashboard', icon: Home, label: 'Home' },
   { href: '/soil-analysis', icon: Sprout, label: 'Soil' },
-  { href: '/chat', icon: Bot, label: 'AI' },
+  { href: '/marketplace', icon: ShoppingCart, label: 'Market' },
   { href: '/moisture-monitor', icon: Droplets, label: 'IoT' },
   { href: '/profile', icon: User, label: 'Profile' },
 ];
