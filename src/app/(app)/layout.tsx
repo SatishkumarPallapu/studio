@@ -1,7 +1,7 @@
 'use client';
 
 import * as React from 'react';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import {
   Bell,
@@ -35,6 +35,7 @@ import {
 import { Icons } from '@/components/icons';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
+import { useFirebase } from '@/firebase';
 
 const navItems = [
   { href: '/dashboard', icon: Home, label: 'Dashboard' },
@@ -55,6 +56,29 @@ const navItems = [
 ].sort((a, b) => a.label.localeCompare(b.label)); // Sort nav items alphabetically
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
+    const { user, isUserLoading } = useFirebase();
+    const router = useRouter();
+    const pathname = usePathname();
+
+    React.useEffect(() => {
+        if (!isUserLoading && !user && pathname !== '/login') {
+            router.push('/login');
+        }
+    }, [isUserLoading, user, router, pathname]);
+
+    if (isUserLoading || (!user && pathname !== '/login')) {
+        return (
+            <div className="flex min-h-screen w-full items-center justify-center">
+                <Icons.logo className="h-16 w-16 animate-spin" />
+            </div>
+        );
+    }
+    
+    if (pathname === '/login') {
+        return <>{children}</>;
+    }
+
+
   return (
         <div className="flex min-h-screen w-full flex-col bg-muted/40">
             <AppSidebar />
@@ -110,6 +134,14 @@ function AppSidebar() {
 
 function AppHeader() {
     const pathname = usePathname();
+    const { auth } = useFirebase();
+    const router = useRouter();
+
+    const handleLogout = async () => {
+        await auth.signOut();
+        router.push('/login');
+    };
+
     const currentNavItem = navItems.find(item => pathname.startsWith(item.href));
     const title = currentNavItem ? currentNavItem.label : 'Dashboard';
 
@@ -171,11 +203,9 @@ function AppHeader() {
                     <DropdownMenuItem>Settings</DropdownMenuItem>
                     <DropdownMenuItem>Support</DropdownMenuItem>
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem>
-                        <Link href="/login" className="flex items-center">
-                            <LogOut className="mr-2 h-4 w-4" />
-                            <span>Logout</span>
-                        </Link>
+                    <DropdownMenuItem onClick={handleLogout}>
+                        <LogOut className="mr-2 h-4 w-4" />
+                        <span>Logout</span>
                     </DropdownMenuItem>
                 </DropdownMenuContent>
             </DropdownMenu>

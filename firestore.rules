@@ -1,36 +1,49 @@
 /**
- * @file Firestore Security Rules
- * @description This ruleset enforces a strict user-ownership model for personal data,
- *              while allowing public read access to certain collections like crop data.
+ * @file Firestore Security Rules for AI Rythu Mitra.
  *
- * Data Structure:
- * - /users/{userId}: Stores user profiles, accessible only to the owning user.
- * - /users/{userId}/soil_reports/{soilReportId}: Stores soil reports, accessible only to the owning user.
- * - /crop_data/{cropDataId}: Stores crop data, publicly readable but writeable by no one (simulating admin-only).
- * - /iot_data/{iotDataId}: Stores IoT sensor data, publicly readable but writeable by no one (simulating admin-only).
- * - /transactions/{transactionId}: Stores transaction data, publicly readable but writeable by no one (simulating admin-only).
- * - /users/{userId}/subsidy_alerts/{subsidyAlertId}: Stores subsidy alerts, accessible only to the owning user.
- * - /users/{userId}/ai_logs/{aiLogId}: Stores AI logs, accessible only to the owning user.
+ * @core_philosophy This ruleset enforces a strict user-ownership model for most data,
+ * ensuring that users can only access their own data. Public read access is granted
+ * to certain collections. Data validation is relaxed in this prototyping phase,
+ * focusing on authorization and relational integrity.
  *
- * Key Security Decisions:
- * - User data is strictly controlled by the user's authentication ID.
- * - Listing of users is disallowed.
- * - Crop data, IoT data, and Transaction data are publicly readable, simulating a public dataset for read-only access.
- * - No role-based access control is implemented in this version.
- * - Unowned data is not directly associated with user accounts.  Association of the data with the user should be done in the application code.
+ * @data_structure
+ * - `/users/{userId}`: Stores user profiles.
+ * - `/users/{userId}/soil_reports/{soilReportId}`: Stores soil reports for each user.
+ * - `/crop_data/{cropDataId}`: Stores public crop data.
+ * - `/iot_data/{iotDataId}`: Stores IoT sensor data (no user association).
+ * - `/transactions/{transactionId}`: Stores transaction data.
+ * - `/users/{userId}/subsidy_alerts/{subsidyAlertId}`: Stores subsidy alerts for each user.
+ * - `/users/{userId}/ai_logs/{aiLogId}`: Stores AI operation logs for each user.
+ * - `/users/{userId}/weekly_reports/{reportId}`: Stores weekly reports for each user.
+ * - `/users/{userId}/drone_missions/{missionId}`: Stores drone mission details for each user.
+ * - `/products/{productId}`: Stores product information.
+ *
+ * @key_security_decisions
+ * - User listing is disallowed.
+ * - `crop_data` collection has public read access and restricted write access.
+ * - IoT data is currently treated as public.
+ * - Ownership is enforced using path-based matching and document-level checks.
+ * - No complex data validation is performed in this prototyping phase.
+ *
+ * @denormalization_for_authorization
+ * - User ID is embedded within documents and matched against the path to enforce ownership.
+ *
+ * @structural_segregation
+ * - User-specific data is stored in subcollections under `/users/{userId}`.
  */
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
     /**
-     * @description Secures user profiles, allowing only the owner to read and write their own data.
+     * @description Controls access to user profile information.
      * @path /users/{userId}
-     * @allow (create) - User with UID 'user_abc' can create their own profile document at /users/user_abc if request.auth.uid == 'user_abc'.
-     * @allow (get, update, delete) - User with UID 'user_abc' can read/update/delete their own profile document at /users/user_abc.
-     * @deny (create) - User with UID 'user_xyz' cannot create a profile document at /users/user_abc.
-     * @deny (get, update, delete) - User with UID 'user_xyz' cannot read/update/delete the profile document at /users/user_abc.
-     * @principle Enforces document ownership for all operations.
+     * @allow (create) Signed-in user can create their own profile if the userId matches their auth.uid.
+     * @allow (get, update, delete) Signed-in user can get, update, or delete their own profile if the userId matches their auth.uid.
+     * @deny (create) Signed-in user cannot create a profile with a userId that doesn't match their auth.uid.
+     * @deny (get, update, delete) Signed-in user cannot get, update, or delete another user's profile.
+     * @deny (list) User listing is not allowed.
+     * @principle Enforces document ownership and prevents unauthorized access to user data.
      */
     match /users/{userId} {
       function isSignedIn() {
@@ -46,20 +59,19 @@ service cloud.firestore {
       }
 
       allow get: if isOwner(userId);
-      allow list: if false; // Prevent listing of all users.
-      allow create: if isSignedIn() && isOwner(userId);
-      allow update: if isExistingOwner(userId); // Allow update if the user is the owner. Removed immutable ID check.
+      allow list: if false;
+      allow create: if isSignedIn() && isOwner(userId) && request.resource.data.id == userId;
+      allow update: if isExistingOwner(userId) && request.resource.data.id == resource.data.id;
       allow delete: if isExistingOwner(userId);
     }
 
     /**
-     * @description Secures soil reports under a user's profile, allowing only the owner to read and write their own reports.
+     * @description Controls access to soil reports submitted by users.
      * @path /users/{userId}/soil_reports/{soilReportId}
-     * @allow (create) - User with UID 'user_abc' can create a soil report at /users/user_abc/soil_reports/report_123.
-     * @allow (get, update, delete) - User with UID 'user_abc' can read/update/delete their own soil report at /users/user_abc/soil_reports/report_123.
-     * @deny (create) - User with UID 'user_xyz' cannot create a soil report under /users/user_abc/.
-     * @deny (get, update, delete) - User with UID 'user_xyz' cannot read/update/delete a soil report under /users/user_abc/.
-     * @principle Enforces document ownership for all operations within the user's data tree.
+     * @allow (create) Signed-in user can create a soil report under their own user ID.
+     * @allow (get, list, update, delete) Signed-in user can get, list, update, or delete their own soil reports.
+     * @deny (create, get, list, update, delete) Signed-in user cannot access another user's soil reports.
+     * @principle Enforces document ownership for writes.
      */
     match /users/{userId}/soil_reports/{soilReportId} {
       function isSignedIn() {
@@ -75,93 +87,128 @@ service cloud.firestore {
       }
 
       allow get: if isOwner(userId);
-      allow list: if false; //Prevent listing.  Listing all soil reports is likely undesirable
-      allow create: if isSignedIn() && isOwner(userId);
-      allow update: if isExistingOwner(userId); // Removed immutable ID check.
+      allow list: if isOwner(userId);
+      allow create: if isSignedIn() && isOwner(userId) && request.resource.data.userId == userId;
+      allow update: if isExistingOwner(userId) && request.resource.data.userId == resource.data.userId;
       allow delete: if isExistingOwner(userId);
     }
 
     /**
-     * @description Allows public read access to crop data but restricts write access. Simulates admin-only write.
+     * @description Controls access to crop data.
      * @path /crop_data/{cropDataId}
-     * @allow (get, list) - Any user, signed in or not, can read crop data.
-     * @deny (create, update, delete) - No user can create, update, or delete crop data.  Requires admin privileges in a real application.
-     * @principle Allows public read access while restricting write operations.
+     * @allow (get, list) Public read access to crop data.
+     * @deny (create, update, delete) Only admin users can modify crop data (TODO: implement admin check).
+     * @principle Provides public read access while restricting write access to authorized users.
      */
     match /crop_data/{cropDataId} {
       allow get, list: if true;
-      allow create: if false;
-      allow update: if false;
-      allow delete: if false;
+      allow create, update, delete: if false; // TODO: Add admin check
     }
 
     /**
-     * @description Allows public read access to IoT data but restricts write access. Simulates admin-only write.
+     * @description Controls access to IoT sensor data.
      * @path /iot_data/{iotDataId}
-     * @allow (get, list) - Any user, signed in or not, can read IoT data.
-     * @deny (create, update, delete) - No user can create, update, or delete IoT data. Requires admin privileges in a real application.
-     * @principle Allows public read access while restricting write operations.
+     * @allow (get, list) Public read access to IoT data.
+     * @deny (create, update, delete) No write access to IoT data.
+     * @principle Provides public read access and disallows writes.
      */
     match /iot_data/{iotDataId} {
       allow get, list: if true;
-      allow create: if false;
-      allow update: if false;
-      allow delete: if false;
+      allow create, update, delete: if false;
     }
 
-        /**
-     * @description Allows public read access to transaction data but restricts write access. Simulates admin-only write.
+    /**
+     * @description Controls access to transaction data.
      * @path /transactions/{transactionId}
-     * @allow (get, list) - Any user, signed in or not, can read transaction data.
-     * @deny (create, update, delete) - No user can create, update, or delete transaction data. Requires admin privileges in a real application.
-     * @principle Allows public read access while restricting write operations.
+     * @allow (create) Signed-in users can create transactions.
+     * @allow (get, list, update, delete) Only the seller or buyer can access the transaction.
+     * @principle Allows authorized users to create, read, and update transactions.
      */
     match /transactions/{transactionId} {
-      allow get, list: if true;
-      allow create: if false;
-      allow update: if false;
-      allow delete: if false;
+          function isSignedIn() {
+            return request.auth != null;
+          }
+
+          function isSellerOrBuyer(sellerId, buyerId) {
+            return request.auth.uid == sellerId || request.auth.uid == buyerId;
+          }
+
+          function isExistingSellerOrBuyer(sellerId, buyerId) {
+            return isSellerOrBuyer(sellerId, buyerId) && resource != null;
+          }
+
+      allow get: if isSignedIn() && isSellerOrBuyer(resource.data.sellerId, resource.data.buyerId);
+      allow list: if isSignedIn(); // Allowing list for all signed-in users. Consider narrowing down based on user role or ownership.
+      allow create: if isSignedIn();
+      allow update: if isExistingSellerOrBuyer(resource.data.sellerId, resource.data.buyerId);
+      allow delete: if isExistingSellerOrBuyer(resource.data.sellerId, resource.data.buyerId);
     }
 
     /**
-     * @description Secures subsidy alerts under a user's profile, allowing only the owner to read and write their own alerts.
+     * @description Controls access to subsidy alerts for users.
      * @path /users/{userId}/subsidy_alerts/{subsidyAlertId}
-     * @allow (create) - User with UID 'user_abc' can create a subsidy alert at /users/user_abc/subsidy_alerts/alert_123.
-     * @allow (get, update, delete) - User with UID 'user_abc' can read/update/delete their own subsidy alert at /users/user_abc/subsidy_alerts/alert_123.
-     * @deny (create) - User with UID 'user_xyz' cannot create a subsidy alert under /users/user_abc/.
-     * @deny (get, update, delete) - User with UID 'user_xyz' cannot read/update/delete a subsidy alert under /users/user_abc/.
-     * @principle Enforces document ownership for all operations within the user's data tree.
+     * @allow (create) Signed-in user can create a subsidy alert under their own user ID.
+     * @allow (get, list, update, delete) Signed-in user can get, list, update, or delete their own subsidy alerts.
+     * @deny (create, get, list, update, delete) Signed-in user cannot access another user's subsidy alerts.
+     * @principle Enforces document ownership for writes.
      */
     match /users/{userId}/subsidy_alerts/{subsidyAlertId} {
-      function isSignedIn() {
-        return request.auth != null;
-      }
+          function isSignedIn() {
+            return request.auth != null;
+          }
 
-      function isOwner(userId) {
-        return request.auth.uid == userId;
-      }
+          function isOwner(userId) {
+            return request.auth.uid == userId;
+          }
 
-      function isExistingOwner(userId) {
-        return isOwner(userId) && resource != null;
-      }
+          function isExistingOwner(userId) {
+            return isOwner(userId) && resource != null;
+          }
 
       allow get: if isOwner(userId);
-      allow list: if false; //Prevent listing.  Listing all subsidy_alerts is likely undesirable
-      allow create: if isSignedIn() && isOwner(userId);
-      allow update: if isExistingOwner(userId); // Removed immutable ID check.
+      allow list: if isOwner(userId);
+      allow create: if isSignedIn() && isOwner(userId) && request.resource.data.userId == userId;
+      allow update: if isExistingOwner(userId) && request.resource.data.userId == resource.data.userId;
       allow delete: if isExistingOwner(userId);
     }
 
     /**
-     * @description Secures AI logs under a user's profile, allowing only the owner to read and write their own logs.
+     * @description Controls access to AI operation logs for users.
      * @path /users/{userId}/ai_logs/{aiLogId}
-     * @allow (create) - User with UID 'user_abc' can create an AI log at /users/user_abc/ai_logs/log_123.
-     * @allow (get, update, delete) - User with UID 'user_abc' can read/update/delete their own AI log at /users/user_abc/ai_logs/log_123.
-     * @deny (create) - User with UID 'user_xyz' cannot create an AI log under /users/user_abc/.
-     * @deny (get, update, delete) - User with UID 'user_xyz' cannot read/update/delete an AI log under /users/user_abc/.
-     * @principle Enforces document ownership for all operations within the user's data tree.
+     * @allow (create) Signed-in user can create an AI log under their own user ID.
+     * @allow (get, list, update, delete) Signed-in user can get, list, update, or delete their own AI logs.
+     * @deny (create, get, list, update, delete) Signed-in user cannot access another user's AI logs.
+     * @principle Enforces document ownership for AI logs.
      */
     match /users/{userId}/ai_logs/{aiLogId} {
+          function isSignedIn() {
+            return request.auth != null;
+          }
+
+          function isOwner(userId) {
+            return request.auth.uid == userId;
+          }
+
+          function isExistingOwner(userId) {
+            return isOwner(userId) && resource != null;
+          }
+
+      allow get: if isOwner(userId);
+      allow list: if isOwner(userId);
+      allow create: if isSignedIn() && isOwner(userId) && request.resource.data.userId == userId;
+      allow update: if isExistingOwner(userId) && request.resource.data.userId == resource.data.userId;
+      allow delete: if isExistingOwner(userId);
+    }
+
+    /**
+     * @description Controls access to weekly reports for users.
+     * @path /users/{userId}/weekly_reports/{reportId}
+     * @allow (create) Signed-in user can create a weekly report under their own user ID.
+     * @allow (get, list, update, delete) Signed-in user can get, list, update, or delete their own weekly reports.
+     * @deny (create, get, list, update, delete) Signed-in user cannot access another user's weekly reports.
+     * @principle Enforces document ownership for weekly reports.
+     */
+    match /users/{userId}/weekly_reports/{reportId} {
       function isSignedIn() {
         return request.auth != null;
       }
@@ -175,10 +222,65 @@ service cloud.firestore {
       }
 
       allow get: if isOwner(userId);
-      allow list: if false; //Prevent listing.  Listing all ai_logs is likely undesirable
-      allow create: if isSignedIn() && isOwner(userId);
-      allow update: if isExistingOwner(userId); // Removed immutable ID check.
+      allow list: if isOwner(userId);
+      allow create: if isSignedIn() && isOwner(userId) && request.resource.data.userId == userId;
+      allow update: if isExistingOwner(userId) && request.resource.data.userId == resource.data.userId;
       allow delete: if isExistingOwner(userId);
     }
+
+    /**
+     * @description Controls access to drone missions for users.
+     * @path /users/{userId}/drone_missions/{missionId}
+     * @allow (create) Signed-in user can create a drone mission under their own user ID.
+     * @allow (get, list, update, delete) Signed-in user can get, list, update, or delete their own drone missions.
+     * @deny (create, get, list, update, delete) Signed-in user cannot access another user's drone missions.
+     * @principle Enforces document ownership for drone missions.
+     */
+    match /users/{userId}/drone_missions/{missionId} {
+      function isSignedIn() {
+        return request.auth != null;
+      }
+
+      function isOwner(userId) {
+        return request.auth.uid == userId;
+      }
+
+      function isExistingOwner(userId) {
+        return isOwner(userId) && resource != null;
+      }
+
+      allow get: if isOwner(userId);
+      allow list: if isOwner(userId);
+      allow create: if isSignedIn() && isOwner(userId) && request.resource.data.userId == userId;
+      allow update: if isExistingOwner(userId) && request.resource.data.userId == resource.data.userId;
+      allow delete: if isExistingOwner(userId);
+    }
+
+      /**
+       * @description Controls access to product information.
+       * @path /products/{productId}
+       * @allow (get, list) Public read access to product data.
+       * @allow (create) Signed-in users can create products.
+       * @allow (update, delete) Only the farmer who created the product can update or delete it.
+       * @principle Allows authorized users to create, read, and update products.
+       */
+      match /products/{productId} {
+          function isSignedIn() {
+              return request.auth != null;
+          }
+
+          function isOwner(farmerId) {
+              return request.auth.uid == farmerId;
+          }
+
+          function isExistingOwner(farmerId) {
+              return isOwner(farmerId) && resource != null;
+          }
+
+          allow get, list: if true; // Public read access
+          allow create: if isSignedIn();
+          allow update: if isExistingOwner(resource.data.farmerId);
+          allow delete: if isExistingOwner(resource.data.farmerId);
+      }
   }
 }

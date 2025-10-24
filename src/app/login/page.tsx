@@ -1,13 +1,13 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
-import { getAuth, RecaptchaVerifier, signInWithPhoneNumber } from "firebase/auth";
+import { getAuth, RecaptchaVerifier, signInWithPhoneNumber, type ConfirmationResult } from "firebase/auth";
 import { useFirebase } from '@/firebase';
 import { Loader2 } from 'lucide-react';
 import { Icons } from '@/components/icons';
@@ -18,14 +18,14 @@ export default function LoginPage() {
   const { auth } = useFirebase();
   const [phoneNumber, setPhoneNumber] = useState('');
   const [otp, setOtp] = useState('');
-  const [confirmationResult, setConfirmationResult] = useState<any>(null);
+  const [confirmationResult, setConfirmationResult] = useState<ConfirmationResult | null>(null);
   const [otpSent, setOtpSent] = useState(false);
   const [loading, setLoading] = useState(false);
   const [isClient, setIsClient] = useState(false);
 
-  useState(() => {
+  useEffect(() => {
     setIsClient(true);
-  });
+  }, []);
   
   const setupRecaptcha = () => {
     if (!isClient) return;
@@ -46,6 +46,12 @@ export default function LoginPage() {
 
   const handleSendOtp = async () => {
     setLoading(true);
+    if (!phoneNumber.trim()) {
+        toast({ variant: 'destructive', title: 'Error', description: 'Phone number cannot be empty.' });
+        setLoading(false);
+        return;
+    }
+
     try {
       const appVerifier = setupRecaptcha();
       if (!appVerifier) {
@@ -163,7 +169,7 @@ export default function LoginPage() {
             {otpSent && (
               <Button variant="link" onClick={() => {
                 setOtpSent(false);
-                setPhoneNumber('');
+                setConfirmationResult(null);
                 setOtp('');
               }}>
                 Change phone number
