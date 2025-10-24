@@ -27,7 +27,7 @@ export default function ChatClient() {
   const [language, setLanguage] = useState('English');
   const [isRecording, setIsRecording] = useState(false);
   const [audioPlayback, setAudioPlayback] = useState<AudioPlayback | null>(null);
-  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const recognitionRef = useRef<SpeechRecognition | null>(null);
   const { toast } = useToast();
 
   const handleSendMessage = async (e?: React.FormEvent) => {
@@ -62,14 +62,22 @@ export default function ChatClient() {
 
   const handleVoiceInput = async () => {
     if (isRecording) {
-      mediaRecorderRef.current?.stop();
+      recognitionRef.current?.stop();
       setIsRecording(false);
       return;
     }
 
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+      await navigator.mediaDevices.getUserMedia({ audio: true });
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (!SpeechRecognition) {
+          toast({ variant: 'destructive', title: 'Browser Not Supported', description: 'Speech recognition is not supported in your browser.' });
+          return;
+      }
+      
+      const recognition = new SpeechRecognition();
+      recognitionRef.current = recognition;
+
       recognition.lang = language === 'Telugu' ? 'te-IN' : language === 'Hindi' ? 'hi-IN' : 'en-US';
       recognition.interimResults = false;
       recognition.maxAlternatives = 1;
@@ -83,10 +91,8 @@ export default function ChatClient() {
         const transcript = event.results[0][0].transcript;
         setInput(transcript);
         // Automatically send the message after transcription
-        // We need to use a function form of setMessages to get the latest state
         setMessages((prevMessages) => {
             const newMessages = [...prevMessages, { role: 'user', content: transcript }];
-            // Now call the send logic with the fresh transcript
             (async () => {
                 setIsLoading(true);
                 try {
@@ -106,42 +112,44 @@ export default function ChatClient() {
             })();
             return newMessages;
         });
-        setInput(''); // Clear input field after sending
+        setInput(''); 
       };
 
       recognition.onerror = (event) => {
-        console.error('Speech recognition error:', event.error);
-        toast({ variant: 'destructive', title: 'Voice Error', description: 'Could not understand audio.' });
+        // The 'aborted' error is common and happens when the user stops speaking.
+        // We only want to show a toast for other, more critical errors.
+        if (event.error !== 'aborted') {
+          console.error('Speech recognition error:', event.error);
+          toast({ variant: 'destructive', title: 'Voice Error', description: 'Could not understand audio.' });
+        }
         setIsRecording(false);
       };
 
       recognition.onend = () => {
         setIsRecording(false);
+        recognitionRef.current = null;
       };
 
       recognition.start();
 
     } catch (error) {
       console.error('Media device error:', error);
-      toast({ variant: 'destructive', title: 'Mic Error', description: 'Could not access the microphone.' });
+      toast({ variant: 'destructive', title: 'Mic Error', description: 'Could not access the microphone or speech recognition is not supported.' });
     }
   };
   
   const handlePlayAudio = async (text: string, id: number) => {
-    // If it's the same message and it's playing, pause it.
     if (audioPlayback?.id === id && audioPlayback.isPlaying) {
       audioPlayback.audio.pause();
       setAudioPlayback(prev => prev ? { ...prev, isPlaying: false } : null);
       return;
     }
-    // If it's the same message and it's paused, play it.
     if (audioPlayback?.id === id && !audioPlayback.isPlaying) {
         audioPlayback.audio.play();
         setAudioPlayback(prev => prev ? { ...prev, isPlaying: true } : null);
         return;
     }
 
-    // Stop any currently playing audio
     if (audioPlayback?.audio) {
       audioPlayback.audio.pause();
     }
