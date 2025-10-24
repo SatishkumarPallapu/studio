@@ -5,7 +5,8 @@ import Image from 'next/image';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 
 export default function DroneHubPage() {
-    const ndviImage = PlaceHolderImages.find(img => img.id === 'iot-dashboard');
+    const ndviImage = PlaceHolderImages.find(img => img.id === 'drone-ndvi');
+    const pathImage = PlaceHolderImages.find(img => img.id === 'drone-path');
   return (
     <div className="space-y-6">
       <Card>
@@ -34,7 +35,7 @@ export default function DroneHubPage() {
                         alt="NDVI map placeholder" 
                         fill
                         className="object-cover"
-                        data-ai-hint="NDVI map"
+                        data-ai-hint={ndviImage.imageHint}
                     />
                      <div className="absolute inset-0 bg-green-900/50 flex items-center justify-center">
                         <p className="text-white font-bold text-xl">NDVI Map Visualization</p>
@@ -54,14 +55,14 @@ export default function DroneHubPage() {
             <CardDescription>Plan and deploy automated pesticide or fertilizer spraying missions.</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            {ndviImage && (
+            {pathImage && (
                 <div className="relative aspect-video w-full overflow-hidden rounded-lg">
                     <Image 
-                        src={ndviImage.imageUrl} 
+                        src={pathImage.imageUrl} 
                         alt="Spraying path placeholder"
                         fill
                         className="object-cover brightness-75"
-                        data-ai-hint="drone path"
+                        data-ai-hint={pathImage.imageHint}
                     />
                     <div className="absolute inset-0 bg-blue-900/50 flex items-center justify-center">
                         <p className="text-white font-bold text-xl">Spraying Path Planner</p>
