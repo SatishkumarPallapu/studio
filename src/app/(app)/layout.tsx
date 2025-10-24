@@ -1,22 +1,12 @@
 'use client';
 
 import * as React from 'react';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import {
   SidebarProvider,
-  Sidebar,
-  SidebarHeader,
-  SidebarContent,
-  SidebarMenu,
-  SidebarMenuItem,
-  SidebarMenuButton,
-  SidebarInset,
-  SidebarTrigger,
-  SidebarFooter,
 } from '@/components/ui/sidebar';
 import {
-  Bot,
   CalendarClock,
   Carrot,
   CloudSun,
@@ -24,12 +14,9 @@ import {
   Home,
   Landmark,
   Leaf,
-  Menu,
-  MoreHorizontal,
-  Search,
-  Settings,
-  User,
+  LogOut,
   PanelLeft,
+  Settings,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -40,10 +27,10 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { Input } from '@/components/ui/input';
 import { Icons } from '@/components/icons';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+import { useFirebase } from '@/firebase';
 
 const navItems = [
   { href: '/dashboard', icon: Home, label: 'Dashboard' },
@@ -56,12 +43,30 @@ const navItems = [
 ];
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
-  const pathname = usePathname();
+  const { user, isUserLoading } = useFirebase();
+  const router = useRouter();
+
+  React.useEffect(() => {
+    if (!isUserLoading && !user) {
+      router.push('/login');
+    }
+  }, [user, isUserLoading, router]);
+
+  if (isUserLoading || !user) {
+    return (
+      <div className="flex min-h-screen w-full items-center justify-center bg-muted/40">
+        <div className="flex items-center space-x-2">
+          <Icons.logo className="h-8 w-8 animate-spin text-primary" />
+          <span className="text-xl font-semibold">Loading...</span>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <SidebarProvider>
         <div className="flex min-h-screen w-full flex-col bg-muted/40">
-            <AppSidebar pathname={pathname} />
+            <AppSidebar />
             <div className="flex flex-col sm:gap-4 sm:py-4 sm:pl-14">
                 <AppHeader />
                 <main className="grid flex-1 items-start gap-4 p-4 sm:px-6 sm:py-0 md:gap-8">
@@ -73,7 +78,8 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   );
 }
 
-function AppSidebar({ pathname }: { pathname: string }) {
+function AppSidebar() {
+    const pathname = usePathname();
     return (
         <aside className="fixed inset-y-0 left-0 z-10 hidden w-14 flex-col border-r bg-background sm:flex">
             <nav className="flex flex-col items-center gap-4 px-2 sm:py-5">
@@ -113,8 +119,14 @@ function AppSidebar({ pathname }: { pathname: string }) {
 }
 
 function AppHeader() {
-    const pathname = usePathname();
-    const currentPage = navItems.find(item => item.href === pathname) || { label: 'Dashboard' };
+    const { auth } = useFirebase();
+    const router = useRouter();
+
+    const handleLogout = async () => {
+        await auth.signOut();
+        router.push('/login');
+    };
+
 
     return (
         <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-background px-4 sm:static sm:h-auto sm:border-0 sm:bg-transparent sm:px-6">
@@ -149,7 +161,7 @@ function AppHeader() {
             </Sheet>
 
             <div className="relative ml-auto flex-1 md:grow-0">
-                <h1 className="font-semibold text-xl font-headline">{currentPage.label}</h1>
+                <h1 className="font-semibold text-xl font-headline">Dashboard</h1>
             </div>
 
             <DropdownMenu>
@@ -171,8 +183,9 @@ function AppHeader() {
                     <DropdownMenuItem>Settings</DropdownMenuItem>
                     <DropdownMenuItem>Support</DropdownMenuItem>
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem>
-                        <Link href="#">Logout</Link>
+                    <DropdownMenuItem onClick={handleLogout}>
+                        <LogOut className="mr-2 h-4 w-4" />
+                        Logout
                     </DropdownMenuItem>
                 </DropdownMenuContent>
             </DropdownMenu>
