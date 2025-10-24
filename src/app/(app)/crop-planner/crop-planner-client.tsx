@@ -13,6 +13,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Bot, Loader2, Plus, Sprout, Tangent, Trash, Recycle } from 'lucide-react';
 import Image from 'next/image';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
+import { Label } from '@/components/ui/label';
 
 const formSchema = z.object({
   crops: z.array(z.string().min(2, "Crop name must be at least 2 characters.")).min(1, "Please enter at least one crop."),
