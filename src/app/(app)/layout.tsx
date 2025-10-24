@@ -172,7 +172,7 @@ function AppHeader() {
                     <DropdownMenuItem>Support</DropdownMenuItem>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem>
-                        <Link href="/login">Logout</Link>
+                        <Link href="#">Logout</Link>
                     </DropdownMenuItem>
                 </DropdownMenuContent>
             </DropdownMenu>
