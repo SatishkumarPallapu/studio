@@ -11,16 +11,6 @@ import {
   User,
 } from 'lucide-react';
 import { Icons } from '@/components/icons';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { Button } from '@/components/ui/button';
 
 const bottomNavItems = [
   { href: '/dashboard', icon: Home, label: 'Home' },
@@ -70,29 +60,6 @@ function AppHeader() {
       <div className="relative flex-1 md:grow-0">
         <h1 className="font-semibold text-xl font-headline hidden sm:block">{title}</h1>
       </div>
-
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button
-            variant="outline"
-            size="icon"
-            className="overflow-hidden rounded-full"
-          >
-            <Avatar>
-              <AvatarImage src="https://picsum.photos/seed/avatar/32/32" alt="@user" />
-              <AvatarFallback>FM</AvatarFallback>
-            </Avatar>
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end">
-          <DropdownMenuLabel>My Account</DropdownMenuLabel>
-          <DropdownMenuSeparator />
-          <DropdownMenuItem>Settings</DropdownMenuItem>
-          <DropdownMenuItem>Support</DropdownMenuItem>
-          <DropdownMenuSeparator />
-          <DropdownMenuItem>Logout</DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
     </header>
   );
 }
