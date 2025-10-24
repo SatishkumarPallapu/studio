@@ -16,7 +16,7 @@ type Diagnosis = {
   remedies: string;
 };
 
-export default function PestDetectionClient() {
+export default function CropHealthClient() {
   const [diagnosis, setDiagnosis] = useState<Diagnosis | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [preview, setPreview] = useState<string | null>(null);
@@ -87,7 +87,7 @@ export default function PestDetectionClient() {
     <div className="grid gap-8 md:grid-cols-2">
       <Card>
         <CardHeader>
-          <CardTitle>Pest & Disease Detection</CardTitle>
+          <CardTitle>AI Crop Health Analysis</CardTitle>
           <CardDescription>
             Upload a photo of an affected crop, and our AI will diagnose the issue and suggest organic remedies.
           </CardDescription>

@@ -1,7 +1,7 @@
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
-import { Carrot, Droplets, Landmark, Leaf, CloudSun, CalendarClock } from 'lucide-react';
+import { Carrot, Droplets, Landmark, Leaf, CloudSun, CalendarClock, ThermometerSun } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 
@@ -14,11 +14,18 @@ const featureCards = [
     imageId: 'crop-recommendation',
   },
   {
-    title: 'Pest & Disease Detection',
+    title: 'AI Crop Health',
     description: 'Upload a photo to identify crop issues and get organic remedies.',
-    href: '/pest-detection',
+    href: '/crop-health',
     icon: <Leaf className="w-8 h-8 text-primary" />,
     imageId: 'pest-detection',
+  },
+   {
+    title: 'IoT Dashboard',
+    description: 'View real-time data from your on-field IoT sensors.',
+    href: '/iot-dashboard',
+    icon: <ThermometerSun className="w-8 h-8 text-primary" />,
+    imageId: 'iot-dashboard',
   },
   {
     title: 'Soil Health Tracking',

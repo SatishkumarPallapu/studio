@@ -17,6 +17,7 @@ import {
   LogOut,
   PanelLeft,
   Settings,
+  ThermometerSun,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -34,8 +35,9 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/co
 const navItems = [
   { href: '/dashboard', icon: Home, label: 'Dashboard' },
   { href: '/crop-recommendation', icon: Carrot, label: 'Crop Recommendation' },
-  { href: '/pest-detection', icon: Leaf, label: 'Pest & Disease' },
+  { href: '/crop-health', icon: Leaf, label: 'Crop Health' },
   { href: '/soil-health', icon: Droplets, label: 'Soil Health' },
+  { href: '/iot-dashboard', icon: ThermometerSun, label: 'IoT Dashboard'},
   { href: '/market-prices', icon: Landmark, label: 'Market Prices' },
   { href: '/weather-alerts', icon: CloudSun, label: 'Weather Alerts' },
   { href: '/reminders', icon: CalendarClock, label: 'Reminders' },
@@ -74,7 +76,7 @@ function AppSidebar() {
                         key={item.href}
                         href={item.href}
                         className={`flex h-9 w-9 items-center justify-center rounded-lg transition-colors md:h-8 md:w-8 ${
-                            pathname === item.href
+                            pathname.startsWith(item.href)
                             ? 'bg-accent text-accent-foreground'
                             : 'text-muted-foreground hover:text-foreground'
                         }`}
@@ -98,6 +100,10 @@ function AppSidebar() {
 }
 
 function AppHeader() {
+    const pathname = usePathname();
+    const currentNavItem = navItems.find(item => pathname.startsWith(item.href));
+    const title = currentNavItem ? currentNavItem.label : 'Dashboard';
+
     return (
         <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-background px-4 sm:static sm:h-auto sm:border-0 sm:bg-transparent sm:px-6">
             <Sheet>
@@ -109,9 +115,9 @@ function AppHeader() {
                 </SheetTrigger>
                 <SheetContent side="left" className="sm:max-w-xs">
                     <SheetHeader>
-                        <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
+                        <SheetTitle>AI Rythu Mitra</SheetTitle>
                     </SheetHeader>
-                    <nav className="grid gap-6 text-lg font-medium">
+                    <nav className="grid gap-6 text-lg font-medium mt-4">
                         <Link
                             href="#"
                             className="group flex h-10 w-10 shrink-0 items-center justify-center gap-2 rounded-full bg-primary text-lg font-semibold text-primary-foreground md:text-base"
@@ -134,7 +140,7 @@ function AppHeader() {
             </Sheet>
 
             <div className="relative ml-auto flex-1 md:grow-0">
-                <h1 className="font-semibold text-xl font-headline">Dashboard</h1>
+                <h1 className="font-semibold text-xl font-headline">{title}</h1>
             </div>
 
             <DropdownMenu>

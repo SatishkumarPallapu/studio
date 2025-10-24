@@ -25,6 +25,12 @@
       "imageHint": "soil hands"
     },
     {
+      "id": "iot-dashboard",
+      "description": "A modern farm with IoT sensors collecting data.",
+      "imageUrl": "https://images.unsplash.com/photo-1621935904838-8958523354f5?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxzbWFydCUyMGZhcm18ZW58MHx8fHwxNzYxNDI3ODg3fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "smart farm"
+    },
+    {
       "id": "market-prices",
       "description": "A bustling local farmers market.",
       "imageUrl": "https://images.unsplash.com/photo-1567306295427-94503f8300d7?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwzfHxmYXJtZXJzJTIwbWFya2V0fGVufDB8fHx8MTc2MTI3NDA4NHww&ixlib=rb-4.1.0&q=80&w=1080",
