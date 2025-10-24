@@ -1,3 +1,46 @@
 {
-  "placeholderImages": []
+  "placeholderImages": [
+    {
+      "id": "login-hero",
+      "description": "A vibrant image of a farmer in a lush green field, symbolizing the app's connection to agriculture.",
+      "imageUrl": "https://images.unsplash.com/photo-1564071074086-4d0aac31eb4d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw5fHxmYXJtZXIlMjBmaWVsZHxlbnwwfHx8fDE3NjEyMjA2NjN8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "farmer field"
+    },
+    {
+      "id": "crop-recommendation",
+      "description": "Lush green saplings growing in fertile soil.",
+      "imageUrl": "https://images.unsplash.com/photo-1459787759585-dc0201b4e0bb?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw0fHxncmVlbiUyMHNhcGxpbmd8ZW58MHx8fHwxNzYxMzQyODM3fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "green sapling"
+    },
+    {
+      "id": "pest-detection",
+      "description": "A close-up of a leaf with signs of pest damage.",
+      "imageUrl": "https://images.unsplash.com/photo-1709195895738-ff30db884df6?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw1fHxsZWFmJTIwcGVzdHxlbnwwfHx8fDE3NjEzNDI4Mzd8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "leaf pest"
+    },
+    {
+      "id": "soil-health",
+      "description": "Hands holding rich, dark soil.",
+      "imageUrl": "https://images.unsplash.com/photo-1492496913980-501348b61469?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxzb2lsJTIwaGFuZHN8ZW58MHx8fHwxNzYxMjc0MDcxfDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "soil hands"
+    },
+    {
+      "id": "market-prices",
+      "description": "A bustling local farmers market.",
+      "imageUrl": "https://images.unsplash.com/photo-1567306295427-94503f8300d7?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwzfHxmYXJtZXJzJTIwbWFya2V0fGVufDB8fHx8MTc2MTI3NDA4NHww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "farmers market"
+    },
+    {
+      "id": "weather-alerts",
+      "description": "Dramatic storm clouds gathering over a field.",
+      "imageUrl": "https://images.unsplash.com/photo-1594123582884-6c88a690210b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw1fHxzdG9ybSUyMGNsb3Vkc3xlbnwwfHx8fDE3NjEyNDk5NDN8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "storm clouds"
+    },
+    {
+      "id": "reminders",
+      "description": "A calendar with marked dates over a farm background.",
+      "imageUrl": "https://images.unsplash.com/photo-1697823553780-236f99f8ca58?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxmYXJtJTIwY2FsZW5kYXJ8ZW58MHx8fHwxNzYxMzQyODM3fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "farm calendar"
+    }
+  ]
 }
