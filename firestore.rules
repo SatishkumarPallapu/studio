@@ -1,0 +1,184 @@
+/**
+ * @file Firestore Security Rules
+ * @description This ruleset enforces a strict user-ownership model for personal data,
+ *              while allowing public read access to certain collections like crop data.
+ *
+ * Data Structure:
+ * - /users/{userId}: Stores user profiles, accessible only to the owning user.
+ * - /users/{userId}/soil_reports/{soilReportId}: Stores soil reports, accessible only to the owning user.
+ * - /crop_data/{cropDataId}: Stores crop data, publicly readable but writeable by no one (simulating admin-only).
+ * - /iot_data/{iotDataId}: Stores IoT sensor data, publicly readable but writeable by no one (simulating admin-only).
+ * - /transactions/{transactionId}: Stores transaction data, publicly readable but writeable by no one (simulating admin-only).
+ * - /users/{userId}/subsidy_alerts/{subsidyAlertId}: Stores subsidy alerts, accessible only to the owning user.
+ * - /users/{userId}/ai_logs/{aiLogId}: Stores AI logs, accessible only to the owning user.
+ *
+ * Key Security Decisions:
+ * - User data is strictly controlled by the user's authentication ID.
+ * - Listing of users is disallowed.
+ * - Crop data, IoT data, and Transaction data are publicly readable, simulating a public dataset for read-only access.
+ * - No role-based access control is implemented in this version.
+ * - Unowned data is not directly associated with user accounts.  Association of the data with the user should be done in the application code.
+ */
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    /**
+     * @description Secures user profiles, allowing only the owner to read and write their own data.
+     * @path /users/{userId}
+     * @allow (create) - User with UID 'user_abc' can create their own profile document at /users/user_abc if request.auth.uid == 'user_abc'.
+     * @allow (get, update, delete) - User with UID 'user_abc' can read/update/delete their own profile document at /users/user_abc.
+     * @deny (create) - User with UID 'user_xyz' cannot create a profile document at /users/user_abc.
+     * @deny (get, update, delete) - User with UID 'user_xyz' cannot read/update/delete the profile document at /users/user_abc.
+     * @principle Enforces document ownership for all operations.
+     */
+    match /users/{userId} {
+      function isSignedIn() {
+        return request.auth != null;
+      }
+
+      function isOwner(userId) {
+        return request.auth.uid == userId;
+      }
+
+      function isExistingOwner(userId) {
+        return isOwner(userId) && resource != null;
+      }
+
+      allow get: if isOwner(userId);
+      allow list: if false; // Prevent listing of all users.
+      allow create: if isSignedIn() && isOwner(userId);
+      allow update: if isExistingOwner(userId); // Allow update if the user is the owner. Removed immutable ID check.
+      allow delete: if isExistingOwner(userId);
+    }
+
+    /**
+     * @description Secures soil reports under a user's profile, allowing only the owner to read and write their own reports.
+     * @path /users/{userId}/soil_reports/{soilReportId}
+     * @allow (create) - User with UID 'user_abc' can create a soil report at /users/user_abc/soil_reports/report_123.
+     * @allow (get, update, delete) - User with UID 'user_abc' can read/update/delete their own soil report at /users/user_abc/soil_reports/report_123.
+     * @deny (create) - User with UID 'user_xyz' cannot create a soil report under /users/user_abc/.
+     * @deny (get, update, delete) - User with UID 'user_xyz' cannot read/update/delete a soil report under /users/user_abc/.
+     * @principle Enforces document ownership for all operations within the user's data tree.
+     */
+    match /users/{userId}/soil_reports/{soilReportId} {
+      function isSignedIn() {
+        return request.auth != null;
+      }
+
+      function isOwner(userId) {
+        return request.auth.uid == userId;
+      }
+
+      function isExistingOwner(userId) {
+        return isOwner(userId) && resource != null;
+      }
+
+      allow get: if isOwner(userId);
+      allow list: if false; //Prevent listing.  Listing all soil reports is likely undesirable
+      allow create: if isSignedIn() && isOwner(userId);
+      allow update: if isExistingOwner(userId); // Removed immutable ID check.
+      allow delete: if isExistingOwner(userId);
+    }
+
+    /**
+     * @description Allows public read access to crop data but restricts write access. Simulates admin-only write.
+     * @path /crop_data/{cropDataId}
+     * @allow (get, list) - Any user, signed in or not, can read crop data.
+     * @deny (create, update, delete) - No user can create, update, or delete crop data.  Requires admin privileges in a real application.
+     * @principle Allows public read access while restricting write operations.
+     */
+    match /crop_data/{cropDataId} {
+      allow get, list: if true;
+      allow create: if false;
+      allow update: if false;
+      allow delete: if false;
+    }
+
+    /**
+     * @description Allows public read access to IoT data but restricts write access. Simulates admin-only write.
+     * @path /iot_data/{iotDataId}
+     * @allow (get, list) - Any user, signed in or not, can read IoT data.
+     * @deny (create, update, delete) - No user can create, update, or delete IoT data. Requires admin privileges in a real application.
+     * @principle Allows public read access while restricting write operations.
+     */
+    match /iot_data/{iotDataId} {
+      allow get, list: if true;
+      allow create: if false;
+      allow update: if false;
+      allow delete: if false;
+    }
+
+        /**
+     * @description Allows public read access to transaction data but restricts write access. Simulates admin-only write.
+     * @path /transactions/{transactionId}
+     * @allow (get, list) - Any user, signed in or not, can read transaction data.
+     * @deny (create, update, delete) - No user can create, update, or delete transaction data. Requires admin privileges in a real application.
+     * @principle Allows public read access while restricting write operations.
+     */
+    match /transactions/{transactionId} {
+      allow get, list: if true;
+      allow create: if false;
+      allow update: if false;
+      allow delete: if false;
+    }
+
+    /**
+     * @description Secures subsidy alerts under a user's profile, allowing only the owner to read and write their own alerts.
+     * @path /users/{userId}/subsidy_alerts/{subsidyAlertId}
+     * @allow (create) - User with UID 'user_abc' can create a subsidy alert at /users/user_abc/subsidy_alerts/alert_123.
+     * @allow (get, update, delete) - User with UID 'user_abc' can read/update/delete their own subsidy alert at /users/user_abc/subsidy_alerts/alert_123.
+     * @deny (create) - User with UID 'user_xyz' cannot create a subsidy alert under /users/user_abc/.
+     * @deny (get, update, delete) - User with UID 'user_xyz' cannot read/update/delete a subsidy alert under /users/user_abc/.
+     * @principle Enforces document ownership for all operations within the user's data tree.
+     */
+    match /users/{userId}/subsidy_alerts/{subsidyAlertId} {
+      function isSignedIn() {
+        return request.auth != null;
+      }
+
+      function isOwner(userId) {
+        return request.auth.uid == userId;
+      }
+
+      function isExistingOwner(userId) {
+        return isOwner(userId) && resource != null;
+      }
+
+      allow get: if isOwner(userId);
+      allow list: if false; //Prevent listing.  Listing all subsidy_alerts is likely undesirable
+      allow create: if isSignedIn() && isOwner(userId);
+      allow update: if isExistingOwner(userId); // Removed immutable ID check.
+      allow delete: if isExistingOwner(userId);
+    }
+
+    /**
+     * @description Secures AI logs under a user's profile, allowing only the owner to read and write their own logs.
+     * @path /users/{userId}/ai_logs/{aiLogId}
+     * @allow (create) - User with UID 'user_abc' can create an AI log at /users/user_abc/ai_logs/log_123.
+     * @allow (get, update, delete) - User with UID 'user_abc' can read/update/delete their own AI log at /users/user_abc/ai_logs/log_123.
+     * @deny (create) - User with UID 'user_xyz' cannot create an AI log under /users/user_abc/.
+     * @deny (get, update, delete) - User with UID 'user_xyz' cannot read/update/delete an AI log under /users/user_abc/.
+     * @principle Enforces document ownership for all operations within the user's data tree.
+     */
+    match /users/{userId}/ai_logs/{aiLogId} {
+      function isSignedIn() {
+        return request.auth != null;
+      }
+
+      function isOwner(userId) {
+        return request.auth.uid == userId;
+      }
+
+      function isExistingOwner(userId) {
+        return isOwner(userId) && resource != null;
+      }
+
+      allow get: if isOwner(userId);
+      allow list: if false; //Prevent listing.  Listing all ai_logs is likely undesirable
+      allow create: if isSignedIn() && isOwner(userId);
+      allow update: if isExistingOwner(userId); // Removed immutable ID check.
+      allow delete: if isExistingOwner(userId);
+    }
+  }
+}

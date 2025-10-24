@@ -1,0 +1,491 @@
+{
+  "entities": {
+    "User": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "User",
+      "type": "object",
+      "description": "Represents a user of the AI Rythu Mitra application.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the user entity."
+        },
+        "phoneNumber": {
+          "type": "string",
+          "description": "User's phone number, used for authentication."
+        },
+        "name": {
+          "type": "string",
+          "description": "User's full name."
+        },
+        "location": {
+          "type": "string",
+          "description": "User's general location (e.g., village, town)."
+        },
+        "farmSize": {
+          "type": "number",
+          "description": "Size of the user's farm in acres."
+        },
+        "cropsCultivated": {
+          "type": "array",
+          "description": "List of crops currently cultivated by the user.",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "id",
+        "phoneNumber",
+        "name"
+      ]
+    },
+    "SoilReport": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "SoilReport",
+      "type": "object",
+      "description": "Represents a soil health report submitted by a user.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the soil report."
+        },
+        "userId": {
+          "type": "string",
+          "description": "Reference to User. (Relationship: User 1:N SoilReport)"
+        },
+        "date": {
+          "type": "string",
+          "description": "Date the soil sample was taken.",
+          "format": "date-time"
+        },
+        "latitude": {
+          "type": "number",
+          "description": "Latitude of the soil sample location."
+        },
+        "longitude": {
+          "type": "number",
+          "description": "Longitude of the soil sample location."
+        },
+        "pH": {
+          "type": "number",
+          "description": "pH level of the soil."
+        },
+        "nitrogen": {
+          "type": "number",
+          "description": "Nitrogen content of the soil (ppm)."
+        },
+        "phosphorus": {
+          "type": "number",
+          "description": "Phosphorus content of the soil (ppm)."
+        },
+        "potassium": {
+          "type": "number",
+          "description": "Potassium content of the soil (ppm)."
+        },
+        "organicCarbon": {
+          "type": "number",
+          "description": "Organic Carbon content of the soil (%)."
+        }
+      },
+      "required": [
+        "id",
+        "userId",
+        "date",
+        "latitude",
+        "longitude",
+        "pH",
+        "nitrogen",
+        "phosphorus",
+        "potassium"
+      ]
+    },
+    "CropData": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "CropData",
+      "type": "object",
+      "description": "Represents historical and predicted data for a specific crop.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the crop data entry."
+        },
+        "cropName": {
+          "type": "string",
+          "description": "Name of the crop (e.g., Rice, Wheat)."
+        },
+        "location": {
+          "type": "string",
+          "description": "Geographic location for the data (e.g., district, state)."
+        },
+        "year": {
+          "type": "number",
+          "description": "Year for which the data is relevant."
+        },
+        "yield": {
+          "type": "number",
+          "description": "Yield of the crop in tons per hectare."
+        },
+        "price": {
+          "type": "number",
+          "description": "Market price of the crop in rupees per quintal."
+        },
+        "rainfall": {
+          "type": "number",
+          "description": "Average rainfall during the crop season."
+        }
+      },
+      "required": [
+        "id",
+        "cropName",
+        "location",
+        "year",
+        "yield",
+        "price"
+      ]
+    },
+    "IoTData": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "IoTData",
+      "type": "object",
+      "description": "Represents data collected from IoT sensors deployed in farms.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the IoT data entry."
+        },
+        "sensorId": {
+          "type": "string",
+          "description": "Identifier of the IoT sensor."
+        },
+        "timestamp": {
+          "type": "string",
+          "description": "Timestamp of when the data was recorded.",
+          "format": "date-time"
+        },
+        "latitude": {
+          "type": "number",
+          "description": "Latitude of the sensor location."
+        },
+        "longitude": {
+          "type": "number",
+          "description": "Longitude of the sensor location."
+        },
+        "temperature": {
+          "type": "number",
+          "description": "Temperature reading from the sensor (in Celsius)."
+        },
+        "humidity": {
+          "type": "number",
+          "description": "Humidity reading from the sensor (percentage)."
+        },
+        "soilMoisture": {
+          "type": "number",
+          "description": "Soil moisture level from the sensor (percentage)."
+        },
+        "lightIntensity": {
+          "type": "number",
+          "description": "Light intensity from the sensor (lux)."
+        }
+      },
+      "required": [
+        "id",
+        "sensorId",
+        "timestamp",
+        "latitude",
+        "longitude",
+        "temperature",
+        "humidity",
+        "soilMoisture",
+        "lightIntensity"
+      ]
+    },
+    "Transaction": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Transaction",
+      "type": "object",
+      "description": "Represents a transaction between a farmer and a buyer in the marketplace.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the transaction."
+        },
+        "sellerId": {
+          "type": "string",
+          "description": "Reference to User (seller). (Relationship: User 1:N Transaction)"
+        },
+        "buyerId": {
+          "type": "string",
+          "description": "Reference to User (buyer). (Relationship: User 1:N Transaction)"
+        },
+        "cropName": {
+          "type": "string",
+          "description": "Name of the crop being transacted."
+        },
+        "quantity": {
+          "type": "number",
+          "description": "Quantity of the crop transacted (in kg)."
+        },
+        "pricePerKg": {
+          "type": "number",
+          "description": "Price per kilogram of the crop."
+        },
+        "totalAmount": {
+          "type": "number",
+          "description": "Total amount of the transaction."
+        },
+        "transactionDate": {
+          "type": "string",
+          "description": "Date of the transaction.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "sellerId",
+        "buyerId",
+        "cropName",
+        "quantity",
+        "pricePerKg",
+        "totalAmount",
+        "transactionDate"
+      ]
+    },
+    "SubsidyAlert": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "SubsidyAlert",
+      "type": "object",
+      "description": "Represents an alert for a government subsidy program relevant to farmers.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the subsidy alert."
+        },
+        "title": {
+          "type": "string",
+          "description": "Title of the subsidy program."
+        },
+        "description": {
+          "type": "string",
+          "description": "Description of the subsidy program."
+        },
+        "eligibilityCriteria": {
+          "type": "string",
+          "description": "Eligibility criteria for the subsidy program."
+        },
+        "applicationDeadline": {
+          "type": "string",
+          "description": "Application deadline for the subsidy program.",
+          "format": "date-time"
+        },
+        "linkToDetails": {
+          "type": "string",
+          "description": "Link to the official details of the subsidy program.",
+          "format": "uri"
+        },
+        "userId": {
+          "type": "string",
+          "description": "Reference to User (alerts sent to)."
+        }
+      },
+      "required": [
+        "id",
+        "title",
+        "description",
+        "eligibilityCriteria",
+        "applicationDeadline",
+        "linkToDetails"
+      ]
+    },
+    "AiLog": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "AiLog",
+      "type": "object",
+      "description": "Represents a log entry for AI-powered operations (crop recommendation, pest detection).",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the AI log entry."
+        },
+        "timestamp": {
+          "type": "string",
+          "description": "Timestamp of when the AI operation was performed.",
+          "format": "date-time"
+        },
+        "userId": {
+          "type": "string",
+          "description": "Reference to User. (Relationship: User 1:N AiLog)"
+        },
+        "operationType": {
+          "type": "string",
+          "description": "Type of AI operation (e.g., cropRecommendation, pestDetection)."
+        },
+        "inputData": {
+          "type": "string",
+          "description": "Input data provided to the AI model (e.g., soil data, image URL)."
+        },
+        "outputData": {
+          "type": "string",
+          "description": "Output data generated by the AI model (e.g., recommended crops, detected pests)."
+        },
+        "modelVersion": {
+          "type": "string",
+          "description": "Version of the AI model used for the operation."
+        },
+        "success": {
+          "type": "boolean",
+          "description": "Indicates whether the AI operation was successful."
+        },
+        "errorMessage": {
+          "type": "string",
+          "description": "Error message if the AI operation failed."
+        }
+      },
+      "required": [
+        "id",
+        "timestamp",
+        "userId",
+        "operationType",
+        "inputData",
+        "outputData",
+        "modelVersion",
+        "success"
+      ]
+    }
+  },
+  "auth": {
+    "providers": [
+      "password",
+      "anonymous"
+    ]
+  },
+  "firestore": {
+    "structure": [
+      {
+        "path": "/users/{userId}",
+        "definition": {
+          "entityName": "User",
+          "schema": {
+            "$ref": "#/backend/entities/User"
+          },
+          "description": "Stores user profile information.  User ID is used for path-based ownership.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique identifier for the user."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/users/{userId}/soil_reports/{soilReportId}",
+        "definition": {
+          "entityName": "SoilReport",
+          "schema": {
+            "$ref": "#/backend/entities/SoilReport"
+          },
+          "description": "Stores soil reports submitted by users. Enforces path-based ownership (User 1:N SoilReport).",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique identifier for the user."
+            },
+            {
+              "name": "soilReportId",
+              "description": "The unique identifier for the soil report."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/crop_data/{cropDataId}",
+        "definition": {
+          "entityName": "CropData",
+          "schema": {
+            "$ref": "#/backend/entities/CropData"
+          },
+          "description": "Stores historical and predicted crop data. This collection is intended for admin read/write, client read-only.",
+          "params": [
+            {
+              "name": "cropDataId",
+              "description": "The unique identifier for the crop data."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/iot_data/{iotDataId}",
+        "definition": {
+          "entityName": "IoTData",
+          "schema": {
+            "$ref": "#/backend/entities/IoTData"
+          },
+          "description": "Stores data collected from IoT sensors.  This data could be associated with a user's farm, but without explicit user association in the schema, it remains a global collection.",
+          "params": [
+            {
+              "name": "iotDataId",
+              "description": "The unique identifier for the IoT data entry."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/transactions/{transactionId}",
+        "definition": {
+          "entityName": "Transaction",
+          "schema": {
+            "$ref": "#/backend/entities/Transaction"
+          },
+          "description": "Stores transaction data between farmers and buyers. Consider creating subcollections under user to reflect 'my sales' vs 'my purchases'.",
+          "params": [
+            {
+              "name": "transactionId",
+              "description": "The unique identifier for the transaction."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/users/{userId}/subsidy_alerts/{subsidyAlertId}",
+        "definition": {
+          "entityName": "SubsidyAlert",
+          "schema": {
+            "$ref": "#/backend/entities/SubsidyAlert"
+          },
+          "description": "Stores subsidy alerts relevant to a user.  Path-based ownership (User 1:N SubsidyAlert).",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique identifier for the user."
+            },
+            {
+              "name": "subsidyAlertId",
+              "description": "The unique identifier for the subsidy alert."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/users/{userId}/ai_logs/{aiLogId}",
+        "definition": {
+          "entityName": "AiLog",
+          "schema": {
+            "$ref": "#/backend/entities/AiLog"
+          },
+          "description": "Stores logs of AI-powered operations performed for a user. Path-based ownership (User 1:N AiLog).",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique identifier for the user."
+            },
+            {
+              "name": "aiLogId",
+              "description": "The unique identifier for the AI log entry."
+            }
+          ]
+        }
+      }
+    ],
+    "reasoning": "The Firestore structure is designed to ensure data isolation and ease of security rule implementation, adhering to Authorization Independence (CRITICAL) by denormalizing authorization context. User-owned data is stored under `/users/{userId}` paths, enabling simple, path-based security rules. Collaborative scenarios are handled using Membership Maps (though not explicitly present in the provided entities). Segregation is used to ensure QAPs by maintaining homogeneous security postures within collections.  For instance, soil reports and AI logs are stored as subcollections of users to reflect the 1:N relationship, improving clarity and debuggability."
+  }
+}
