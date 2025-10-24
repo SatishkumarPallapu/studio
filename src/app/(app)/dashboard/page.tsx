@@ -1,7 +1,7 @@
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
-import { Carrot, Droplets, Landmark, Leaf, CloudSun, CalendarClock, ThermometerSun } from 'lucide-react';
+import { Bell, CalendarClock, Carrot, CloudSun, Combine, Droplets, Landmark, Leaf, ShoppingBasket, ThermometerSun } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 
@@ -20,7 +20,14 @@ const featureCards = [
     icon: <Leaf className="w-8 h-8 text-primary" />,
     imageId: 'pest-detection',
   },
-   {
+  {
+    title: 'Multi-Crop Planner',
+    description: 'Plan intercropping strategies to boost farm health and yield.',
+    href: '/crop-planner',
+    icon: <Combine className="w-8 h-8 text-primary" />,
+    imageId: 'crop-recommendation',
+  },
+  {
     title: 'IoT Dashboard',
     description: 'View real-time data from your on-field IoT sensors.',
     href: '/iot-dashboard',
@@ -28,11 +35,18 @@ const featureCards = [
     imageId: 'iot-dashboard',
   },
   {
-    title: 'Soil Health Tracking',
-    description: 'Log and visualize your soil health data over time.',
+    title: 'Soil Health',
+    description: 'Analyze soil reports and track health over time.',
     href: '/soil-health',
     icon: <Droplets className="w-8 h-8 text-primary" />,
     imageId: 'soil-health',
+  },
+  {
+    title: 'Marketplace',
+    description: 'Browse and list produce in the community marketplace.',
+    href: '/marketplace',
+    icon: <ShoppingBasket className="w-8 h-8 text-primary" />,
+    imageId: 'market-prices',
   },
   {
     title: 'Market Prices',
@@ -40,6 +54,13 @@ const featureCards = [
     href: '/market-prices',
     icon: <Landmark className="w-8 h-8 text-primary" />,
     imageId: 'market-prices',
+  },
+  {
+    title: 'Subsidy Alerts',
+    description: 'Get notified about relevant government subsidies.',
+    href: '/subsidy-alerts',
+    icon: <Bell className="w-8 h-8 text-primary" />,
+    imageId: 'reminders', // Using reminders image for now
   },
   {
     title: 'Weather Alerts',
@@ -64,7 +85,7 @@ export default function DashboardPage() {
         <h1 className="text-3xl font-bold font-headline tracking-tight">Welcome back, Farmer!</h1>
         <p className="text-muted-foreground">Here&apos;s your farm&apos;s command center.</p>
       </div>
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         {featureCards.map((feature) => {
           const image = PlaceHolderImages.find((img) => img.id === feature.imageId);
           return (

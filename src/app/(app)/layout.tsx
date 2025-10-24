@@ -7,9 +7,11 @@ import {
   SidebarProvider,
 } from '@/components/ui/sidebar';
 import {
+  Bell,
   CalendarClock,
   Carrot,
   CloudSun,
+  Combine,
   Droplets,
   Home,
   Landmark,
@@ -18,6 +20,7 @@ import {
   MessageCircle,
   PanelLeft,
   Settings,
+  ShoppingBasket,
   ThermometerSun,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -38,9 +41,12 @@ const navItems = [
   { href: '/chat', icon: MessageCircle, label: 'Chat' },
   { href: '/crop-recommendation', icon: Carrot, label: 'Crop Recommendation' },
   { href: '/crop-health', icon: Leaf, label: 'Crop Health' },
+  { href: '/crop-planner', icon: Combine, label: 'Multi-Crop Planner' },
   { href: '/soil-health', icon: Droplets, label: 'Soil Health' },
   { href: '/iot-dashboard', icon: ThermometerSun, label: 'IoT Dashboard'},
   { href: '/market-prices', icon: Landmark, label: 'Market Prices' },
+  { href: '/marketplace', icon: ShoppingBasket, label: 'Marketplace' },
+  { href: '/subsidy-alerts', icon: Bell, label: 'Subsidy Alerts' },
   { href: '/weather-alerts', icon: CloudSun, label: 'Weather Alerts' },
   { href: '/reminders', icon: CalendarClock, label: 'Reminders' },
 ];
