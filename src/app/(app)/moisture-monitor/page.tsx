@@ -40,9 +40,9 @@ export default function MoistureMonitorPage() {
     <div className="space-y-6">
        <Card>
         <CardHeader>
-          <CardTitle>IoT Moisture Monitor</CardTitle>
+          <CardTitle>IoT Sensor Dashboard</CardTitle>
           <CardDescription>
-            Real-time data from your on-field ESP32 sensors (Mock Data).
+            Real-time data from your on-field ESP32 sensors (Mock Data). This page is also available in your Crop Lifecycle Dashboard.
           </CardDescription>
         </CardHeader>
       </Card>

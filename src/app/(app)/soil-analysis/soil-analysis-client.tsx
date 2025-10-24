@@ -7,9 +7,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
-import { Bot, Loader2, Upload, BarChart } from 'lucide-react';
+import { Bot, Loader2, Upload, BarChart, Droplets } from 'lucide-react';
 import Image from 'next/image';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
+import Link from 'next/link';
 
 type SoilData = {
   nitrogen: number;
@@ -117,18 +118,22 @@ export default function SoilHealthClient() {
         <CardHeader>
           <CardTitle>Automated Soil Test Analysis</CardTitle>
           <CardDescription>
-            Upload your soil test report (PDF or image) to let our AI extract the key metrics for you.
+            Upload your soil test report (PDF or image) or sync with your IoT device.
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="grid w-full items-center gap-1.5">
-              <Label htmlFor="soil-report">Soil Report File</Label>
-              <div className="flex items-center gap-2">
-                <Input id="soil-report" type="file" accept="image/*,application/pdf" onChange={handleFileChange} />
-              </div>
-            </div>
+          <div className="flex gap-4 mb-6">
+              <Button onClick={() => document.getElementById('soil-report-upload')?.click()} className="flex-1" variant="outline">
+                <Upload className="mr-2 h-4 w-4" /> Upload Report
+              </Button>
+              <input id="soil-report-upload" type="file" accept="image/*,application/pdf" onChange={handleFileChange} className="hidden" />
 
+              <Button className="flex-1">
+                <Droplets className="mr-2 h-4 w-4" /> Get Live Data
+              </Button>
+          </div>
+
+          <form onSubmit={handleSubmit} className="space-y-6">
             {preview && (
               <div>
                 <Label>Image Preview</Label>
@@ -143,17 +148,18 @@ export default function SoilHealthClient() {
                 </div>
              )}
 
-
-            <Button type="submit" disabled={isLoading || !file} className="w-full">
-              {isLoading ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Analyzing Report...
-                </>
-              ) : (
-                'Analyze Soil Report'
-              )}
-            </Button>
+            {file && (
+                <Button type="submit" disabled={isLoading || !file} className="w-full">
+                {isLoading ? (
+                    <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Analyzing Report...
+                    </>
+                ) : (
+                    'Analyze Soil Report'
+                )}
+                </Button>
+            )}
           </form>
         </CardContent>
       </Card>
@@ -171,7 +177,7 @@ export default function SoilHealthClient() {
                 <BarChart className="w-8 h-8 text-primary"/>
                 <div>
                     <CardTitle>AI Analysis Results</CardTitle>
-                    <CardDescription>Extracted from your soil report.</CardDescription>
+                    <CardDescription>Your soil is {soilData.fertility}</CardDescription>
                 </div>
               </CardHeader>
               <CardContent className="grid grid-cols-2 gap-4">
@@ -191,16 +197,12 @@ export default function SoilHealthClient() {
                     <p className="text-sm text-muted-foreground">pH Level</p>
                     <p className="text-2xl font-bold">{soilData.ph}</p>
                 </div>
-                <div className="col-span-2 flex flex-col space-y-1.5 rounded-lg border bg-accent/20 p-4">
-                    <p className="text-sm text-muted-foreground">Fertility Status</p>
-                    <p className="text-2xl font-bold">{soilData.fertility}</p>
-                </div>
               </CardContent>
             </Card>
             <Button className="w-full" asChild>
-                <a href={`/crop-recommendation?N=${soilData.nitrogen}&P=${soilData.phosphorus}&K=${soilData.potassium}&pH=${soilData.ph}`}>
-                    Get Crop Recommendations
-                </a>
+                <Link href={`/crop-recommendation?N=${soilData.nitrogen}&P=${soilData.phosphorus}&K=${soilData.potassium}&pH=${soilData.ph}`}>
+                    Get Best Crops for This Soil
+                </Link>
             </Button>
           </>
         ) : (

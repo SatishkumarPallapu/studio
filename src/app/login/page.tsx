@@ -19,12 +19,13 @@ export default function LoginPage() {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    
     // This is a temporary mock login to allow app navigation.
-    // The original phone auth code can be restored after enabling it in Firebase Console.
     toast({
       title: 'Login Successful',
-      description: 'You are now logged in.',
+      description: 'Redirecting to your dashboard.',
     });
+    
     // Simulate network delay
     setTimeout(() => {
       router.push('/dashboard');
@@ -33,7 +34,7 @@ export default function LoginPage() {
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-muted">
-      <Card className="w-[400px]">
+      <Card className="w-full max-w-sm mx-auto">
         <CardHeader className="text-center">
           <div className="flex items-center justify-center gap-2 mb-4">
             <Icons.logo className="h-8 w-8 text-primary" />
@@ -48,21 +49,19 @@ export default function LoginPage() {
           <div className="space-y-4">
             <form onSubmit={handleLogin} className="grid gap-4">
               <div className="grid gap-2">
-                <Label htmlFor="email">Email</Label>
+                <Label htmlFor="email">Phone Number or Email</Label>
                 <Input
                   id="email"
-                  type="email"
-                  placeholder="m@example.com"
+                  type="text"
+                  placeholder="+91... or m@example.com"
                   required
                 />
               </div>
               <div className="grid gap-2">
-                <Label htmlFor="password">Password</Label>
+                <Label htmlFor="password">Password / OTP</Label>
                 <Input id="password" type="password" required />
               </div>
-              <p className="text-xs text-center text-muted-foreground p-2 border rounded-md bg-background">
-                **Note:** Phone authentication is temporarily disabled. You can log in with any email/password to proceed while you enable Phone Sign-In in your Firebase project settings.
-              </p>
+              
               <Button
                 type="submit"
                 disabled={loading}

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams, useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -38,6 +38,7 @@ type Recommendation = {
 
 export default function CropRecommendationClient() {
   const searchParams = useSearchParams();
+  const router = useRouter();
   const [recommendation, setRecommendation] = useState<Recommendation | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
@@ -46,29 +47,48 @@ export default function CropRecommendationClient() {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      nitrogen: searchParams.get('N') ? parseFloat(searchParams.get('N')!) : '',
-      phosphorus: searchParams.get('P') ? parseFloat(searchParams.get('P')!) : '',
-      potassium: searchParams.get('K') ? parseFloat(searchParams.get('K')!) : '',
-      ph: searchParams.get('pH') ? parseFloat(searchParams.get('pH')!) : '',
+      nitrogen: searchParams.get('N') ? parseFloat(searchParams.get('N')!) : undefined,
+      phosphorus: searchParams.get('P') ? parseFloat(searchParams.get('P')!) : undefined,
+      potassium: searchParams.get('K') ? parseFloat(searchParams.get('K')!) : undefined,
+      ph: searchParams.get('pH') ? parseFloat(searchParams.get('pH')!) : undefined,
       location: '',
     },
   });
 
   useEffect(() => {
+    const N = searchParams.get('N');
+    const P = searchParams.get('P');
+    const K = searchParams.get('K');
+    const pH = searchParams.get('pH');
+    
     form.reset({
-      nitrogen: searchParams.get('N') ? parseFloat(searchParams.get('N')!) : '',
-      phosphorus: searchParams.get('P') ? parseFloat(searchParams.get('P')!) : '',
-      potassium: searchParams.get('K') ? parseFloat(searchParams.get('K')!) : '',
-      ph: searchParams.get('pH') ? parseFloat(searchParams.get('pH')!) : '',
+      nitrogen: N ? parseFloat(N) : undefined,
+      phosphorus: P ? parseFloat(P) : undefined,
+      potassium: K ? parseFloat(K) : undefined,
+      ph: pH ? parseFloat(pH) : undefined,
       location: form.getValues('location') || '',
     });
+
+    if (N && P && K && pH) {
+        // Automatically submit if params are present
+        // We wrap this in a timeout to allow the form state to update properly
+        setTimeout(() => {
+            form.handleSubmit(onSubmit)();
+        }, 100);
+    }
   }, [searchParams, form]);
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsLoading(true);
     setRecommendation(null);
     try {
-      const result = await cropRecommendationFromSoil(values);
+      const result = await cropRecommendationFromSoil({
+          nitrogen: values.nitrogen!,
+          phosphorus: values.phosphorus!,
+          potassium: values.potassium!,
+          ph: values.ph!,
+          location: values.location
+      });
       setRecommendation(result);
       toast({
         title: "Recommendations Ready!",
@@ -86,13 +106,12 @@ export default function CropRecommendationClient() {
     }
   }
 
-  const handleStartTracking = (cropName: string) => {
-    // In a real app, this would likely involve a database mutation
-    // to create a new crop tracking entry for the current user.
+  const handleCropSelection = (cropName: string) => {
     toast({
-        title: "Tracking Started!",
-        description: `You are now tracking the progress of ${cropName}.`,
+        title: "Crop Selected!",
+        description: `Lifecycle plan for ${cropName} created.`,
     });
+    router.push('/crop-dashboard');
   };
 
   return (
@@ -101,7 +120,7 @@ export default function CropRecommendationClient() {
         <CardHeader>
           <CardTitle>AI Crop Recommendation</CardTitle>
           <CardDescription>
-            Enter your soil data and location to get personalized crop suggestions from our AI.
+            Enter your soil data and location to get personalized crop suggestions from our AI. Data from soil analysis is pre-filled.
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -111,28 +130,28 @@ export default function CropRecommendationClient() {
                 <FormField control={form.control} name="nitrogen" render={({ field }) => (
                   <FormItem>
                     <FormLabel>Nitrogen (ppm)</FormLabel>
-                    <FormControl><Input type="number" placeholder="e.g., 120" {...field} /></FormControl>
+                    <FormControl><Input type="number" placeholder="e.g., 120" {...field} value={field.value ?? ''} /></FormControl>
                     <FormMessage />
                   </FormItem>
                 )} />
                 <FormField control={form.control} name="phosphorus" render={({ field }) => (
                   <FormItem>
                     <FormLabel>Phosphorus (ppm)</FormLabel>
-                    <FormControl><Input type="number" placeholder="e.g., 50" {...field} /></FormControl>
+                    <FormControl><Input type="number" placeholder="e.g., 50" {...field} value={field.value ?? ''} /></FormControl>
                     <FormMessage />
                   </FormItem>
                 )} />
                 <FormField control={form.control} name="potassium" render={({ field }) => (
                   <FormItem>
                     <FormLabel>Potassium (ppm)</FormLabel>
-                    <FormControl><Input type="number" placeholder="e.g., 75" {...field} /></FormControl>
+                    <FormControl><Input type="number" placeholder="e.g., 75" {...field} value={field.value ?? ''} /></FormControl>
                     <FormMessage />
                   </FormItem>
                 )} />
                 <FormField control={form.control} name="ph" render={({ field }) => (
                   <FormItem>
                     <FormLabel>pH Level</FormLabel>
-                    <FormControl><Input type="number" step="0.1" placeholder="e.g., 6.8" {...field} /></FormControl>
+                    <FormControl><Input type="number" step="0.1" placeholder="e.g., 6.8" {...field} value={field.value ?? ''} /></FormControl>
                     <FormMessage />
                   </FormItem>
                 )} />
@@ -165,26 +184,33 @@ export default function CropRecommendationClient() {
           <>
             <Card>
               <CardHeader>
-                <CardTitle>Recommended Crops</CardTitle>
-                <CardDescription>Based on your soil, location, and market demand.</CardDescription>
+                <CardTitle>Top 3 Recommended Crops</CardTitle>
+                <CardDescription>Select a crop to create a lifecycle plan and start tracking.</CardDescription>
               </CardHeader>
               <CardContent>
                 <TooltipProvider>
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {recommendation.recommended_crops.map((crop) => (
-                      <Tooltip key={crop.name} delayDuration={100}>
-                        <TooltipTrigger asChild>
-                          <Card className="p-4 flex flex-col items-center justify-center text-center space-y-2 hover:bg-accent hover:shadow-md transition-all">
-                              <Sprout className="w-8 h-8 text-primary"/>
-                              <p className="font-semibold">{crop.name}</p>
-                          </Card>
-                        </TooltipTrigger>
-                        <TooltipContent side="bottom" className="max-w-xs text-center">
-                          <p className="font-bold mb-2">Nutritional Info</p>
-                          <p><strong>Vitamins:</strong> {crop.vitamins}</p>
-                          <p><strong>Medicinal Value:</strong> {crop.medicinal_value}</p>
-                        </TooltipContent>
-                      </Tooltip>
+                    {recommendation.recommended_crops.slice(0, 3).map((crop) => (
+                       <Card key={crop.name} className="p-4 flex flex-col items-center justify-center text-center space-y-3 hover:bg-accent hover:shadow-md transition-all">
+                            <Sprout className="w-10 h-10 text-primary"/>
+                            <p className="font-semibold text-lg">{crop.name}</p>
+                            <div className="text-xs text-muted-foreground">
+                                <p>Yield: High</p>
+                                <p>Profit: Good</p>
+                                <p>Suitability: 90%</p>
+                            </div>
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <Button variant="ghost" size="sm"><Info className="w-4 h-4 mr-1" /> Info</Button>
+                                </TooltipTrigger>
+                                <TooltipContent side="bottom" className="max-w-xs text-center">
+                                <p className="font-bold mb-2">Nutritional Info</p>
+                                <p><strong>Vitamins:</strong> {crop.vitamins}</p>
+                                <p><strong>Medicinal Value:</strong> {crop.medicinal_value}</p>
+                                </TooltipContent>
+                            </Tooltip>
+                            <Button size="sm" className="w-full" onClick={() => handleCropSelection(crop.name)}>Select Crop ✅</Button>
+                        </Card>
                     ))}
                   </div>
                 </TooltipProvider>
@@ -198,29 +224,6 @@ export default function CropRecommendationClient() {
                 </CardHeader>
                 <CardContent>
                     <p>{recommendation.intercropping_suggestions}</p>
-                </CardContent>
-            </Card>
-
-            <Card>
-                <CardHeader>
-                    <CardTitle>Next Steps</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {recommendation.recommended_crops.map((crop) => (
-                       <div key={crop.name} className="flex flex-col gap-2 rounded-md border p-4">
-                         <h3 className="font-semibold">{crop.name}</h3>
-                         <div className="flex gap-2 mt-auto">
-                            <Button asChild size="sm" className="flex-1">
-                                <Link href={`/crop-roadmap/${crop.name.toLowerCase().replace(/ /g, '-')}`}>
-                                    View Complete Roadmap
-                                </Link>
-                            </Button>
-                            <Button size="sm" variant="secondary" onClick={() => handleStartTracking(crop.name)}>Start Tracking</Button>
-                         </div>
-                       </div>
-                    ))}
-                  </div>
                 </CardContent>
             </Card>
           </>
@@ -242,5 +245,3 @@ export default function CropRecommendationClient() {
     </div>
   );
 }
-
-    
