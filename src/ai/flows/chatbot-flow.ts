@@ -10,6 +10,7 @@ import { ai } from '@/ai/genkit';
 import { z } from 'genkit';
 import wav from 'wav';
 import { googleAI } from '@genkit-ai/google-genai';
+import { Message, Part } from 'genkit';
 
 // Chat Flow
 const ChatInputSchema = z.object({
@@ -41,13 +42,15 @@ const chatFlow = ai.defineFlow(
     const llm = googleAI.model('gemini-2.5-flash');
     const systemPrompt = `You are "AI Rythu Mitra," a friendly and expert agricultural assistant for Indian farmers. Your goal is to provide helpful, concise, and accurate information. Converse with the user in ${language}.`;
 
+    const systemMessage: Message = {
+      role: 'system',
+      content: [{text: systemPrompt}]
+    };
+
     const response = await ai.generate({
       model: llm,
       prompt: prompt,
-      history: history,
-      config: {
-        systemPrompt,
-      },
+      history: [systemMessage, ...history],
     });
 
     return { response: response.text };
