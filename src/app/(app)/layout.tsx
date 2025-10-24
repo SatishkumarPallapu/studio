@@ -5,13 +5,12 @@ import { usePathname } from 'next/navigation';
 import Link from 'next/link';
 import {
   Bell,
-  CalendarClock,
+  Calendar,
   Carrot,
-  CloudSun,
   Combine,
   Droplets,
   Home,
-  Landmark,
+  Bot,
   Leaf,
   LogOut,
   MessageCircle,
@@ -19,9 +18,8 @@ import {
   Settings,
   ShoppingBasket,
   ThermometerSun,
-  FileText,
-  Wind,
-  Bot
+  LineChart,
+  User,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -37,22 +35,29 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 
 const navItems = [
-  { href: '/dashboard', icon: Home, label: 'Dashboard' },
-  { href: '/chat', icon: MessageCircle, label: 'Chat' },
-  { href: '/crop-recommendation', icon: Carrot, label: 'Crop Recommendation' },
-  { href: '/crop-health', icon: Leaf, label: 'Crop Health' },
-  { href: '/crop-planner', icon: Combine, label: 'Multi-Crop Planner' },
-  { href: '/soil-health', icon: Droplets, label: 'Soil Health' },
-  { href: '/iot-dashboard', icon: ThermometerSun, label: 'IoT Dashboard'},
-  { href: '/market-prices', icon: Landmark, label: 'Market Prices' },
-  { href: '/marketplace', icon: ShoppingBasket, label: 'Marketplace' },
-  { href: '/subsidy-alerts', icon: Bell, label: 'Subsidy Alerts' },
-  { href: '/weather-alerts', icon: CloudSun, label: 'Weather Alerts' },
-  { href: '/reminders', icon: CalendarClock, label: 'Reminders' },
-  { href: '/reports', icon: FileText, label: 'Weekly Reports' },
-  { href: '/drone-hub', icon: Wind, label: 'Drone Hub' },
-  { href: '/traceability', icon: Bot, label: 'Traceability' },
+    // Phase 1
+    { href: '/dashboard', icon: Home, label: 'Dashboard', group: 'Home' },
+    { href: '/profile', icon: User, label: 'Profile', group: 'Home' },
+    { href: '/subsidies', icon: Bell, label: 'Subsidy Alerts', group: 'Phase 1: Setup' },
+    { href: '/soil-analysis', icon: Droplets, label: 'Soil Analysis', group: 'Phase 1: Setup' },
+    // Phase 2
+    { href: '/crop-recommendation', icon: Carrot, label: 'Crop Recommendation', group: 'Phase 2: Planning' },
+    { href: '/crop-planner', icon: Combine, label: 'Multi-Crop Planner', group: 'Phase 2: Planning' },
+    // Phase 3
+    { href: '/moisture-monitor', icon: ThermometerSun, label: 'IoT Monitor', group: 'Phase 3: Lifecycle' },
+    { href: '/crop-health', icon: Leaf, label: 'Crop Health', group: 'Phase 3: Lifecycle' },
+    { href: '/calendar', icon: Calendar, label: 'Calendar', group: 'Phase 3: Lifecycle' },
+    { href: '/chat', icon: MessageCircle, label: 'AI Assistant', group: 'Phase 3: Lifecycle' },
+    // Phase 4
+    { href: '/marketplace', icon: ShoppingBasket, label: 'Marketplace', group: 'Phase 4: Harvest' },
+    // Phase 5
+    { href: '/analytics', icon: LineChart, label: 'Analytics', group: 'Phase 5: Post-Harvest' },
+    // Other
+    { href: '/traceability', icon: Bot, label: 'Traceability', group: 'Other' },
 ].sort((a, b) => a.label.localeCompare(b.label)); // Sort nav items alphabetically
+
+const navGroups = ['Home', 'Phase 1: Setup', 'Phase 2: Planning', 'Phase 3: Lifecycle', 'Phase 4: Harvest', 'Phase 5: Post-Harvest', 'Other'];
+
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
 

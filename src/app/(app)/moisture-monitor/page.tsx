@@ -35,12 +35,12 @@ const sensorCards = [
   },
 ];
 
-export default function IotDashboardPage() {
+export default function MoistureMonitorPage() {
   return (
     <div className="space-y-6">
        <Card>
         <CardHeader>
-          <CardTitle>IoT Sensor Dashboard</CardTitle>
+          <CardTitle>IoT Moisture Monitor</CardTitle>
           <CardDescription>
             Real-time data from your on-field ESP32 sensors (Mock Data).
           </CardDescription>

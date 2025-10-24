@@ -1,11 +1,34 @@
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
-import { FileText, Bell, CalendarClock, Carrot, CloudSun, Combine, Droplets, Landmark, Leaf, ShoppingBasket, ThermometerSun, Wind, Bot } from 'lucide-react';
+import { FileText, Bell, Calendar, Carrot, LineChart, Combine, Droplets, Landmark, Leaf, ShoppingBasket, ThermometerSun, User, Bot } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 
 const featureCards = [
+  // Phase 1
+  {
+    title: 'Profile',
+    description: 'Manage your farm and personal details.',
+    href: '/profile',
+    icon: <User className="w-8 h-8 text-primary" />,
+    imageId: 'login-hero',
+  },
+  {
+    title: 'Subsidy Alerts',
+    description: 'Get notified about relevant government subsidies.',
+    href: '/subsidies',
+    icon: <Bell className="w-8 h-8 text-primary" />,
+    imageId: 'subsidy-alerts',
+  },
+  {
+    title: 'Soil Analysis',
+    description: 'Analyze soil reports and track health over time.',
+    href: '/soil-analysis',
+    icon: <Droplets className="w-8 h-8 text-primary" />,
+    imageId: 'soil-health',
+  },
+  // Phase 2
   {
     title: 'Crop Recommendation',
     description: 'Get AI-powered suggestions for the best crops to plant.',
@@ -14,33 +37,35 @@ const featureCards = [
     imageId: 'crop-recommendation',
   },
   {
-    title: 'AI Crop Health',
-    description: 'Upload a photo to identify crop issues and get organic remedies.',
-    href: '/crop-health',
-    icon: <Leaf className="w-8 h-8 text-primary" />,
-    imageId: 'pest-detection',
-  },
-  {
     title: 'Multi-Crop Planner',
     description: 'Plan intercropping strategies to boost farm health and yield.',
     href: '/crop-planner',
     icon: <Combine className="w-8 h-8 text-primary" />,
     imageId: 'crop-recommendation',
   },
+  // Phase 3
   {
-    title: 'IoT Dashboard',
+    title: 'IoT Monitor',
     description: 'View real-time data from your on-field IoT sensors.',
-    href: '/iot-dashboard',
+    href: '/moisture-monitor',
     icon: <ThermometerSun className="w-8 h-8 text-primary" />,
     imageId: 'iot-dashboard',
   },
   {
-    title: 'Soil Health',
-    description: 'Analyze soil reports and track health over time.',
-    href: '/soil-health',
-    icon: <Droplets className="w-8 h-8 text-primary" />,
-    imageId: 'soil-health',
+    title: 'Crop Health',
+    description: 'Upload a photo to identify crop issues and get organic remedies.',
+    href: '/crop-health',
+    icon: <Leaf className="w-8 h-8 text-primary" />,
+    imageId: 'pest-detection',
   },
+  {
+    title: 'Calendar',
+    description: 'Manage your farming schedule and reminders.',
+    href: '/calendar',
+    icon: <Calendar className="w-8 h-8 text-primary" />,
+    imageId: 'reminders',
+  },
+  // Phase 4
   {
     title: 'Marketplace',
     description: 'Browse and list produce in the community marketplace.',
@@ -48,59 +73,25 @@ const featureCards = [
     icon: <ShoppingBasket className="w-8 h-8 text-primary" />,
     imageId: 'market-prices',
   },
+  // Phase 5
   {
-    title: 'Market Prices',
-    description: 'Analyze market data to get the best price for your produce.',
-    href: '/market-prices',
-    icon: <Landmark className="w-8 h-8 text-primary" />,
-    imageId: 'market-prices',
-  },
-  {
-    title: 'Subsidy Alerts',
-    description: 'Get notified about relevant government subsidies.',
-    href: '/subsidy-alerts',
-    icon: <Bell className="w-8 h-8 text-primary" />,
-    imageId: 'reminders', // Using reminders image for now
-  },
-  {
-    title: 'Weather Alerts',
-    description: 'Receive real-time weather alerts and farming tips.',
-    href: '/weather-alerts',
-    icon: <CloudSun className="w-8 h-8 text-primary" />,
-    imageId: 'weather-alerts',
-  },
-  {
-    title: 'Farming Reminders',
-    description: 'Set and manage reminders for important farming activities.',
-    href: '/reminders',
-    icon: <CalendarClock className="w-8 h-8 text-primary" />,
-    imageId: 'reminders',
-  },
-  {
-    title: 'Weekly Reports',
-    description: 'Get AI-generated weekly reports with voice summaries.',
-    href: '/reports',
-    icon: <FileText className="w-8 h-8 text-primary" />,
+    title: 'Analytics',
+    description: 'Review yield, profit, and other farm analytics.',
+    href: '/analytics',
+    icon: <LineChart className="w-8 h-8 text-primary" />,
     imageId: 'reminders', // Placeholder
   },
-  {
-    title: 'Drone Hub',
-    description: 'Manage drone operations for NDVI scans and spraying.',
-    href: '/drone-hub',
-    icon: <Wind className="w-8 h-8 text-primary" />,
-    imageId: 'iot-dashboard', // Placeholder
-  },
-  {
+  // Other
+   {
     title: 'Traceability',
     description: 'Track your produce from farm to market with blockchain.',
     href: '/traceability',
-    icon: <Bot className="w-8 h-8 text-primary" />, // Using Bot icon as placeholder
-    imageId: 'market-prices', // Placeholder
+    icon: <Bot className="w-8 h-8 text-primary" />, 
+    imageId: 'market-prices', 
   },
 ];
 
 export default function DashboardPage() {
-  // Sort cards alphabetically by title for a consistent order
   const sortedFeatureCards = featureCards.sort((a, b) => a.title.localeCompare(b.title));
 
   return (
