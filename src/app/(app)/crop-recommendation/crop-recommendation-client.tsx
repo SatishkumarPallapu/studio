@@ -46,20 +46,20 @@ export default function CropRecommendationClient() {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      nitrogen: searchParams.get('N') ? parseFloat(searchParams.get('N')!) : undefined,
-      phosphorus: searchParams.get('P') ? parseFloat(searchParams.get('P')!) : undefined,
-      potassium: searchParams.get('K') ? parseFloat(searchParams.get('K')!) : undefined,
-      ph: searchParams.get('pH') ? parseFloat(searchParams.get('pH')!) : undefined,
+      nitrogen: searchParams.get('N') ? parseFloat(searchParams.get('N')!) : '',
+      phosphorus: searchParams.get('P') ? parseFloat(searchParams.get('P')!) : '',
+      potassium: searchParams.get('K') ? parseFloat(searchParams.get('K')!) : '',
+      ph: searchParams.get('pH') ? parseFloat(searchParams.get('pH')!) : '',
       location: '',
     },
   });
 
   useEffect(() => {
     form.reset({
-      nitrogen: searchParams.get('N') ? parseFloat(searchParams.get('N')!) : undefined,
-      phosphorus: searchParams.get('P') ? parseFloat(search_params.get('P')!) : undefined,
-      potassium: searchParams.get('K') ? parseFloat(search_params.get('K')!) : undefined,
-      ph: searchParams.get('pH') ? parseFloat(search_params.get('pH')!) : undefined,
+      nitrogen: searchParams.get('N') ? parseFloat(searchParams.get('N')!) : '',
+      phosphorus: searchParams.get('P') ? parseFloat(searchParams.get('P')!) : '',
+      potassium: searchParams.get('K') ? parseFloat(searchParams.get('K')!) : '',
+      ph: searchParams.get('pH') ? parseFloat(searchParams.get('pH')!) : '',
       location: form.getValues('location') || '',
     });
   }, [searchParams, form]);
@@ -242,3 +242,5 @@ export default function CropRecommendationClient() {
     </div>
   );
 }
+
+    
