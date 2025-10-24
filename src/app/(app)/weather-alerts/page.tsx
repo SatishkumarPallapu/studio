@@ -4,14 +4,14 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
-import { Cloud, CloudRain, CloudSun, Sun, Windy } from 'lucide-react';
+import { Cloud, CloudRain, CloudSun, Sun, Wind } from 'lucide-react';
 
 const forecastData = [
   { day: 'Today', temp: '32°C', condition: 'Sunny', icon: <Sun className="w-10 h-10 text-yellow-500" /> },
   { day: 'Tomorrow', temp: '30°C', condition: 'Partly Cloudy', icon: <CloudSun className="w-10 h-10 text-gray-500" /> },
   { day: 'Mon', temp: '28°C', condition: 'Cloudy', icon: <Cloud className="w-10 h-10 text-gray-400" /> },
   { day: 'Tue', temp: '27°C', condition: 'Rainy', icon: <CloudRain className="w-10 h-10 text-blue-500" /> },
-  { day: 'Wed', temp: '29°C', condition: 'Windy', icon: <Windy className="w-10 h-10 text-gray-600" /> },
+  { day: 'Wed', temp: '29°C', condition: 'Windy', icon: <Wind className="w-10 h-10 text-gray-600" /> },
 ];
 
 export default function WeatherAlertsPage() {
