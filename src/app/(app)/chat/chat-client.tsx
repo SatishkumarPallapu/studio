@@ -79,8 +79,10 @@ export default function ChatClient() {
       recognitionRef.current = recognition;
 
       recognition.lang = language === 'Telugu' ? 'te-IN' : language === 'Hindi' ? 'hi-IN' : 'en-US';
-      recognition.interimResults = false;
+      recognition.interimResults = true;
       recognition.maxAlternatives = 1;
+      recognition.continuous = true;
+
 
       recognition.onstart = () => {
         setIsRecording(true);
@@ -88,37 +90,22 @@ export default function ChatClient() {
       };
 
       recognition.onresult = (event) => {
-        const transcript = event.results[0][0].transcript;
-        setInput(transcript);
-        // Automatically send the message after transcription
-        setMessages((prevMessages) => {
-            const newMessages = [...prevMessages, { role: 'user', content: transcript }];
-            (async () => {
-                setIsLoading(true);
-                try {
-                    const history = newMessages.map(msg => ({
-                        role: msg.role,
-                        content: [{ text: msg.content }],
-                    }));
-
-                    const result = await chat({ prompt: transcript, language, history });
-                    const modelMessage: Message = { role: 'model', content: result.response };
-                    setMessages((prev) => [...prev, modelMessage]);
-                } catch (error) {
-                    console.error('Chat error:', error);
-                } finally {
-                    setIsLoading(false);
-                }
-            })();
-            return newMessages;
-        });
-        setInput(''); 
+        let interimTranscript = '';
+        let finalTranscript = '';
+        for (let i = 0; i < event.results.length; ++i) {
+          if (event.results[i].isFinal) {
+            finalTranscript += event.results[i][0].transcript;
+          } else {
+            interimTranscript += event.results[i][0].transcript;
+          }
+        }
+        setInput(finalTranscript + interimTranscript);
       };
 
       recognition.onerror = (event) => {
         // The 'aborted' error is common and happens when the user stops speaking.
         // We only want to show a toast for other, more critical errors.
-        if (event.error !== 'aborted') {
+        if (event.error !== 'aborted' && event.error !== 'no-speech') {
           console.error('Speech recognition error:', event.error);
           toast({ variant: 'destructive', title: 'Voice Error', description: 'Could not understand audio.' });
         }
