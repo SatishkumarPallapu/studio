@@ -1,7 +1,7 @@
 'use client';
 
 import * as React from 'react';
-import { usePathname, useRouter } from 'next/navigation';
+import { usePathname } from 'next/navigation';
 import Link from 'next/link';
 import {
   SidebarProvider,
@@ -30,7 +30,6 @@ import {
 import { Icons } from '@/components/icons';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
-import { useFirebase } from '@/firebase';
 
 const navItems = [
   { href: '/dashboard', icon: Home, label: 'Dashboard' },
@@ -43,26 +42,6 @@ const navItems = [
 ];
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
-  const { user, isUserLoading } = useFirebase();
-  const router = useRouter();
-
-  React.useEffect(() => {
-    if (!isUserLoading && !user) {
-      router.push('/login');
-    }
-  }, [user, isUserLoading, router]);
-
-  if (isUserLoading || !user) {
-    return (
-      <div className="flex min-h-screen w-full items-center justify-center bg-muted/40">
-        <div className="flex items-center space-x-2">
-          <Icons.logo className="h-8 w-8 animate-spin text-primary" />
-          <span className="text-xl font-semibold">Loading...</span>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <SidebarProvider>
         <div className="flex min-h-screen w-full flex-col bg-muted/40">
@@ -119,15 +98,6 @@ function AppSidebar() {
 }
 
 function AppHeader() {
-    const { auth } = useFirebase();
-    const router = useRouter();
-
-    const handleLogout = async () => {
-        await auth.signOut();
-        router.push('/login');
-    };
-
-
     return (
         <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-background px-4 sm:static sm:h-auto sm:border-0 sm:bg-transparent sm:px-6">
             <Sheet>
@@ -182,11 +152,6 @@ function AppHeader() {
                     <DropdownMenuSeparator />
                     <DropdownMenuItem>Settings</DropdownMenuItem>
                     <DropdownMenuItem>Support</DropdownMenuItem>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={handleLogout}>
-                        <LogOut className="mr-2 h-4 w-4" />
-                        Logout
-                    </DropdownMenuItem>
                 </DropdownMenuContent>
             </DropdownMenu>
         </header>
