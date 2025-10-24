@@ -1,11 +1,10 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Sprout, Droplets, Leaf, Calendar, Bot, Bell } from 'lucide-react';
+import { Sprout, Droplets, Leaf, Calendar, Bot } from 'lucide-react';
 import MoistureMonitorPage from '../moisture-monitor/page';
 import CropHealthClient from '../crop-health/crop-health-client';
 import CalendarPage from '../calendar/page';
 import ChatClient from '../chat/chat-client';
-import SubsidyAlertsClient from '../subsidies/subsidies-client';
 
 export default function CropDashboardPage() {
   return (
@@ -25,12 +24,11 @@ export default function CropDashboardPage() {
       </Card>
       
       <Tabs defaultValue="iot" className="w-full">
-        <TabsList className="grid w-full grid-cols-5">
+        <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="iot"><Droplets className="mr-2 h-4 w-4" />IoT Monitor</TabsTrigger>
           <TabsTrigger value="health"><Leaf className="mr-2 h-4 w-4" />Crop Health</TabsTrigger>
           <TabsTrigger value="calendar"><Calendar className="mr-2 h-4 w-4" />Calendar</TabsTrigger>
           <TabsTrigger value="assistant"><Bot className="mr-2 h-4 w-4" />AI Assistant</TabsTrigger>
-          <TabsTrigger value="subsidies"><Bell className="mr-2 h-4 w-4" />Subsidies</TabsTrigger>
         </TabsList>
         <TabsContent value="iot">
             <MoistureMonitorPage />
@@ -43,9 +41,6 @@ export default function CropDashboardPage() {
         </TabsContent>
         <TabsContent value="assistant">
             <ChatClient />
-        </TabsContent>
-        <TabsContent value="subsidies">
-            <SubsidyAlertsClient />
         </TabsContent>
       </Tabs>
     </div>
