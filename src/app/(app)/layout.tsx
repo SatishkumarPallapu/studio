@@ -4,9 +4,6 @@ import * as React from 'react';
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
 import {
-  SidebarProvider,
-} from '@/components/ui/sidebar';
-import {
   Bell,
   CalendarClock,
   Carrot,
@@ -22,6 +19,9 @@ import {
   Settings,
   ShoppingBasket,
   ThermometerSun,
+  FileText,
+  Wind,
+  Bot
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -49,11 +49,13 @@ const navItems = [
   { href: '/subsidy-alerts', icon: Bell, label: 'Subsidy Alerts' },
   { href: '/weather-alerts', icon: CloudSun, label: 'Weather Alerts' },
   { href: '/reminders', icon: CalendarClock, label: 'Reminders' },
-];
+  { href: '/reports', icon: FileText, label: 'Weekly Reports' },
+  { href: '/drone-hub', icon: Wind, label: 'Drone Hub' },
+  { href: '/traceability', icon: Bot, label: 'Traceability' },
+].sort((a, b) => a.label.localeCompare(b.label)); // Sort nav items alphabetically
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   return (
-    <SidebarProvider>
         <div className="flex min-h-screen w-full flex-col bg-muted/40">
             <AppSidebar />
             <div className="flex flex-col sm:gap-4 sm:py-4 sm:pl-14">
@@ -63,7 +65,6 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                 </main>
             </div>
         </div>
-    </SidebarProvider>
   );
 }
 
@@ -169,6 +170,13 @@ function AppHeader() {
                     <DropdownMenuSeparator />
                     <DropdownMenuItem>Settings</DropdownMenuItem>
                     <DropdownMenuItem>Support</DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem>
+                        <Link href="/login" className="flex items-center">
+                            <LogOut className="mr-2 h-4 w-4" />
+                            <span>Logout</span>
+                        </Link>
+                    </DropdownMenuItem>
                 </DropdownMenuContent>
             </DropdownMenu>
         </header>

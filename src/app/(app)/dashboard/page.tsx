@@ -1,7 +1,7 @@
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
-import { Bell, CalendarClock, Carrot, CloudSun, Combine, Droplets, Landmark, Leaf, ShoppingBasket, ThermometerSun } from 'lucide-react';
+import { FileText, Bell, CalendarClock, Carrot, CloudSun, Combine, Droplets, Landmark, Leaf, ShoppingBasket, ThermometerSun, Wind, Bot } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 
@@ -76,9 +76,33 @@ const featureCards = [
     icon: <CalendarClock className="w-8 h-8 text-primary" />,
     imageId: 'reminders',
   },
+  {
+    title: 'Weekly Reports',
+    description: 'Get AI-generated weekly reports with voice summaries.',
+    href: '/reports',
+    icon: <FileText className="w-8 h-8 text-primary" />,
+    imageId: 'reminders', // Placeholder
+  },
+  {
+    title: 'Drone Hub',
+    description: 'Manage drone operations for NDVI scans and spraying.',
+    href: '/drone-hub',
+    icon: <Wind className="w-8 h-8 text-primary" />,
+    imageId: 'iot-dashboard', // Placeholder
+  },
+  {
+    title: 'Traceability',
+    description: 'Track your produce from farm to market with blockchain.',
+    href: '/traceability',
+    icon: <Bot className="w-8 h-8 text-primary" />, // Using Bot icon as placeholder
+    imageId: 'market-prices', // Placeholder
+  },
 ];
 
 export default function DashboardPage() {
+  // Sort cards alphabetically by title for a consistent order
+  const sortedFeatureCards = featureCards.sort((a, b) => a.title.localeCompare(b.title));
+
   return (
     <div className="space-y-6">
       <div className="text-center md:text-left">
@@ -86,7 +110,7 @@ export default function DashboardPage() {
         <p className="text-muted-foreground">Here&apos;s your farm&apos;s command center.</p>
       </div>
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-        {featureCards.map((feature) => {
+        {sortedFeatureCards.map((feature) => {
           const image = PlaceHolderImages.find((img) => img.id === feature.imageId);
           return (
             <Card key={feature.title} className="flex flex-col overflow-hidden hover:shadow-lg transition-shadow duration-300">
