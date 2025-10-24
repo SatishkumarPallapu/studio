@@ -15,6 +15,7 @@ import {
   Landmark,
   Leaf,
   LogOut,
+  MessageCircle,
   PanelLeft,
   Settings,
   ThermometerSun,
@@ -34,6 +35,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/co
 
 const navItems = [
   { href: '/dashboard', icon: Home, label: 'Dashboard' },
+  { href: '/chat', icon: MessageCircle, label: 'Chat' },
   { href: '/crop-recommendation', icon: Carrot, label: 'Crop Recommendation' },
   { href: '/crop-health', icon: Leaf, label: 'Crop Health' },
   { href: '/soil-health', icon: Droplets, label: 'Soil Health' },
