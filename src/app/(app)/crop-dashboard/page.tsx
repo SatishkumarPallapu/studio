@@ -1,11 +1,12 @@
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Sprout, Droplets, Leaf, Calendar, Bot } from 'lucide-react';
+import { Sprout, Droplets, Leaf, Calendar, Bot, Satellite } from 'lucide-react';
 import MoistureMonitorPage from '../moisture-monitor/page';
 import CropHealthClient from '../crop-health/crop-health-client';
 import CalendarPage from '../calendar/page';
 import ChatClient from '../chat/chat-client';
+import SatelliteHealthPage from './satellite-health/page';
 
 export default function CropDashboardPage() {
     // In a real application, you would fetch the authenticated user's
@@ -29,14 +30,22 @@ export default function CropDashboardPage() {
       </Card>
       
       <Tabs defaultValue="iot" className="w-full">
-        <TabsList className="grid w-full grid-cols-4">
-          <TabsTrigger value="iot"><Droplets className="mr-2 h-4 w-4" />IoT Monitor</TabsTrigger>
-          <TabsTrigger value="health"><Leaf className="mr-2 h-4 w-4" />Crop Health</TabsTrigger>
-          <TabsTrigger value="calendar"><Calendar className="mr-2 h-4 w-4" />Calendar</TabsTrigger>
-          <TabsTrigger value="assistant"><Bot className="mr-2 h-4 w-4" />AI Assistant</TabsTrigger>
-        </TabsList>
+        <div className="relative">
+          <div className="overflow-x-auto pb-2">
+            <TabsList className="inline-flex items-center justify-start w-max space-x-1.5 h-auto">
+              <TabsTrigger value="iot"><Droplets className="mr-2 h-4 w-4" />IoT Monitor</TabsTrigger>
+              <TabsTrigger value="satellite"><Satellite className="mr-2 h-4 w-4" />Satellite</TabsTrigger>
+              <TabsTrigger value="health"><Leaf className="mr-2 h-4 w-4" />Crop Health</TabsTrigger>
+              <TabsTrigger value="calendar"><Calendar className="mr-2 h-4 w-4" />Calendar</TabsTrigger>
+              <TabsTrigger value="assistant"><Bot className="mr-2 h-4 w-4" />AI Assistant</TabsTrigger>
+            </TabsList>
+          </div>
+        </div>
         <TabsContent value="iot">
             <MoistureMonitorPage />
+        </TabsContent>
+        <TabsContent value="satellite">
+            <SatelliteHealthPage />
         </TabsContent>
         <TabsContent value="health">
             <CropHealthClient />
@@ -51,4 +60,3 @@ export default function CropDashboardPage() {
     </div>
   );
 }
-
