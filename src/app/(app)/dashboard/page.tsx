@@ -1,9 +1,8 @@
 'use client';
 import * as React from 'react';
-import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
-import { FileText, Bell, Calendar, Carrot, LineChart, Combine, Droplets, Landmark, Leaf, ShoppingBasket, ThermometerSun, User, Bot, CloudSun } from 'lucide-react';
+import { Carrot, CloudSun } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useLanguage } from '@/contexts/language-context';
@@ -102,25 +101,22 @@ export default function DashboardPage() {
           <CarouselContent>
             {matchedSubsidies.map((subsidy) => (
               <CarouselItem key={subsidy.id} className="md:basis-1/2 lg:basis-1/3">
-                <div className="p-1 h-full">
-                  <Card className="flex flex-col h-full overflow-hidden">
-                    <CardHeader>
-                      <CardTitle className="text-xl">{subsidy.title}</CardTitle>
-                      <CardDescription>{subsidy.description}</CardDescription>
-                    </CardHeader>
-                    <CardContent className="flex-grow space-y-4">
-                        <div>
-                            <h4 className="font-semibold text-sm">Benefits</h4>
-                            <p className="text-sm text-muted-foreground">{subsidy.eligibility}</p>
-                        </div>
-                    </CardContent>
-                    <div className="p-6 pt-0">
-                         <Button asChild className="w-full">
-                            <Link href={subsidy.link}>Apply Now</Link>
-                        </Button>
-                    </div>
-                  </Card>
-                </div>
+                <Link href={subsidy.link} className="h-full block">
+                  <div className="p-1 h-full">
+                    <Card className="flex flex-col h-full overflow-hidden hover:bg-muted/50 transition-colors">
+                      <CardHeader>
+                        <CardTitle className="text-xl">{subsidy.title}</CardTitle>
+                        <CardDescription>{subsidy.description}</CardDescription>
+                      </CardHeader>
+                      <CardContent className="flex-grow space-y-4">
+                          <div>
+                              <h4 className="font-semibold text-sm">Benefits</h4>
+                              <p className="text-sm text-muted-foreground">{subsidy.eligibility}</p>
+                          </div>
+                      </CardContent>
+                    </Card>
+                  </div>
+                </Link>
               </CarouselItem>
             ))}
           </CarouselContent>
@@ -131,31 +127,33 @@ export default function DashboardPage() {
         {dashboardCards.map((feature) => {
           const image = PlaceHolderImages.find((img) => img.id === feature.imageId);
           return (
-            <Card key={feature.title} className="flex flex-col overflow-hidden hover:shadow-lg transition-shadow duration-300">
-              {image && (
-                <div className="aspect-video relative">
-                    <Image
-                    src={image.imageUrl}
-                    alt={image.description}
-                    fill
-                    className="object-cover"
-                    data-ai-hint={image.imageHint}
-                    />
-                </div>
-              )}
-              <CardHeader className="flex-row items-start gap-4 space-y-0">
-                <div className="flex-shrink-0">{feature.icon}</div>
-                <div className="flex-grow">
-                  <CardTitle>{feature.title}</CardTitle>
-                  <CardDescription>{feature.description}</CardDescription>
-                </div>
-              </CardHeader>
-              <CardContent className="mt-auto">
-                <Button asChild className="w-full bg-primary hover:bg-primary/90">
-                  <Link href={feature.href}>{translations.dashboard.viewDetails}</Link>
-                </Button>
-              </CardContent>
-            </Card>
+            <Link href={feature.href} key={feature.title} className="flex flex-col">
+                <Card className="flex flex-col flex-1 overflow-hidden hover:shadow-lg transition-shadow duration-300">
+                {image && (
+                    <div className="aspect-video relative">
+                        <Image
+                        src={image.imageUrl}
+                        alt={image.description}
+                        fill
+                        className="object-cover"
+                        data-ai-hint={image.imageHint}
+                        />
+                    </div>
+                )}
+                <CardHeader className="flex-row items-start gap-4 space-y-0">
+                    <div className="flex-shrink-0">{feature.icon}</div>
+                    <div className="flex-grow">
+                    <CardTitle>{feature.title}</CardTitle>
+                    <CardDescription>{feature.description}</CardDescription>
+                    </div>
+                </CardHeader>
+                <CardContent className="mt-auto">
+                    <div className="w-full bg-primary hover:bg-primary/90 text-primary-foreground text-center p-2 rounded-md">
+                        {translations.dashboard.viewDetails}
+                    </div>
+                </CardContent>
+                </Card>
+            </Link>
           );
         })}
       </div>
