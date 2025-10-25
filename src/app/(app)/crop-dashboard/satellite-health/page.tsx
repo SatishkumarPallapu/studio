@@ -1,0 +1,156 @@
+
+'use client';
+
+import { useState, useEffect, useMemo } from 'react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
+import { Badge } from '@/components/ui/badge';
+import { AlertCircle, CheckCircle, TrendingUp, Zap } from 'lucide-react';
+import { useFirebase, useUser } from '@/firebase';
+import { useCollection } from '@/firebase/firestore/use-collection';
+import { collection, query, orderBy, limit } from 'firebase/firestore';
+
+type SatelliteHealthData = {
+    date: string;
+    ndvi: number;
+    healthStatus: 'Healthy' | 'Moderate Stress' | 'Severe Stress';
+    advice: string;
+};
+
+// Mock data to use when no live data is available
+const mockSatelliteData: SatelliteHealthData[] = [
+    { date: '2024-06-01', ndvi: 0.68, healthStatus: 'Moderate Stress', advice: 'Stress detected. Check irrigation or nutrient levels.' },
+    { date: '2024-06-08', ndvi: 0.75, healthStatus: 'Healthy', advice: 'Crop appears healthy. Maintain current practices.' },
+    { date: '2024-06-15', ndvi: 0.72, healthStatus: 'Healthy', advice: 'Slight dip in health, monitor closely.' },
+    { date: '2024-06-22', ndvi: 0.81, healthStatus: 'Healthy', advice: 'Excellent health. Crop is thriving.' },
+    { date: '2024-06-29', ndvi: 0.79, healthStatus: 'Healthy', advice: 'Stable and healthy. Continue monitoring.' },
+];
+
+const getStatusInfo = (status: SatelliteHealthData['healthStatus']) => {
+    switch (status) {
+        case 'Healthy':
+            return {
+                variant: 'default',
+                icon: <CheckCircle className="h-5 w-5 text-green-500" />,
+                className: 'bg-green-100/50 text-green-800 border-green-200',
+            };
+        case 'Moderate Stress':
+            return {
+                variant: 'secondary',
+                icon: <Zap className="h-5 w-5 text-yellow-500" />,
+                className: 'bg-yellow-100/50 text-yellow-800 border-yellow-200',
+            };
+        case 'Severe Stress':
+            return {
+                variant: 'destructive',
+                icon: <AlertCircle className="h-5 w-5 text-red-500" />,
+                className: 'bg-red-100/50 text-red-800 border-red-200',
+            };
+        default:
+            return {
+                variant: 'secondary',
+                icon: <CheckCircle className="h-5 w-5" />,
+                className: '',
+            };
+    }
+};
+
+export default function SatelliteHealthPage() {
+    const { firestore } = useFirebase();
+    const { user } = useUser();
+    
+    // Hardcoded for prototype
+    const userId = user?.uid ?? 'mock-user';
+    const cropId = 'tomato-123';
+
+    const healthCollectionQuery = useMemo(() => {
+        if (!firestore) return null;
+        return query(
+            collection(firestore, `users/${userId}/crops/${cropId}/satelliteHealth`),
+            orderBy('date', 'desc'),
+            limit(10)
+        );
+    }, [firestore, userId, cropId]);
+
+    const { data: liveData, isLoading } = useCollection<SatelliteHealthData>(healthCollectionQuery);
+    
+    const [latestData, setLatestData] = useState<SatelliteHealthData | null>(null);
+    const [chartData, setChartData] = useState<SatelliteHealthData[]>([]);
+
+    useEffect(() => {
+        // Use live data if available and not loading, otherwise use mock data
+        const data = !isLoading && liveData && liveData.length > 0 ? liveData : mockSatelliteData;
+        
+        // Data is ordered desc, so reverse for chart and take first for latest
+        const sortedData = [...data].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+
+        setChartData(sortedData);
+        setLatestData(sortedData.length > 0 ? sortedData[sortedData.length - 1] : null);
+
+    }, [liveData, isLoading]);
+
+    const statusInfo = latestData ? getStatusInfo(latestData.healthStatus) : getStatusInfo('Healthy');
+
+    return (
+        <div className="space-y-6">
+            <Card>
+                <CardHeader>
+                    <CardTitle>Satellite Health Monitoring (NDVI)</CardTitle>
+                    <CardDescription>Weekly crop health analysis based on satellite imagery.</CardDescription>
+                </CardHeader>
+            </Card>
+
+            {latestData && (
+                <Card className={statusInfo.className}>
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                        <CardTitle className="text-sm font-medium">Latest Health Status</CardTitle>
+                        {statusInfo.icon}
+                    </CardHeader>
+                    <CardContent>
+                        <div className="text-2xl font-bold">{latestData.healthStatus}</div>
+                        <p className="text-xs text-muted-foreground">{latestData.advice}</p>
+                    </CardContent>
+                </Card>
+            )}
+
+            <Card>
+                <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                        <TrendingUp className="w-5 h-5" />
+                        NDVI Health Trend
+                    </CardTitle>
+                    <CardDescription>Visualizing crop health over the last few weeks.</CardDescription>
+                </CardHeader>
+                <CardContent>
+                    <div className="h-[250px] w-full">
+                        <ResponsiveContainer>
+                            <AreaChart data={chartData}>
+                                <defs>
+                                    <linearGradient id="colorNdvi" x1="0" y1="0" x2="0" y2="1">
+                                        <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.8}/>
+                                        <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0}/>
+                                    </linearGradient>
+                                </defs>
+                                <XAxis 
+                                    dataKey="date" 
+                                    tickFormatter={(str) => new Date(str).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                                    style={{ fontSize: '12px' }}
+                                />
+                                <YAxis domain={[0, 1]} style={{ fontSize: '12px' }} />
+                                <Tooltip 
+                                    contentStyle={{ 
+                                        borderRadius: 'var(--radius)', 
+                                        border: '1px solid hsl(var(--border))',
+                                        background: 'hsl(var(--background))'
+                                    }}
+                                    labelFormatter={(label) => new Date(label).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
+                                />
+                                <Area type="monotone" dataKey="ndvi" stroke="hsl(var(--primary))" fillOpacity={1} fill="url(#colorNdvi)" />
+                            </AreaChart>
+                        </ResponsiveContainer>
+                    </div>
+                </CardContent>
+            </Card>
+        </div>
+    );
+}
