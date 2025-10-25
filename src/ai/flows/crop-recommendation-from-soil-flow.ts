@@ -46,10 +46,57 @@ const prompt = ai.definePrompt({
 
 Based on the provided soil data and location, recommend 3 to 5 suitable crops. Prioritize crops with shorter growth cycles (quick cash crops) and those that work well in intercropping systems.
 
-You MUST ONLY choose from the following list of crops:
+Your recommendations must be based on the following high-value, fast-ROI crops and enterprises. Do NOT use any other crops.
+
+---
+### High-Value, Fast ROI Crops & Enterprises for Smallholders
+
+1.  **Moringa (Drumstick)**
+    -   **ROI Time:** 5–6 months per cycle
+    -   **Profit Margin:** ₹3–5 lakh/acre annually
+    -   **Why:** Drought-tolerant, low-input, used in exports, nutraceuticals, and powders. Excellent intercrop for vegetables.
+
+2.  **Stevia (Natural Sweetener Leaf)**
+    -   **ROI Time:** 4–5 months per harvest (multiple cuts/year)
+    -   **Profit Margin:** ₹4–6 lakh/acre/year through pharma and food contracts
+    -   **Why:** Heavy demand from health-conscious markets. Low water needs.
+
+3.  **Exotic Vegetables (in Polyhouse/Net House)**
+    -   **ROI Time:** 3–4 months
+    -   **Profit Margin:** ₹6–10 lakh/acre/year
+    -   **Best Crops:** Bell pepper, zucchini, broccoli, lettuce, cherry tomato
+    -   **Why:** Premium prices from restaurants and hotels.
+
+4.  **Mushrooms (Oyster, Button, or Shiitake)**
+    -   **ROI Time:** 45–60 days
+    -   **Profit Margin:** ₹2–8 lakh/year from a 500 sq ft shed
+    -   **Why:** Ideal for small spaces, quick turnover, high demand.
+
+5.  **Turmeric and Ginger**
+    -   **ROI Time:** 8–10 months
+    -   **Profit Margin:** ₹2.5–4 lakh/acre
+    -   **Why:** Long shelf life, export potential, thrives in mixed-cropping.
+
+6.  **Medicinal & Herbal Crops (Ashwagandha, Aloe Vera, Lemongrass)**
+    -   **ROI Time:** 6–9 months
+    -   **Profit Margin:** ₹3–7 lakh/acre/year
+    -   **Why:** Used in pharma, cosmetics. High foreign exchange value.
+
+7.  **Microgreens & Hydroponics**
+    -   **ROI Time:** 10–20 days (fastest ROI)
+    -   **Profit Margin:** ₹20–25 lakh/year in small indoor setups
+    -   **Why:** Fast yield, minimal space, high-end restaurant demand.
+
+8.  **Dragon Fruit Farming**
+    -   **ROI Time:** 8–12 months
+    -   **Profit Margin:** ₹6–8 lakh/acre/year after maturity
+    -   **Why:** High export demand, survives arid zones, minimal pesticides.
+
+---
+You may also recommend from this list of common Indian crops if they fit the profitability goal:
 - Tomato
 - Mint (Pudina)
-- Coriander (Kothimir / Kothimeera)
+- Coriander (Kothimir)
 - Marigold (Kalya Maku)
 - Maize / Corn (Mokka Jonna)
 - Paddy (Rice crop)
