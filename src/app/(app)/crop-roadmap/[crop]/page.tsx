@@ -1,4 +1,5 @@
-
+'use client';
+import { useState, useEffect } from 'react';
 import {
   Card,
   CardContent,
@@ -6,8 +7,8 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { generateCropRoadmap } from '@/ai/flows/crop-roadmap-flow';
-import { CheckCircle2, CalendarDays, Sprout } from 'lucide-react';
+import { generateCropRoadmap, CropRoadmapOutput } from '@/ai/flows/crop-roadmap-flow';
+import { CheckCircle2, Sprout, Loader2 } from 'lucide-react';
 import {
   Accordion,
   AccordionContent,
@@ -16,13 +17,42 @@ import {
 } from "@/components/ui/accordion"
 import StartTrackingButton from './start-tracking-button';
 
-export default async function CropRoadmapPage({
+export default function CropRoadmapPage({
   params,
 }: {
   params: { crop: string };
 }) {
+  const [roadmap, setRoadmap] = useState<CropRoadmapOutput | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
   const cropName = decodeURIComponent(params.crop.replace(/-/g, ' '));
-  const roadmap = await generateCropRoadmap({ cropName });
+
+  useEffect(() => {
+    const fetchRoadmap = async () => {
+      try {
+        setIsLoading(true);
+        const result = await generateCropRoadmap({ cropName });
+        setRoadmap(result);
+      } catch (error) {
+        console.error("Failed to fetch crop roadmap:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchRoadmap();
+  }, [cropName]);
+  
+  if (isLoading) {
+    return (
+        <div className="flex items-center justify-center h-96">
+            <Loader2 className="w-12 h-12 text-primary animate-spin" />
+        </div>
+    );
+  }
+
+  if (!roadmap) {
+    return <p>Failed to load roadmap.</p>;
+  }
 
   const activitiesByStage = roadmap.activities.reduce((acc, activity) => {
     const stage = activity.stage;
