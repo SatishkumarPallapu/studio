@@ -13,6 +13,7 @@ import {
   Wind,
   FileText,
   ScanEye,
+  Tangent,
 } from 'lucide-react';
 import { Icons } from '@/components/icons';
 import { LanguageProvider, useLanguage } from '@/contexts/language-context';
@@ -31,6 +32,7 @@ const mainNavItems = [
     { href: '/dashboard', label: 'Dashboard' },
     { href: '/soil-analysis', label: 'Soil Analysis' },
     { href: '/crop-recommendation', label: 'Crop Recommendation' },
+    { href: '/crop-planner', label: 'Multi-Crop Planner' },
     { href: '/crop-dashboard', label: 'Crop Lifecycle' },
     { href: '/drone-hub', label: 'Drone Hub'},
     { href: '/reports', label: 'Weekly Reports'},
