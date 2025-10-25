@@ -1,3 +1,4 @@
+
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Sprout, Droplets, Leaf, Calendar, Bot } from 'lucide-react';
@@ -7,6 +8,10 @@ import CalendarPage from '../calendar/page';
 import ChatClient from '../chat/chat-client';
 
 export default function CropDashboardPage() {
+    // In a real application, you would fetch the authenticated user's
+    // phone number from your database (e.g., Firestore).
+    const mockFarmerPhone = '+919999999999'; // Replace with a real number for testing
+
   return (
     <div className="space-y-6">
       <Card>
@@ -40,9 +45,10 @@ export default function CropDashboardPage() {
             <CalendarPage />
         </TabsContent>
         <TabsContent value="assistant">
-            <ChatClient />
+            <ChatClient farmerPhone={mockFarmerPhone} />
         </TabsContent>
       </Tabs>
     </div>
   );
 }
+

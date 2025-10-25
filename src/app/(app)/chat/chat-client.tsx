@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
@@ -21,7 +22,7 @@ type Message = {
 };
 
 interface ChatClientProps {
-  farmerPhone: string;
+  farmerPhone?: string;
 }
 
 // Custom Icon for WhatsApp
@@ -61,11 +62,14 @@ export default function ChatClient({ farmerPhone }: ChatClientProps) {
   const initialTip = translations.chat.initialTip;
 
   useEffect(() => {
-    const sendInitialTip = async () => {
-      // Show AI tip in chat
+    // Show AI tip in chat on initial load
+    if (messages.length === 0) {
       setMessages([{ role: 'model', content: initialTip }]);
-
-      // Send tip via WhatsApp
+    }
+    
+    // Function to send the initial tip via WhatsApp
+    const sendInitialWhatsAppTip = async () => {
+        if (!farmerPhoneRef.current) return;
       try {
         await fetch('/api/send-whatsapp', {
           method: 'POST',
@@ -82,7 +86,7 @@ export default function ChatClient({ farmerPhone }: ChatClientProps) {
       }
     };
 
-    sendInitialTip();
+    // sendInitialWhatsAppTip(); // Uncomment to send tip on load
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [initialTip]);
 
@@ -331,3 +335,4 @@ export default function ChatClient({ farmerPhone }: ChatClientProps) {
     </div>
   );
 }
+
