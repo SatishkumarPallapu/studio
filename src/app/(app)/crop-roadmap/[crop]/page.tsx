@@ -1,3 +1,4 @@
+
 import {
   Card,
   CardContent,
@@ -63,7 +64,7 @@ export default async function CropRoadmapPage({
                 <AccordionContent>
                     <div className="p-4 space-y-4">
                         {activities.map((activity) => (
-                            <Card key={activity.day} className="relative overflow-hidden">
+                            <Card key={`${activity.day}-${activity.activity}`} className="relative overflow-hidden">
                                 <div className="absolute top-4 right-4 bg-primary text-primary-foreground rounded-full h-8 w-8 flex items-center justify-center font-bold text-sm">
                                 {activity.day}
                                 </div>
