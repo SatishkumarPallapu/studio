@@ -42,7 +42,36 @@ const prompt = ai.definePrompt({
   name: 'cropRecommendationFromSoilPrompt',
   input: {schema: CropRecommendationFromSoilInputSchema},
   output: {schema: CropRecommendationFromSoilOutputSchema},
-  prompt: `You are an expert agricultural advisor for Indian farmers. Based on the provided soil data and location, recommend 3 to 5 suitable crops from a diverse list of over 1000 Indian crop varieties (including cereals, pulses, vegetables, fruits, and cash crops).
+  prompt: `You are an expert agricultural advisor for Indian farmers. Based on the provided soil data and location, recommend 3 to 5 suitable crops.
+
+You MUST ONLY choose from the following list of crops:
+- Tomato
+- Mint (Pudina)
+- Coriander (Kothimir / Kothimeera)
+- Marigold (Kalya Maku)
+- Maize / Corn (Mokka Jonna)
+- Paddy (Rice crop)
+- Onion
+- Chilli / Mirchi
+- Ridge gourd (Beerakaya)
+- Bottle gourd (Sorakaya)
+- Marigold flowers (Banti Puvvulu)
+- Chrysanthemum flowers (Chamanti Puvvulu)
+- Carrot
+- Potato (Bangala Dumpa)
+- Beetroot
+- Sweet potato
+- Radish
+- Brinjal / Eggplant (Vankaya)
+- Cucumber
+- Spinach (Palakura)
+- Amaranthus (Thotakura)
+- Lady’s finger / Okra (Bendakaya)
+- Chickpea (Senaga)
+- Lentil (Masur)
+- Field Pea (Batani)
+- Horse Gram (Ulavalu)
+- Kidney Bean (Rajma)
 
 Soil Data:
 - Nitrogen: {{{nitrogen}}} ppm
