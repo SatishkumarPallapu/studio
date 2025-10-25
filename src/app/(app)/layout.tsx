@@ -36,6 +36,7 @@ import {
   SidebarProvider,
   SidebarTrigger,
   SidebarInset,
+  useSidebar,
 } from '@/components/ui/sidebar';
 
 const bottomNavItems = [
@@ -139,6 +140,7 @@ function AppHeader() {
 
 function AppSidebar() {
   const pathname = usePathname();
+  const { setOpen } = useSidebar();
   return (
     <Sidebar className="border-r" collapsible="icon">
         <SidebarHeader>
@@ -146,11 +148,11 @@ function AppSidebar() {
                 <Icons.logo className="w-8 h-8 text-primary" />
             </Link>
         </SidebarHeader>
-        <SidebarContent>
+        <SidebarContent className="group-data-[collapsible=icon]:overflow-hidden">
             <SidebarMenu>
                 {mainNavItems.map(item => (
                     <SidebarMenuItem key={item.href}>
-                         <Link href={item.href}>
+                         <Link href={item.href} onClick={() => setOpen(false)}>
                             <SidebarMenuButton
                                 tooltip={{children: item.label}}
                                 isActive={pathname.startsWith(item.href)}
