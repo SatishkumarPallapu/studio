@@ -4,7 +4,7 @@
 import { useState, useMemo } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { IndianRupee, Search, PlusCircle, ArrowUp, ArrowDown, Carrot, Apple, Wheat, Grape, Sunflower } from 'lucide-react';
+import { IndianRupee, Search, PlusCircle, ArrowUp, ArrowDown, Carrot, Apple, Wheat, Grape, Flower2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -18,7 +18,7 @@ import {
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 
-type Category = 'Vegetable' | 'Fruit' | 'Pulse' | 'Grain' | 'Flower' | 'Paddy';
+type Category = 'Vegetable' | 'Fruit' | 'Pulse' | 'Grain' | 'Paddy' | 'Flower';
 
 type Crop = {
     name: string;
@@ -148,7 +148,7 @@ const categoryIcons: Record<Category, React.ReactNode> = {
     Pulse: <Grape className="h-8 w-8 text-purple-500" />, // No direct icon, using grape as placeholder
     Grain: <Wheat className="h-8 w-8 text-yellow-600" />,
     Paddy: <Wheat className="h-8 w-8 text-amber-500" />,
-    Flower: <Sunflower className="h-8 w-8 text-yellow-400" />,
+    Flower: <Flower2 className="h-8 w-8 text-pink-500" />,
 };
 
 const categories: Category[] = ['Vegetable', 'Fruit', 'Pulse', 'Grain', 'Paddy', 'Flower'];
@@ -266,7 +266,7 @@ export default function MarketplaceClient() {
                         <div className={`flex items-center justify-between text-xs ${getPriceColor(crop.price, crop.yesterdayPrice)}`}>
                             <p>Yesterday: ₹{crop.yesterdayPrice}/{crop.unit}</p>
                             <div className="flex items-center font-semibold">
-                                {getPriceIndicator(crop.price, crop.yesterdayPrice)}
+                                {getPriceIndicator(crop.price, crop.yesterday)}
                                 {Math.abs(crop.price - crop.yesterdayPrice)}
                             </div>
                         </div>
@@ -293,3 +293,5 @@ export default function MarketplaceClient() {
     </div>
   );
 }
+
+    
