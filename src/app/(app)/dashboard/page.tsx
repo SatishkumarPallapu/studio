@@ -43,13 +43,13 @@ export default function DashboardPage() {
 
         <div className="grid grid-cols-2 gap-4">
             <Button asChild className="h-20 bg-primary hover:bg-primary/90 text-primary-foreground text-lg">
-                <Link href="/crop-recommendation">
+                <Link href="/crop-recommendation" className="flex flex-col items-center justify-center text-center">
                     <Atom className="mr-2 h-6 w-6" />
                     AI Recommendations
                 </Link>
             </Button>
             <Button asChild className="h-20 bg-accent hover:bg-accent/90 text-accent-foreground text-lg">
-                 <Link href="/chat">
+                 <Link href="/chat" className="flex flex-col items-center justify-center text-center">
                     <MessageSquare className="mr-2 h-6 w-6" />
                     Voice Chat
                 </Link>
