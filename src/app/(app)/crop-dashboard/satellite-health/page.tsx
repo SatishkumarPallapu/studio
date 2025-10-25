@@ -57,29 +57,31 @@ const getStatusInfo = (status: SatelliteHealthData['healthStatus']) => {
 
 export default function SatelliteHealthPage() {
     const { firestore } = useFirebase();
-    const { user } = useUser();
+    const { user, isUserLoading } = useUser();
     
-    // Hardcoded for prototype
-    const userId = user?.uid ?? 'mock-user';
+    // Hardcoded for prototype, but will use real user ID when available
     const cropId = 'tomato-123';
 
     const healthCollectionQuery = useMemoFirebase(() => {
-        if (!firestore) return null;
+        // Wait for auth to finish and services to be available.
+        if (isUserLoading || !user || !firestore) {
+            return null;
+        }
         return query(
-            collection(firestore, `users/${userId}/crops/${cropId}/satelliteHealth`),
+            collection(firestore, `users/${user.uid}/crops/${cropId}/satelliteHealth`),
             orderBy('date', 'desc'),
             limit(10)
         );
-    }, [firestore, userId, cropId]);
+    }, [firestore, user, isUserLoading, cropId]);
 
-    const { data: liveData, isLoading } = useCollection<SatelliteHealthData>(healthCollectionQuery);
+    const { data: liveData, isLoading: isCollectionLoading } = useCollection<SatelliteHealthData>(healthCollectionQuery);
     
     const [latestData, setLatestData] = useState<SatelliteHealthData | null>(null);
     const [chartData, setChartData] = useState<SatelliteHealthData[]>([]);
 
     useEffect(() => {
         // Use live data if available and not loading, otherwise use mock data
-        const data = !isLoading && liveData && liveData.length > 0 ? liveData : mockSatelliteData;
+        const data = !isCollectionLoading && liveData && liveData.length > 0 ? liveData : mockSatelliteData;
         
         // Data is ordered desc, so reverse for chart and take first for latest
         const sortedData = [...data].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
@@ -87,9 +89,18 @@ export default function SatelliteHealthPage() {
         setChartData(sortedData);
         setLatestData(sortedData.length > 0 ? sortedData[sortedData.length - 1] : null);
 
-    }, [liveData, isLoading]);
+    }, [liveData, isCollectionLoading]);
 
     const statusInfo = latestData ? getStatusInfo(latestData.healthStatus) : getStatusInfo('Healthy');
+
+    if (isUserLoading) {
+        return (
+            <div className="flex justify-center items-center h-64">
+                <p className="text-muted-foreground">Authenticating user...</p>
+            </div>
+        );
+    }
+
 
     return (
         <div className="space-y-6">
