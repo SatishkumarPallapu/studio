@@ -1,5 +1,5 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Droplets, Thermometer, Sun, Sprout } from 'lucide-react';
+import { Droplets, Thermometer, Sun, Sprout, TrendingUp } from 'lucide-react';
 
 const iotData = {
   temperature: 28.5,
@@ -10,28 +10,32 @@ const iotData = {
 
 const sensorCards = [
   {
+    title: 'Soil Moisture',
+    value: `${iotData.soilMoisture}%`,
+    icon: <Sprout className="w-5 h-5 text-green-600" />,
+    description: 'Good level',
+    color: 'text-green-600'
+  },
+  {
     title: 'Temperature',
     value: `${iotData.temperature}°C`,
-    icon: <Thermometer className="w-8 h-8 text-red-500" />,
-    description: 'Ambient air temperature',
+    icon: <Thermometer className="w-5 h-5 text-red-500" />,
+    description: 'Optimal',
+    color: 'text-red-500'
   },
   {
     title: 'Humidity',
     value: `${iotData.humidity}%`,
-    icon: <Droplets className="w-8 h-8 text-blue-500" />,
-    description: 'Air moisture level',
-  },
-  {
-    title: 'Soil Moisture',
-    value: `${iotData.soilMoisture}%`,
-    icon: <Sprout className="w-8 h-8 text-green-500" />,
-    description: 'Water content in the soil',
+    icon: <Droplets className="w-5 h-5 text-blue-500" />,
+    description: 'Normal',
+    color: 'text-blue-500'
   },
   {
     title: 'Light Intensity',
     value: `${iotData.lightIntensity} lux`,
-    icon: <Sun className="w-8 h-8 text-yellow-500" />,
-    description: 'Sunlight exposure',
+    icon: <Sun className="w-5 h-5 text-yellow-500" />,
+    description: 'Bright',
+    color: 'text-yellow-500'
   },
 ];
 
@@ -42,19 +46,19 @@ export default function MoistureMonitorPage() {
         <CardHeader>
           <CardTitle>IoT Sensor Dashboard</CardTitle>
           <CardDescription>
-            Real-time data from your on-field ESP32 sensors (Mock Data). This page is also available in your Crop Lifecycle Dashboard.
+            Real-time data from your on-field ESP32 sensors (Mock Data).
           </CardDescription>
         </CardHeader>
       </Card>
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-6 md:grid-cols-2">
         {sensorCards.map((sensor) => (
           <Card key={sensor.title}>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">{sensor.title}</CardTitle>
-              {sensor.icon}
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{sensor.value}</div>
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between mb-2">
+                <p className="text-sm font-medium text-muted-foreground">{sensor.title}</p>
+                {sensor.icon}
+              </div>
+              <p className={`text-3xl font-bold ${sensor.color}`}>{sensor.value}</p>
               <p className="text-xs text-muted-foreground">{sensor.description}</p>
             </CardContent>
           </Card>
@@ -62,11 +66,14 @@ export default function MoistureMonitorPage() {
       </div>
       <Card>
         <CardHeader>
-            <CardTitle>Historical Data</CardTitle>
+            <CardTitle className="flex items-center gap-2">
+              <TrendingUp className="w-5 h-5" />
+              Historical Data
+            </CardTitle>
             <CardDescription>Visualizing sensor data over the last 24 hours (Placeholder).</CardDescription>
         </CardHeader>
         <CardContent>
-            <div className="h-[300px] flex items-center justify-center bg-muted/50 rounded-lg">
+            <div className="h-[200px] flex items-center justify-center bg-muted/50 rounded-lg">
                 <p className="text-muted-foreground">Chart placeholder</p>
             </div>
         </CardContent>
