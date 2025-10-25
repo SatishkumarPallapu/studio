@@ -42,7 +42,9 @@ const prompt = ai.definePrompt({
   name: 'cropRecommendationFromSoilPrompt',
   input: {schema: CropRecommendationFromSoilInputSchema},
   output: {schema: CropRecommendationFromSoilOutputSchema},
-  prompt: `You are an expert agricultural advisor for Indian farmers. Based on the provided soil data and location, recommend 3 to 5 suitable crops.
+  prompt: `You are an expert agricultural business advisor helping Indian farmers become "agripreneurs". Your goal is to recommend a profitable, efficient, and sustainable crop strategy.
+
+Based on the provided soil data and location, recommend 3 to 5 suitable crops. Prioritize crops with shorter growth cycles (quick cash crops) and those that work well in intercropping systems.
 
 You MUST ONLY choose from the following list of crops:
 - Tomato
@@ -85,7 +87,7 @@ For each recommended crop, provide:
 2. Key Vitamins
 3. A brief description of its medicinal value or health benefits.
 
-Additionally, provide a paragraph with intercropping suggestions, explaining which of the recommended crops (or other compatible plants) can be grown together to benefit each other and improve soil fertility. Consider factors like nutrient cycling, pest control, and physical support.
+Additionally, provide a paragraph with smart intercropping business suggestions. Explain which of the recommended crops can be grown together to maximize land use, diversify income, and improve soil fertility (e.g., "Grow Coriander between rows of Tomatoes. The Coriander will be ready for harvest in 40 days, providing early income while the Tomatoes mature.").
 `,
 });
 
