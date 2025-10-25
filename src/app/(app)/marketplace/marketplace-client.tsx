@@ -270,7 +270,7 @@ export default function MarketplaceClient() {
         </CardContent>
       </Card>
       
-      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         {filteredCrops.map((crop) => (
             <Card key={crop.name} className="overflow-hidden transition-all hover:shadow-lg flex flex-col">
                 <CardHeader className="flex-row items-start gap-4 bg-muted/20 pb-4">
@@ -321,3 +321,4 @@ export default function MarketplaceClient() {
 }
 
     
+
