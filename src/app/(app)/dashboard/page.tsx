@@ -2,7 +2,7 @@
 import * as React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
-import { Carrot, CloudSun } from 'lucide-react';
+import { Carrot, CloudSun, Sun, Thermometer } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useLanguage } from '@/contexts/language-context';
@@ -12,6 +12,11 @@ import { Carousel, CarouselContent, CarouselItem } from '@/components/ui/carouse
 const userProfile = {
   district: 'Anantapur',
   crops: ['Paddy', 'Groundnut'],
+};
+
+// Mock weather data
+const weatherData = {
+    current: { temp: 32, condition: 'Sunny', icon: <Sun className="w-5 h-5 text-yellow-500" /> },
 };
 
 // Mock subsidy data (as we can't call APIs directly)
@@ -65,13 +70,6 @@ export default function DashboardPage() {
 
   const dashboardCards = [
     {
-      title: translations.dashboard.weather.title,
-      description: translations.dashboard.weather.description,
-      href: '/weather',
-      icon: <CloudSun className="w-8 h-8 text-primary" />,
-      imageId: 'weather-alerts',
-    },
-    {
       title: translations.dashboard.activeCrop.title,
       description: translations.dashboard.activeCrop.description,
       href: '/crop-dashboard',
@@ -90,7 +88,7 @@ export default function DashboardPage() {
       </div>
 
       <div>
-        <h2 className="text-2xl font-bold font-headline mb-4">Government Schemes & Subsidies</h2>
+        <h2 className="text-2xl font-bold font-headline mb-4">{translations.dashboard.subsidies.title}</h2>
         <Carousel
             className="w-full"
             opts={{
@@ -110,7 +108,7 @@ export default function DashboardPage() {
                       </CardHeader>
                       <CardContent className="flex-grow space-y-4">
                           <div>
-                              <h4 className="font-semibold text-sm">Benefits</h4>
+                              <h4 className="font-semibold text-sm">{translations.dashboard.subsidies.benefits}</h4>
                               <p className="text-sm text-muted-foreground">{subsidy.eligibility}</p>
                           </div>
                       </CardContent>
@@ -124,6 +122,29 @@ export default function DashboardPage() {
       </div>
 
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        <Link href="/weather" className="flex flex-col">
+          <Card className="flex flex-col flex-1 overflow-hidden hover:shadow-lg transition-shadow duration-300">
+            <CardHeader className="flex-row items-start gap-4 space-y-0">
+                <div className="flex-shrink-0"><CloudSun className="w-8 h-8 text-primary" /></div>
+                <div className="flex-grow">
+                <CardTitle>{translations.dashboard.weather.title}</CardTitle>
+                <CardDescription>{translations.dashboard.weather.description}</CardDescription>
+                </div>
+            </CardHeader>
+            <CardContent className="mt-auto">
+              <div className="flex items-center justify-between p-2 rounded-md bg-muted/50">
+                  <div className="flex items-center gap-2">
+                    <Thermometer className="w-5 h-5 text-red-500"/>
+                    <span className="font-bold">{weatherData.current.temp}°C</span>
+                  </div>
+                   <div className="flex items-center gap-2">
+                    {weatherData.current.icon}
+                    <span className="font-bold">{weatherData.current.condition}</span>
+                  </div>
+              </div>
+            </CardContent>
+          </Card>
+        </Link>
         {dashboardCards.map((feature) => {
           const image = PlaceHolderImages.find((img) => img.id === feature.imageId);
           return (

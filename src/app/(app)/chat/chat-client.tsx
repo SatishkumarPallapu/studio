@@ -43,7 +43,7 @@ const WhatsAppIcon = () => (
 );
 
 export default function ChatClient({ farmerPhone }: ChatClientProps) {
-  const { language } = useLanguage();
+  const { language, translations } = useLanguage();
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -58,8 +58,7 @@ export default function ChatClient({ farmerPhone }: ChatClientProps) {
   const { toast } = useToast();
   const farmerPhoneRef = useRef(farmerPhone);
 
-  const initialTip =
-    "Hello! I'm your AI Rythu Mitra. Based on the current weather forecast, light rain is expected in 2 days. It would be wise to hold off on watering your Tomato crop. How else can I help you today?";
+  const initialTip = translations.chat.initialTip;
 
   useEffect(() => {
     const sendInitialTip = async () => {
@@ -85,7 +84,7 @@ export default function ChatClient({ farmerPhone }: ChatClientProps) {
 
     sendInitialTip();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []); // Only run once when the component mounts
+  }, [initialTip]);
 
   const handleSendMessage = async (e?: React.FormEvent) => {
     e?.preventDefault();
@@ -147,7 +146,7 @@ export default function ChatClient({ farmerPhone }: ChatClientProps) {
 
     recognitionRef.current.onstart = () => {
       setIsRecording(true);
-      toast({ title: 'Listening...', description: 'Please start speaking.' });
+      toast({ title: translations.chat.listening, description: translations.chat.listeningDescription });
     };
 
     recognitionRef.current.onresult = (event) => {
@@ -229,9 +228,9 @@ export default function ChatClient({ farmerPhone }: ChatClientProps) {
     <div className="flex flex-col h-[calc(100vh-8rem)]">
       <Card>
         <CardHeader>
-          <CardTitle>Agripreneur AI Assistant</CardTitle>
+          <CardTitle>{translations.chat.title}</CardTitle>
           <CardDescription>
-            Your strategic partner for profitable farming. Ask me anything.
+            {translations.chat.description}
           </CardDescription>
         </CardHeader>
       </Card>
@@ -277,7 +276,7 @@ export default function ChatClient({ farmerPhone }: ChatClientProps) {
                     onClick={() => handleShareOnWhatsApp(msg.content)}
                   >
                     <WhatsAppIcon />
-                    <span className="sr-only">Share on WhatsApp</span>
+                    <span className="sr-only">{translations.chat.share}</span>
                   </Button>
                 </div>
               )}
@@ -300,7 +299,7 @@ export default function ChatClient({ farmerPhone }: ChatClientProps) {
           <Input
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            placeholder="Type or use the mic to ask your AI assistant..."
+            placeholder={translations.chat.inputPlaceholder}
             disabled={isLoading}
           />
           <Button
