@@ -21,6 +21,25 @@ type AudioPlayback = {
   isPlaying: boolean;
 };
 
+// Custom Icon for WhatsApp
+const WhatsAppIcon = () => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width="24"
+    height="24"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className="h-4 w-4"
+  >
+    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52s-.67-.165-.917-.165-.522-.025-.795-.025a1.29 1.29 0 0 0-.946.445c-.273.297-1.04 1.016-1.04 2.479s1.065 2.875 1.213 3.074c.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z" />
+  </svg>
+);
+
+
 export default function ChatClient() {
   const { language, translations } = useLanguage();
   const [messages, setMessages] = useState<Message[]>([]);
@@ -108,18 +127,15 @@ export default function ChatClient() {
   };
 
  const handlePlayAudio = async (text: string, id: number) => {
-    // If clicking the same message that is playing, pause it.
     if (currentAudio?.id === id && currentAudio.isPlaying) {
         currentAudio.audio.pause();
         return;
     }
-    // If clicking the same message that is paused, play it.
     if (currentAudio?.id === id && !currentAudio.isPlaying) {
         currentAudio.audio.play();
         return;
     }
 
-    // If there's an existing audio, pause it before starting new one.
     if (currentAudio) {
         currentAudio.audio.pause();
     }
@@ -149,6 +165,12 @@ export default function ChatClient() {
     }
   };
 
+  const handleShareOnWhatsApp = (message: string) => {
+    const encodedMessage = encodeURIComponent(message);
+    const whatsappUrl = `https://wa.me/?text=${encodedMessage}`;
+    window.open(whatsappUrl, '_blank', 'noopener,noreferrer');
+  };
+
   return (
     <div className="flex flex-col h-[calc(100vh-8rem)]">
       <Card>
@@ -165,10 +187,16 @@ export default function ChatClient() {
             <div className={`p-3 rounded-lg max-w-lg ${msg.role === 'user' ? 'bg-primary text-primary-foreground' : 'bg-muted'}`}>
               <p className="whitespace-pre-wrap">{msg.content}</p>
               {msg.role === 'model' && (
-                <Button variant="ghost" size="icon" className="mt-2 h-7 w-7" onClick={() => handlePlayAudio(msg.content, index)}>
-                  {currentAudio?.id === index && currentAudio.isPlaying ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
-                  <span className="sr-only">Play audio</span>
-                </Button>
+                <div className="flex items-center gap-2 mt-2">
+                  <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => handlePlayAudio(msg.content, index)}>
+                    {currentAudio?.id === index && currentAudio.isPlaying ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
+                    <span className="sr-only">Play audio</span>
+                  </Button>
+                  <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => handleShareOnWhatsApp(msg.content)}>
+                    <WhatsAppIcon />
+                    <span className="sr-only">Share on WhatsApp</span>
+                  </Button>
+                </div>
               )}
             </div>
             {msg.role === 'user' && <User className="w-8 h-8 flex-shrink-0" />}
