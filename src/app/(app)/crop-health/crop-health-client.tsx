@@ -16,6 +16,23 @@ type Diagnosis = {
   remedies: string;
 };
 
+const WhatsAppIcon = () => (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className="h-4 w-4"
+    >
+      <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path>
+    </svg>
+  );
+
 export default function CropHealthClient() {
   const [diagnosis, setDiagnosis] = useState<Diagnosis | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -64,6 +81,13 @@ export default function CropHealthClient() {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleShareOnWhatsApp = (diagnosis: Diagnosis) => {
+    const message = `*AI Crop Diagnosis:*\n${diagnosis.diagnosis}\n\n*Suggested Organic Remedies:*\n${diagnosis.remedies}`;
+    const encodedMessage = encodeURIComponent(message);
+    const whatsappUrl = `https://wa.me/?text=${encodedMessage}`;
+    window.open(whatsappUrl, '_blank', 'noopener,noreferrer');
   };
   
   const placeholderContent = (
@@ -145,9 +169,12 @@ export default function CropHealthClient() {
               </Card>
             )}
             <Card>
-              <CardHeader>
-                <CardTitle>AI Diagnosis</CardTitle>
-              </CardHeader>
+                <CardHeader className="flex-row items-center justify-between">
+                    <CardTitle>AI Diagnosis</CardTitle>
+                    <Button variant="ghost" size="icon" onClick={() => handleShareOnWhatsApp(diagnosis)}>
+                        <WhatsAppIcon />
+                    </Button>
+                </CardHeader>
               <CardContent>
                 <p className="leading-relaxed">{diagnosis.diagnosis}</p>
               </CardContent>
