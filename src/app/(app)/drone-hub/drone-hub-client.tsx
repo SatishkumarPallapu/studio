@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useMemo } from 'react';
@@ -202,8 +203,8 @@ export default function DroneHubClient() {
                     <DialogTitle>Plan a New Drone Mission</DialogTitle>
                     <DialogDescription>Schedule a new operation for your drone.</DialogDescription>
                 </DialogHeader>
-                <form id="plan-mission-form" onSubmit={handlePlanMission} className="space-y-4">
-                    <div>
+                <form id="plan-mission-form" onSubmit={handlePlanMission} className="space-y-4 py-4">
+                    <div className="space-y-2">
                         <Label htmlFor="type">Mission Type</Label>
                         <Select name="type" required>
                             <SelectTrigger>
@@ -215,7 +216,7 @@ export default function DroneHubClient() {
                             </SelectContent>
                         </Select>
                     </div>
-                    <div>
+                    <div className="space-y-2">
                         <Label htmlFor="date">Date</Label>
                         <Input id="date" name="date" type="date" required/>
                     </div>

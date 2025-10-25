@@ -227,7 +227,7 @@ export default function MarketplaceClient() {
                         <DialogTitle>List Your Produce for Sale</DialogTitle>
                         <DialogDescription>Fill in the details below to add your harvest to the marketplace.</DialogDescription>
                     </DialogHeader>
-                    <form id="list-produce-form" className="space-y-4">
+                    <form id="list-produce-form" className="space-y-4 py-4">
                         <div className="space-y-2">
                             <Label htmlFor="crop-name">Crop Name</Label>
                             <Input id="crop-name" name="crop-name" placeholder="e.g., Tomato" required />
@@ -321,4 +321,3 @@ export default function MarketplaceClient() {
 }
 
     
-
