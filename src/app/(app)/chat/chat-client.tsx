@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
@@ -5,7 +6,6 @@ import { chat, textToSpeech } from '@/ai/flows/chatbot-flow';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Bot, Loader2, Send, Mic, User, Pause, Play } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useLanguage } from '@/contexts/language-context';
@@ -13,12 +13,6 @@ import { useLanguage } from '@/contexts/language-context';
 type Message = {
   role: 'user' | 'model';
   content: string;
-};
-
-type AudioPlayback = {
-  id: number;
-  audio: HTMLAudioElement;
-  isPlaying: boolean;
 };
 
 // Custom Icon for WhatsApp
@@ -41,8 +35,13 @@ const WhatsAppIcon = () => (
 
 
 export default function ChatClient() {
-  const { language, translations } = useLanguage();
-  const [messages, setMessages] = useState<Message[]>([]);
+  const { language } = useLanguage();
+  const [messages, setMessages] = useState<Message[]>([
+    {
+        role: 'model',
+        content: "Hello! I'm your AI Rythu Mitra. Based on the current weather forecast, light rain is expected in 2 days. It would be wise to hold off on watering your Tomato crop. How else can I help you today?"
+    }
+  ]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
@@ -231,3 +230,5 @@ export default function ChatClient() {
     </div>
   );
 }
+
+    
