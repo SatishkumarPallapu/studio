@@ -1,12 +1,12 @@
 
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 import { Badge } from '@/components/ui/badge';
 import { AlertCircle, CheckCircle, TrendingUp, Zap } from 'lucide-react';
-import { useFirebase, useUser } from '@/firebase';
+import { useFirebase, useUser, useMemoFirebase } from '@/firebase';
 import { useCollection } from '@/firebase/firestore/use-collection';
 import { collection, query, orderBy, limit } from 'firebase/firestore';
 
@@ -63,7 +63,7 @@ export default function SatelliteHealthPage() {
     const userId = user?.uid ?? 'mock-user';
     const cropId = 'tomato-123';
 
-    const healthCollectionQuery = useMemo(() => {
+    const healthCollectionQuery = useMemoFirebase(() => {
         if (!firestore) return null;
         return query(
             collection(firestore, `users/${userId}/crops/${cropId}/satelliteHealth`),
