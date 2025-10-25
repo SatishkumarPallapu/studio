@@ -8,7 +8,6 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useLanguage } from '@/contexts/language-context';
 import { Carousel, CarouselContent, CarouselItem } from '@/components/ui/carousel';
-import Autoplay from "embla-carousel-autoplay";
 
 // Mock user profile
 const userProfile = {
@@ -64,9 +63,6 @@ const matchedSubsidies = allSubsidies.filter(subsidy => {
 
 export default function DashboardPage() {
   const { translations } = useLanguage();
-  const plugin = React.useRef(
-    Autoplay({ delay: 3000, stopOnInteraction: true })
-  );
 
   const dashboardCards = [
     {
@@ -97,10 +93,7 @@ export default function DashboardPage() {
       <div>
         <h2 className="text-2xl font-bold font-headline mb-4">Government Schemes & Subsidies</h2>
         <Carousel
-            plugins={[plugin.current]}
             className="w-full"
-            onMouseEnter={plugin.current.stop}
-            onMouseLeave={plugin.current.reset}
             opts={{
                 align: "start",
                 loop: true,
