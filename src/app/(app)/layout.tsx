@@ -8,7 +8,6 @@ import {
   Home,
   Bot,
   Sprout,
-  Droplets,
   User,
   ShoppingCart,
   Wind,
@@ -36,9 +35,6 @@ import {
   SidebarMenuButton,
   SidebarProvider,
   SidebarTrigger,
-  SidebarMenuSub,
-  SidebarMenuSubButton,
-  SidebarMenuSubItem,
   SidebarInset,
 } from '@/components/ui/sidebar';
 
@@ -70,8 +66,6 @@ const mainNavItems = [
 
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
-  const pathname = usePathname();
-
   return (
     <LanguageProvider>
       <SidebarProvider>
@@ -91,41 +85,44 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 }
 
 function AppHeader() {
-  const pathname = usePathname();
-  const { language, setLanguage, translations } = useLanguage();
-  const currentNavItem = mainNavItems.find(item => pathname.startsWith(item.href));
-  const title = currentNavItem ? currentNavItem.label : 'AI Rythu Mitra';
+  const { language, setLanguage } = useLanguage();
 
   return (
-    <header className="sticky top-0 z-30 flex h-14 items-center justify-between gap-4 border-b bg-background px-4 sm:static sm:h-auto sm:border-0 sm:bg-transparent sm:px-6">
-       <Sheet>
-        <SheetTrigger asChild>
-          <Button size="icon" variant="outline" className="sm:hidden">
-            <Home className="h-5 w-5" />
-            <span className="sr-only">Toggle Menu</span>
-          </Button>
-        </SheetTrigger>
-        <SheetContent side="left" className="sm:max-w-xs">
-          <nav className="grid gap-6 text-lg font-medium">
-            <Link
-              href="#"
-              className="group flex h-10 w-10 shrink-0 items-center justify-center gap-2 rounded-full bg-primary text-lg font-semibold text-primary-foreground md:text-base"
-            >
-              <Icons.logo className="h-5 w-5 transition-all group-hover:scale-110" />
-              <span className="sr-only">AI Rythu Mitra</span>
-            </Link>
-            {mainNavItems.map(item => (
-                <Link key={item.href} href={item.href} className="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-foreground">
-                    <item.icon className="h-5 w-5" />
-                    {item.label}
+    <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-background px-4 sm:static sm:h-auto sm:border-0 sm:bg-transparent sm:px-6">
+       <div className="sm:hidden">
+        <Sheet>
+            <SheetTrigger asChild>
+            <Button size="icon" variant="outline">
+                <Home className="h-5 w-5" />
+                <span className="sr-only">Toggle Menu</span>
+            </Button>
+            </SheetTrigger>
+            <SheetContent side="left" className="sm:max-w-xs">
+            <nav className="grid gap-6 text-lg font-medium">
+                <Link
+                href="/dashboard"
+                className="group flex h-10 w-10 shrink-0 items-center justify-center gap-2 rounded-full bg-primary text-lg font-semibold text-primary-foreground md:text-base"
+                >
+                <Icons.logo className="h-5 w-5 transition-all group-hover:scale-110" />
+                <span className="sr-only">AI Rythu Mitra</span>
                 </Link>
-            ))}
-          </nav>
-        </SheetContent>
-      </Sheet>
+                {mainNavItems.map(item => (
+                    <Link key={item.href} href={item.href} className="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-foreground">
+                        <item.icon className="h-5 w-5" />
+                        {item.label}
+                    </Link>
+                ))}
+            </nav>
+            </SheetContent>
+        </Sheet>
+       </div>
       
+      <div className="hidden sm:block">
+        <SidebarTrigger />
+      </div>
+
       <div className="flex items-center gap-4 ml-auto">
-        <Select onValueChange={setLanguage} defaultValue={language}>
+        <Select onValueChange={setLanguage as (value: string) => void} defaultValue={language}>
             <SelectTrigger className="w-[150px]">
                 <SelectValue placeholder="Language" />
             </SelectTrigger>
@@ -193,4 +190,3 @@ function BottomNavBar() {
     </nav>
   );
 }
-
