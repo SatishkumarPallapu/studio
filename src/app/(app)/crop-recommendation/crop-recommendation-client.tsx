@@ -69,9 +69,8 @@ export default function CropRecommendationClient() {
       location: form.getValues('location') || '',
     });
 
-    if (N && P && K && pH) {
-        // Automatically submit if params are present
-        // We wrap this in a timeout to allow the form state to update properly
+    if (N && P && K && pH && form.getValues('location')) {
+        // Automatically submit if params are present and location is set
         setTimeout(() => {
             form.handleSubmit(onSubmit)();
         }, 100);
@@ -107,11 +106,7 @@ export default function CropRecommendationClient() {
   }
 
   const handleCropSelection = (cropName: string) => {
-    toast({
-        title: "Crop Selected!",
-        description: `Lifecycle plan for ${cropName} created.`,
-    });
-    router.push('/crop-dashboard');
+    router.push(`/crop-roadmap/${encodeURIComponent(cropName.toLowerCase().replace(/ /g, '-'))}`);
   };
 
   return (
@@ -185,7 +180,7 @@ export default function CropRecommendationClient() {
             <Card>
               <CardHeader>
                 <CardTitle>Top 3 Recommended Crops</CardTitle>
-                <CardDescription>Select a crop to create a lifecycle plan and start tracking.</CardDescription>
+                <CardDescription>Select a crop to generate a detailed farming roadmap.</CardDescription>
               </CardHeader>
               <CardContent>
                 <TooltipProvider>
@@ -209,7 +204,7 @@ export default function CropRecommendationClient() {
                                 <p><strong>Medicinal Value:</strong> {crop.medicinal_value}</p>
                                 </TooltipContent>
                             </Tooltip>
-                            <Button size="sm" className="w-full" onClick={() => handleCropSelection(crop.name)}>Select Crop ✅</Button>
+                            <Button size="sm" className="w-full" onClick={() => handleCropSelection(crop.name)}>View Roadmap</Button>
                         </Card>
                     ))}
                   </div>
