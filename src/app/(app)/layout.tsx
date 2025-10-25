@@ -26,7 +26,7 @@ import { Icons } from '@/components/icons';
 import { LanguageProvider, useLanguage } from '@/contexts/language-context';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
-import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription, SheetTrigger } from '@/components/ui/sheet';
 import {
   Sidebar,
   SidebarContent,
@@ -100,21 +100,25 @@ function AppHeader() {
             </Button>
             </SheetTrigger>
             <SheetContent side="left" className="sm:max-w-xs">
-            <nav className="grid gap-6 text-lg font-medium">
-                <Link
-                href="/dashboard"
-                className="group flex h-10 w-10 shrink-0 items-center justify-center gap-2 rounded-full bg-primary text-lg font-semibold text-primary-foreground md:text-base"
-                >
-                <Icons.logo className="h-5 w-5 transition-all group-hover:scale-110" />
-                <span className="sr-only">AI Rythu Mitra</span>
-                </Link>
-                {mainNavItems.map(item => (
-                    <Link key={item.href} href={item.href} className="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-foreground">
-                        <item.icon className="h-5 w-5" />
-                        {item.label}
+                <SheetHeader className="sr-only">
+                    <SheetTitle>Main Menu</SheetTitle>
+                    <SheetDescription>Navigation links for the application.</SheetDescription>
+                </SheetHeader>
+                <nav className="grid gap-6 text-lg font-medium">
+                    <Link
+                    href="/dashboard"
+                    className="group flex h-10 w-10 shrink-0 items-center justify-center gap-2 rounded-full bg-primary text-lg font-semibold text-primary-foreground md:text-base"
+                    >
+                    <Icons.logo className="h-5 w-5 transition-all group-hover:scale-110" />
+                    <span className="sr-only">AI Rythu Mitra</span>
                     </Link>
-                ))}
-            </nav>
+                    {mainNavItems.map(item => (
+                        <Link key={item.href} href={item.href} className="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-foreground">
+                            <item.icon className="h-5 w-5" />
+                            {item.label}
+                        </Link>
+                    ))}
+                </nav>
             </SheetContent>
         </Sheet>
        </div>
