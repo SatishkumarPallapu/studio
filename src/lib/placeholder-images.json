@@ -8,9 +8,9 @@
     },
     {
       "id": "crop-recommendation",
-      "description": "Lush green saplings growing in fertile soil.",
-      "imageUrl": "https://images.unsplash.com/photo-1459787759585-dc0201b4e0bb?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw0fHxncmVlbiUyMHNhcGxpbmd8ZW58MHx8fHwxNzYxMzQyODM3fDA&ixlib=rb-4.1.0&q=80&w=1080",
-      "imageHint": "green sapling"
+      "description": "Lush green saplings growing in fertile soil, representing new growth and potential.",
+      "imageUrl": "https://images.unsplash.com/photo-1492496913980-501348b61469?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxzb2lsJTIwaGFuZHN8ZW58MHx8fHwxNzYxMjc0MDcxfDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "green sapling soil"
     },
     {
       "id": "pest-detection",
@@ -21,7 +21,7 @@
     {
       "id": "soil-health",
       "description": "Hands holding rich, dark soil.",
-      "imageUrl": "https://images.unsplash.com/photo-1492496913980-501348b61469?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxzb2lsJTIwaGFuZHN8ZW58MHx8fHwxNzYxMjc0MDcxfDA&ixlibrb-4.1.0&q=80&w=1080",
+      "imageUrl": "https://images.unsplash.com/photo-1492496913980-501348b61469?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxzb2lsJTIwaGFuZHN8ZW58MHx8fHwxNzYxMjc0MDcxfDA&ixlib=rb-4.1.0&q=80&w=1080",
       "imageHint": "soil hands"
     },
     {
@@ -45,25 +45,25 @@
     {
       "id": "reminders",
       "description": "A calendar with marked dates over a farm background.",
-      "imageUrl": "https://images.unsplash.com/photo-1697823553780-236f99f8ca58?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxmYXJtJTIwY2FsZW5kYXJ8ZW58MHx8fHwxNzYxMzQyODM3fDA&ixlib-rb-4.1.0&q=80&w=1080",
+      "imageUrl": "https://images.unsplash.com/photo-1697823553780-236f99f8ca58?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxmYXJtJTIwY2FsZW5kYXJ8ZW58MHx8fHwxNzYxMzQyODM3fDA&ixlib=rb-4.1.0&q=80&w=1080",
       "imageHint": "farm calendar"
     },
     {
       "id": "subsidy-alerts",
       "description": "A government building, representing official announcements.",
-      "imageUrl": "https://images.unsplash.com/photo-1580465446361-8aae556d7560?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxnb3Zlcm5tZW50JTIwYnVpbGRpbmcsJTIwaW5kaWF8ZW58MHx8fHwxNzYxNDMwOTMxfDA&ixlib-rb-4.1.0&q=80&w=1080",
+      "imageUrl": "https://images.unsplash.com/photo-1580465446361-8aae556d7560?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxnb3Zlcm5tZW50JTIwYnVpbGRpbmcsJTIwaW5kaWF8ZW58MHx8fHwxNzYxNDMwOTMxfDA&ixlib=rb-4.1.0&q=80&w=1080",
       "imageHint": "government india"
     },
     {
       "id": "drone-ndvi",
       "description": "An aerial NDVI map showing crop health.",
-      "imageUrl": "https://images.unsplash.com/photo-1625239622428-ba0ae330a1f9?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHxORFZJJTIwbWFwfGVufDB8fHx8MTc2MTM0NTcwM3ww&ixlib-rb-4.1.0&q=80&w=1080",
+      "imageUrl": "https://images.unsplash.com/photo-1625239622428-ba0ae330a1f9?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHxORFZJJTIwbWFwfGVufDB8fHx8MTc2MTM0NTcwM3ww&ixlib=rb-4.1.0&q=80&w=1080",
       "imageHint": "NDVI map"
     },
     {
       "id": "drone-path",
       "description": "A drone's spraying path overlaid on a field.",
-      "imageUrl": "https://images.unsplash.com/photo-1684508959330-bbcdb98dcfea?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw2fHxkcm9uZSUyMHBhdGh8ZW58MHx8fHwxNzYxMzQ1NzAzfDA&ixlib-rb-4.1.0&q=80&w=1080",
+      "imageUrl": "https://images.unsplash.com/photo-1684508959330-bbcdb98dcfea?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw2fHxkcm9uZSUyMHBhdGh8ZW58MHx8fHwxNzYxMzQ1NzAzfDA&ixlib=rb-4.1.0&q=80&w=1080",
       "imageHint": "drone path"
     }
   ]
