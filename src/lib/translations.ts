@@ -11,10 +11,6 @@ export const translations = {
         title: 'Active Crop: Tomato',
         description: 'Flowering stage, 45 days remaining.',
       },
-      subsidyHighlights: {
-        title: 'Smart Subsidy Highlights',
-        description: 'Top 3 schemes for your district.',
-      },
       viewDetails: 'View Details',
     },
   },
@@ -30,10 +26,6 @@ export const translations = {
         title: 'క్రియాశీల పంట: టమోటా',
         description: 'పూత దశ, 45 రోజులు మిగిలి ఉన్నాయి.',
       },
-      subsidyHighlights: {
-        title: 'స్మార్ట్ సబ్సిడీ ముఖ్యాంశాలు',
-        description: 'మీ జిల్లాకు టాప్ 3 పథకాలు.',
-      },
       viewDetails: 'వివరాలను వీక్షించండి',
     },
   },
@@ -48,10 +40,6 @@ export const translations = {
       activeCrop: {
         title: 'सक्रिय फसल: टमाटर',
         description: 'फूल आने की अवस्था, 45 दिन शेष।',
-      },
-      subsidyHighlights: {
-        title: 'स्मार्ट सब्सिडी हाइलाइट्स',
-        description: 'आपके जिले के लिए शीर्ष 3 योजनाएं।',
       },
       viewDetails: 'विवरण देखें',
     },

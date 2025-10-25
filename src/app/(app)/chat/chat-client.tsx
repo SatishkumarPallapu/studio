@@ -56,6 +56,7 @@ export default function ChatClient({ farmerPhone }: ChatClientProps) {
 
   const recognitionRef = useRef<SpeechRecognition | null>(null);
   const { toast } = useToast();
+  const farmerPhoneRef = useRef(farmerPhone);
 
   const initialTip =
     "Hello! I'm your AI Rythu Mitra. Based on the current weather forecast, light rain is expected in 2 days. It would be wise to hold off on watering your Tomato crop. How else can I help you today?";
@@ -71,7 +72,7 @@ export default function ChatClient({ farmerPhone }: ChatClientProps) {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            to: `whatsapp:${farmerPhone}`,
+            to: `whatsapp:${farmerPhoneRef.current}`,
             message: initialTip,
           }),
         });
@@ -84,7 +85,7 @@ export default function ChatClient({ farmerPhone }: ChatClientProps) {
 
     sendInitialTip();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [farmerPhone]); // Only run once when the component mounts with the phone number
+  }, []); // Only run once when the component mounts
 
   const handleSendMessage = async (e?: React.FormEvent) => {
     e?.preventDefault();
