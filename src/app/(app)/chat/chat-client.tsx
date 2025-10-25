@@ -6,8 +6,9 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Bot, Loader2, Send, Mic, Volume2, User, Play, Pause } from 'lucide-react';
+import { Bot, Loader2, Send, Mic, User, Pause, Play } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { useLanguage } from '@/contexts/language-context';
 
 type Message = {
   role: 'user' | 'model';
@@ -21,12 +22,13 @@ type AudioPlayback = {
 };
 
 export default function ChatClient() {
+  const { language, translations } = useLanguage();
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [language, setLanguage] = useState('English');
   const [isRecording, setIsRecording] = useState(false);
-  const [audioPlayback, setAudioPlayback] = useState<AudioPlayback | null>(null);
+  const [currentAudio, setCurrentAudio] = useState<{ id: number, audio: HTMLAudioElement, isPlaying: boolean } | null>(null);
+
   const recognitionRef = useRef<SpeechRecognition | null>(null);
   const { toast } = useToast();
 
@@ -45,7 +47,7 @@ export default function ChatClient() {
         content: [{ text: msg.content }],
       }));
 
-      const result = await chat({ prompt: input, language, history });
+      const result = await chat({ prompt: input, language: language === 'te' ? 'Telugu' : language === 'hi' ? 'Hindi' : 'English', history });
       const modelMessage: Message = { role: 'model', content: result.response };
       setMessages((prev) => [...prev, modelMessage]);
     } catch (error) {
@@ -60,103 +62,84 @@ export default function ChatClient() {
     }
   };
 
-  const handleVoiceInput = async () => {
+  const handleVoiceInput = () => {
     if (isRecording) {
       recognitionRef.current?.stop();
-      setIsRecording(false);
       return;
     }
 
-    try {
-      await navigator.mediaDevices.getUserMedia({ audio: true });
-      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-      if (!SpeechRecognition) {
-          toast({ variant: 'destructive', title: 'Browser Not Supported', description: 'Speech recognition is not supported in your browser.' });
-          return;
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+      toast({ variant: 'destructive', title: 'Browser Not Supported', description: 'Speech recognition is not supported.' });
+      return;
+    }
+
+    recognitionRef.current = new SpeechRecognition();
+    recognitionRef.current.lang = language === 'te' ? 'te-IN' : language === 'hi' ? 'hi-IN' : 'en-US';
+    recognitionRef.current.interimResults = true;
+    recognitionRef.current.continuous = true;
+
+    recognitionRef.current.onstart = () => {
+      setIsRecording(true);
+      toast({ title: 'Listening...', description: 'Please start speaking.' });
+    };
+
+    recognitionRef.current.onresult = (event) => {
+      let finalTranscript = '';
+      for (let i = event.resultIndex; i < event.results.length; ++i) {
+        finalTranscript += event.results[i][0].transcript;
       }
-      
-      const recognition = new SpeechRecognition();
-      recognitionRef.current = recognition;
+      setInput(prev => prev + finalTranscript);
+    };
 
-      recognition.lang = language === 'Telugu' ? 'te-IN' : language === 'Hindi' ? 'hi-IN' : 'en-US';
-      recognition.interimResults = true;
-      recognition.maxAlternatives = 1;
-      recognition.continuous = true;
+    recognitionRef.current.onend = () => {
+      setIsRecording(false);
+      if (input) handleSendMessage();
+    };
 
+    recognitionRef.current.onerror = (event) => {
+      if (event.error !== 'aborted' && event.error !== 'no-speech') {
+        toast({ variant: 'destructive', title: 'Voice Error', description: `Could not understand audio: ${event.error}` });
+      }
+      setIsRecording(false);
+    };
 
-      recognition.onstart = () => {
-        setIsRecording(true);
-        toast({ title: 'Listening...', description: 'Please start speaking.' });
-      };
-
-      recognition.onresult = (event) => {
-        let interimTranscript = '';
-        let finalTranscript = '';
-        for (let i = 0; i < event.results.length; ++i) {
-          if (event.results[i].isFinal) {
-            finalTranscript += event.results[i][0].transcript;
-          } else {
-            interimTranscript += event.results[i][0].transcript;
-          }
-        }
-        setInput(finalTranscript + interimTranscript);
-      };
-
-      recognition.onerror = (event) => {
-        // The 'aborted' error is common and happens when the user stops speaking.
-        // We only want to show a toast for other, more critical errors.
-        if (event.error !== 'aborted' && event.error !== 'no-speech') {
-          console.error('Speech recognition error:', event.error);
-          toast({ variant: 'destructive', title: 'Voice Error', description: 'Could not understand audio.' });
-        }
-        setIsRecording(false);
-      };
-
-      recognition.onend = () => {
-        setIsRecording(false);
-        recognitionRef.current = null;
-      };
-
-      recognition.start();
-
-    } catch (error) {
-      console.error('Media device error:', error);
-      toast({ variant: 'destructive', title: 'Mic Error', description: 'Could not access the microphone or speech recognition is not supported.' });
-    }
+    recognitionRef.current.start();
   };
-  
-  const handlePlayAudio = async (text: string, id: number) => {
-    if (audioPlayback?.id === id && audioPlayback.isPlaying) {
-      audioPlayback.audio.pause();
-      setAudioPlayback(prev => prev ? { ...prev, isPlaying: false } : null);
-      return;
+
+ const handlePlayAudio = async (text: string, id: number) => {
+    // If clicking the same message that is playing, pause it.
+    if (currentAudio?.id === id && currentAudio.isPlaying) {
+        currentAudio.audio.pause();
+        return;
     }
-    if (audioPlayback?.id === id && !audioPlayback.isPlaying) {
-        audioPlayback.audio.play();
-        setAudioPlayback(prev => prev ? { ...prev, isPlaying: true } : null);
+    // If clicking the same message that is paused, play it.
+    if (currentAudio?.id === id && !currentAudio.isPlaying) {
+        currentAudio.audio.play();
         return;
     }
 
-    if (audioPlayback?.audio) {
-      audioPlayback.audio.pause();
+    // If there's an existing audio, pause it before starting new one.
+    if (currentAudio) {
+        currentAudio.audio.pause();
     }
     
     setIsLoading(true);
     try {
         const { audio: audioDataUri } = await textToSpeech({ text });
-        const audio = new Audio(audioDataUri);
+        const newAudio = new Audio(audioDataUri);
         
-        audio.onplay = () => {
-            setAudioPlayback({ id, audio, isPlaying: true });
+        newAudio.onplay = () => {
+            setCurrentAudio({ id, audio: newAudio, isPlaying: true });
         };
-        audio.onpause = () => {
-             setAudioPlayback(prev => prev ? { ...prev, isPlaying: false } : null);
+        newAudio.onpause = () => {
+            setCurrentAudio(prev => prev ? { ...prev, isPlaying: false } : null);
         };
-        audio.onended = () => {
-            setAudioPlayback(null);
+        newAudio.onended = () => {
+            setCurrentAudio(null);
         };
         
-        audio.play();
+        newAudio.play();
 
     } catch (error) {
         console.error('TTS error:', error);
@@ -170,21 +153,9 @@ export default function ChatClient() {
     <div className="flex flex-col h-[calc(100vh-8rem)]">
       <Card>
         <CardHeader>
-          <CardTitle>AI Rythu Mitra Chat</CardTitle>
-          <CardDescription>Your personal agricultural assistant. Ask me anything in Telugu, Hindi, or English.</CardDescription>
+          <CardTitle>Agripreneur AI Assistant</CardTitle>
+          <CardDescription>Your strategic partner for profitable farming. Ask me anything.</CardDescription>
         </CardHeader>
-        <CardContent>
-            <Select onValueChange={setLanguage} defaultValue={language}>
-                <SelectTrigger className="w-[180px]">
-                    <SelectValue placeholder="Language" />
-                </SelectTrigger>
-                <SelectContent>
-                    <SelectItem value="English">English</SelectItem>
-                    <SelectItem value="Telugu">Telugu (తెలుగు)</SelectItem>
-                    <SelectItem value="Hindi">Hindi (हिन्दी)</SelectItem>
-                </SelectContent>
-            </Select>
-        </CardContent>
       </Card>
       
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
@@ -192,10 +163,10 @@ export default function ChatClient() {
           <div key={index} className={`flex items-start gap-3 ${msg.role === 'user' ? 'justify-end' : ''}`}>
             {msg.role === 'model' && <Bot className="w-8 h-8 text-primary flex-shrink-0" />}
             <div className={`p-3 rounded-lg max-w-lg ${msg.role === 'user' ? 'bg-primary text-primary-foreground' : 'bg-muted'}`}>
-              <p>{msg.content}</p>
+              <p className="whitespace-pre-wrap">{msg.content}</p>
               {msg.role === 'model' && (
                 <Button variant="ghost" size="icon" className="mt-2 h-7 w-7" onClick={() => handlePlayAudio(msg.content, index)}>
-                  {audioPlayback?.id === index && audioPlayback.isPlaying ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
+                  {currentAudio?.id === index && currentAudio.isPlaying ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
                   <span className="sr-only">Play audio</span>
                 </Button>
               )}
@@ -218,7 +189,7 @@ export default function ChatClient() {
           <Input
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            placeholder="Type your message or use the mic..."
+            placeholder="Type or use the mic to ask your AI assistant..."
             disabled={isLoading}
           />
           <Button type="button" size="icon" variant="outline" onClick={handleVoiceInput} disabled={isLoading}>
