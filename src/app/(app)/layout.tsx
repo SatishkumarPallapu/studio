@@ -100,9 +100,9 @@ function AppHeader() {
             </Button>
             </SheetTrigger>
             <SheetContent side="left" className="sm:max-w-xs">
-                <SheetHeader className="sr-only">
-                    <SheetTitle>Main Menu</SheetTitle>
-                    <SheetDescription>Navigation links for the application.</SheetDescription>
+                <SheetHeader>
+                    <SheetTitle className="sr-only">Main Menu</SheetTitle>
+                    <SheetDescription className="sr-only">Navigation links for the application.</SheetDescription>
                 </SheetHeader>
                 <nav className="grid gap-6 text-lg font-medium">
                     <Link
@@ -148,7 +148,7 @@ function AppSidebar() {
   const { setOpen, isMobile } = useSidebar();
   
   const handleLinkClick = () => {
-    if (!isMobile) {
+    if (isMobile) {
       setOpen(false);
     }
   }
@@ -160,7 +160,7 @@ function AppSidebar() {
                 <Icons.logo className="w-8 h-8 text-primary" />
             </Link>
         </SidebarHeader>
-        <SidebarContent className="group-data-[collapsible=icon]:overflow-hidden">
+        <SidebarContent className="h-full group-data-[collapsible=icon]:overflow-hidden">
             <SidebarMenu>
                 {mainNavItems.map(item => (
                     <SidebarMenuItem key={item.href}>
@@ -204,4 +204,3 @@ function BottomNavBar() {
     </nav>
   );
 }
-
