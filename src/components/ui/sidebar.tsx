@@ -176,6 +176,12 @@ const Sidebar = React.forwardRef<
     ref
   ) => {
     const { isMobile, state, openMobile, setOpenMobile } = useSidebar()
+    const [mounted, setMounted] = React.useState(false);
+
+    React.useEffect(() => {
+      setMounted(true);
+    }, []);
+
 
     if (collapsible === "none") {
       return (
@@ -210,6 +216,10 @@ const Sidebar = React.forwardRef<
           </SheetContent>
         </Sheet>
       )
+    }
+    
+    if (!mounted) {
+      return null;
     }
 
     return (
@@ -404,7 +414,8 @@ const SidebarContent = React.forwardRef<
       ref={ref}
       data-sidebar="content"
       className={cn(
-        "flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto overflow-x-hidden group-data-[collapsible=icon]:overflow-hidden",
+        "flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto overflow-x-hidden",
+        "group-data-[collapsible=icon]:overflow-hidden",
         className
       )}
       {...props}
