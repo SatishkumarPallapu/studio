@@ -18,13 +18,6 @@ export default function DashboardPage() {
       imageId: 'weather-alerts',
     },
     {
-      title: translations.dashboard.soilMoisture.title,
-      description: translations.dashboard.soilMoisture.description,
-      href: '/moisture-monitor',
-      icon: <Droplets className="w-8 h-8 text-primary" />,
-      imageId: 'iot-dashboard',
-    },
-    {
       title: translations.dashboard.activeCrop.title,
       description: translations.dashboard.activeCrop.description,
       href: '/crop-dashboard',
