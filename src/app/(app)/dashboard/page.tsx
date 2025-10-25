@@ -1,183 +1,157 @@
 'use client';
 import * as React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { PlaceHolderImages } from '@/lib/placeholder-images';
-import { Carrot, CloudSun, Sun, Thermometer } from 'lucide-react';
-import Image from 'next/image';
+import { Button } from '@/components/ui/button';
+import { Cloud, Bot, MessageSquare, Layers, Calendar, Droplets, Thermometer, Sun, TrendingUp, Atom, Info } from 'lucide-react';
 import Link from 'next/link';
-import { useLanguage } from '@/contexts/language-context';
-import { Carousel, CarouselContent, CarouselItem } from '@/components/ui/carousel';
 
-// Mock user profile
-const userProfile = {
-  district: 'Anantapur',
-  crops: ['Paddy', 'Groundnut'],
-};
-
-// Mock weather data
 const weatherData = {
-    current: { temp: 32, condition: 'Sunny', icon: <Sun className="w-5 h-5 text-yellow-500" /> },
+    current: { temp: 28, condition: 'Sunny', icon: <Sun className="w-5 h-5 text-yellow-500" /> },
 };
 
-// Mock subsidy data (as we can't call APIs directly)
-const allSubsidies = [
-  {
-    id: 1,
-    title: 'Pradhan Mantri Fasal Bima Yojana (PMFBY)',
-    description: 'Crop insurance scheme to provide financial support to farmers suffering crop loss/damage.',
-    eligibility: 'All farmers including sharecroppers and tenant farmers growing notified crops in the notified areas are eligible.',
-    deadline: '2024-12-31',
-    link: '#',
-    tags: { districts: ['All'], crops: ['All'] },
-  },
-  {
-    id: 2,
-    title: 'Rythu Bharosa',
-    description: 'Financial assistance to farmers for investment in crops.',
-    eligibility: 'Farmers owning cultivable land in Andhra Pradesh.',
-    deadline: '2025-01-15',
-    link: '#',
-    tags: { districts: ['Anantapur', 'Chittoor', 'Kadapa'], crops: ['All'] },
-  },
-  {
-    id: 3,
-    title: 'Drip Irrigation Subsidy',
-    description: '70% subsidy on the cost of drip irrigation systems to promote water conservation.',
-    eligibility: 'Farmers in drought-prone areas.',
-    deadline: '2024-11-30',
-    link: '#',
-    tags: { districts: ['Anantapur'], crops: ['Groundnut', 'Maize', 'Horticulture crops'] },
-  },
-  {
-    id: 4,
-    title: 'National Food Security Mission (NFSM) - Pulses',
-    description: 'Assistance for purchasing high-yielding variety seeds for pulses.',
-    eligibility: 'All farmers cultivating pulses.',
-    deadline: '2024-12-10',
-    link: '#',
-    tags: { districts: ['All'], crops: ['Pulses', 'Lentils'] },
-  },
-];
+const soilData = {
+    moisture: 68,
+    ph: 6.8,
+    nitrogen: 120,
+    potassium: 200,
+};
 
-const matchedSubsidies = allSubsidies.filter(subsidy => {
-    const districtMatch = subsidy.tags.districts.includes('All') || subsidy.tags.districts.includes(userProfile.district);
-    const cropMatch = subsidy.tags.crops.includes('All') || userProfile.crops.some(crop => subsidy.tags.crops.includes(crop));
-    return districtMatch && cropMatch;
-});
+const yieldData = {
+    trend: '+12%',
+};
+
 
 export default function DashboardPage() {
-  const { translations } = useLanguage();
-
-  const dashboardCards = [
-    {
-      title: translations.dashboard.activeCrop.title,
-      description: translations.dashboard.activeCrop.description,
-      href: '/crop-dashboard',
-      icon: <Carrot className="w-8 h-8 text-primary" />,
-      imageId: 'crop-recommendation',
-    },
-  ];
-
   return (
-    <div className="space-y-8">
-      <div className="text-center md:text-left">
-        <h1 className="text-3xl font-bold font-headline tracking-tight">
-            {translations.dashboard.greeting}
-        </h1>
-        <p className="text-muted-foreground">{translations.dashboard.welcome}</p>
-      </div>
-
+    <div className="space-y-6">
       <div>
-        <h2 className="text-2xl font-bold font-headline mb-4">{translations.dashboard.subsidies.title}</h2>
-        <Carousel
-            className="w-full"
-            opts={{
-                align: "start",
-                loop: true,
-            }}
-        >
-          <CarouselContent>
-            {matchedSubsidies.map((subsidy) => (
-              <CarouselItem key={subsidy.id} className="md:basis-1/2 lg:basis-1/3">
-                <Link href={subsidy.link} className="h-full block">
-                  <div className="p-1 h-full">
-                    <Card className="flex flex-col h-full overflow-hidden hover:bg-muted/50 transition-colors">
-                      <CardHeader>
-                        <CardTitle className="text-xl">{subsidy.title}</CardTitle>
-                        <CardDescription>{subsidy.description}</CardDescription>
-                      </CardHeader>
-                      <CardContent className="flex-grow space-y-4">
-                          <div>
-                              <h4 className="font-semibold text-sm">{translations.dashboard.subsidies.benefits}</h4>
-                              <p className="text-sm text-muted-foreground">{subsidy.eligibility}</p>
-                          </div>
-                      </CardContent>
-                    </Card>
-                  </div>
-                </Link>
-              </CarouselItem>
-            ))}
-          </CarouselContent>
-        </Carousel>
+        <h1 className="text-3xl font-bold font-headline tracking-tight text-foreground">
+            Welcome, Farmer! 🌾
+        </h1>
+        <p className="text-muted-foreground">Monitor your farm and get AI-powered insights</p>
       </div>
 
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-        <Link href="/weather" className="flex flex-col">
-          <Card className="flex flex-col flex-1 overflow-hidden hover:shadow-lg transition-shadow duration-300">
-            <CardHeader className="flex-row items-start gap-4 space-y-0">
-                <div className="flex-shrink-0"><CloudSun className="w-8 h-8 text-primary" /></div>
-                <div className="flex-grow">
-                <CardTitle>{translations.dashboard.weather.title}</CardTitle>
-                <CardDescription>{translations.dashboard.weather.description}</CardDescription>
+      <Card>
+        <CardHeader className="flex-row items-center gap-4">
+            <Cloud className="w-6 h-6 text-primary" />
+            <CardTitle className="text-lg">7-Day Weather Forecast</CardTitle>
+        </CardHeader>
+        <CardContent>
+            <p className="text-muted-foreground">No forecast data available</p>
+        </CardContent>
+      </Card>
+
+        <div className="grid grid-cols-2 gap-4">
+            <Button asChild className="h-20 bg-primary hover:bg-primary/90 text-primary-foreground text-lg">
+                <Link href="/crop-recommendation">
+                    <Atom className="mr-2 h-6 w-6" />
+                    AI Recommendations
+                </Link>
+            </Button>
+            <Button asChild className="h-20 bg-accent hover:bg-accent/90 text-accent-foreground text-lg">
+                 <Link href="/chat">
+                    <MessageSquare className="mr-2 h-6 w-6" />
+                    Voice Chat
+                </Link>
+            </Button>
+            <Button asChild variant="outline" className="h-16">
+                 <Link href="/crop-planner">
+                    <Layers className="mr-2 h-5 w-5" />
+                    Multi-Crop Plan
+                </Link>
+            </Button>
+            <Button asChild variant="outline" className="h-16">
+                <Link href="/calendar">
+                    <Calendar className="mr-2 h-5 w-5" />
+                    Calendar
+                </Link>
+            </Button>
+        </div>
+
+        <div className="grid grid-cols-2 gap-4">
+            <Card>
+                <CardContent className="p-4">
+                    <div className="flex items-center justify-between text-sm text-muted-foreground">
+                        <p>Soil Moisture</p>
+                        <Droplets className="w-4 h-4"/>
+                    </div>
+                    <p className="text-2xl font-bold text-primary mt-1">{soilData.moisture}%</p>
+                    <p className="text-xs text-muted-foreground">Good level</p>
+                </CardContent>
+            </Card>
+            <Card>
+                <CardContent className="p-4">
+                    <div className="flex items-center justify-between text-sm text-muted-foreground">
+                        <p>Temperature</p>
+                        <Thermometer className="w-4 h-4"/>
+                    </div>
+                    <p className="text-2xl font-bold text-primary mt-1">{weatherData.current.temp}°C</p>
+                    <p className="text-xs text-muted-foreground">Optimal</p>
+                </CardContent>
+            </Card>
+             <Card>
+                <CardContent className="p-4">
+                    <div className="flex items-center justify-between text-sm text-muted-foreground">
+                        <p>Weather</p>
+                        <Sun className="w-4 h-4"/>
+                    </div>
+                    <p className="text-2xl font-bold text-primary mt-1">{weatherData.current.condition}</p>
+                    <p className="text-xs text-muted-foreground">Clear skies</p>
+                </CardContent>
+            </Card>
+             <Card>
+                <CardContent className="p-4">
+                    <div className="flex items-center justify-between text-sm text-muted-foreground">
+                        <p>Yield Trend</p>
+                        <TrendingUp className="w-4 h-4"/>
+                    </div>
+                    <p className="text-2xl font-bold text-primary mt-1">{yieldData.trend}</p>
+                    <p className="text-xs text-muted-foreground">This season</p>
+                </CardContent>
+            </Card>
+        </div>
+
+        <Card>
+            <CardHeader>
+                <div className="flex items-center justify-between">
+                    <CardTitle>Soil Analysis</CardTitle>
+                    <div className="text-sm font-medium text-primary bg-primary/10 px-3 py-1 rounded-full">Healthy</div>
                 </div>
             </CardHeader>
-            <CardContent className="mt-auto">
-              <div className="flex items-center justify-between p-2 rounded-md bg-muted/50">
-                  <div className="flex items-center gap-2">
-                    <Thermometer className="w-5 h-5 text-red-500"/>
-                    <span className="font-bold">{weatherData.current.temp}°C</span>
-                  </div>
-                   <div className="flex items-center gap-2">
-                    {weatherData.current.icon}
-                    <span className="font-bold">{weatherData.current.condition}</span>
-                  </div>
-              </div>
+            <CardContent className="space-y-4">
+                <div className="grid grid-cols-3 text-center">
+                    <div>
+                        <p className="text-muted-foreground text-sm">pH Level</p>
+                        <p className="text-xl font-bold">{soilData.ph}</p>
+                    </div>
+                    <div>
+                        <p className="text-muted-foreground text-sm">Nitrogen</p>
+                        <p className="text-xl font-bold">{soilData.nitrogen} kg</p>
+                    </div>
+                    <div>
+                        <p className="text-muted-foreground text-sm">Potassium</p>
+                        <p className="text-xl font-bold">{soilData.potassium} kg</p>
+                    </div>
+                </div>
+                <Button asChild variant="outline" className="w-full">
+                    <Link href="/soil-analysis">View Full Report</Link>
+                </Button>
             </CardContent>
-          </Card>
-        </Link>
-        {dashboardCards.map((feature) => {
-          const image = PlaceHolderImages.find((img) => img.id === feature.imageId);
-          return (
-            <Link href={feature.href} key={feature.title} className="flex flex-col">
-                <Card className="flex flex-col flex-1 overflow-hidden hover:shadow-lg transition-shadow duration-300">
-                {image && (
-                    <div className="aspect-video relative">
-                        <Image
-                        src={image.imageUrl}
-                        alt={image.description}
-                        fill
-                        className="object-cover"
-                        data-ai-hint={image.imageHint}
-                        />
-                    </div>
-                )}
-                <CardHeader className="flex-row items-start gap-4 space-y-0">
-                    <div className="flex-shrink-0">{feature.icon}</div>
-                    <div className="flex-grow">
-                    <CardTitle>{feature.title}</CardTitle>
-                    <CardDescription>{feature.description}</CardDescription>
-                    </div>
-                </CardHeader>
-                <CardContent className="mt-auto">
-                    <div className="w-full bg-primary hover:bg-primary/90 text-primary-foreground text-center p-2 rounded-md">
-                        {translations.dashboard.viewDetails}
-                    </div>
-                </CardContent>
-                </Card>
-            </Link>
-          );
-        })}
-      </div>
+        </Card>
+        
+        <Card className="bg-primary/5 border-primary/20">
+            <CardContent className="p-4 flex items-center gap-4">
+                <div className="bg-muted p-2 rounded-full">
+                    <Bot className="w-8 h-8 text-primary" />
+                </div>
+                <div>
+                    <CardTitle className="text-base mb-1">AI Recommendation</CardTitle>
+                    <p className="text-sm text-muted-foreground">
+                        Based on your soil analysis, consider planting tomatoes this season. Market demand is predicted to increase by 15%.
+                    </p>
+                </div>
+            </CardContent>
+        </Card>
     </div>
   );
 }
