@@ -31,13 +31,6 @@ export default function DashboardPage() {
       icon: <Bell className="w-8 h-8 text-primary" />,
       imageId: 'subsidy-alerts',
     },
-    {
-      title: translations.dashboard.smartTips.title,
-      description: translations.dashboard.smartTips.description,
-      href: '/chat',
-      icon: <Bot className="w-8 h-8 text-primary" />,
-      imageId: 'reminders',
-    },
   ];
 
   return (
