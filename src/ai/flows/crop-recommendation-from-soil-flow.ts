@@ -44,21 +44,21 @@ const prompt = ai.definePrompt({
   output: {schema: CropRecommendationFromSoilOutputSchema},
   prompt: `You are an expert agricultural business advisor helping Indian farmers become "agripreneurs". Your goal is to recommend a profitable, efficient, and sustainable crop strategy, focusing on short-duration crops for the fastest ROI.
 
-Your recommendations must be based on the following high-value, fast-ROI crops and enterprises. Do NOT use any other crops. Prioritize crops from the "Best short-term crops" list first.
+Your recommendations must be based on the following high-value, fast-ROI crops and enterprises. Do NOT use any other crops. Prioritize crops from the "Fastest Cash Crops (Under 6 Months)" list first.
 
 ---
-### Best short-term crops for ROI on <1 acre (30-90 days)
+### Fastest Cash Crops for ROI on <1 acre (Under 6 Months)
 
-1.  **Lettuce (30–60 days)** - High demand in urban restaurants.
-2.  **Spinach / Amaranthus (25–35 days)** - Fastest vegetative return (monthly cash flow).
-3.  **Cucumber (45–60 days)** - Excellent early-market value in summer.
-4.  **Bottle Gourd / Lauki (60–75 days)** - Reliable low-cost, high-yield vegetable.
-5.  **Basil (Tulsi) (45–60 days)** - Quick for herbal and culinary markets.
-6.  **Mushroom Cultivation (Oyster / Button) (45-60 days)** - Fastest enterprise ROI, minimal land.
-7.  **Cowpea / Cluster Bean (60–70 days)** - Nitrogen-fixing intercrop, drought-tolerant.
-8.  **Watermelon and Muskmelon (60–90 days)** - Strong summer market demand.
-9.  **Coriander and Fenugreek (Methi) Leaves (30–45 days)** - Extremely short duration, constant demand.
-10. **Microgreens (10–20 days)** - Fastest ROI of all, strong urban D2C potential.
+1.  **Radish (21-30 days)** - Ideal for quick turnover and continuous income.
+2.  **Spinach & Leafy Mixes (30-45 days)** - Strong local demand, allows for multiple cuts.
+3.  **Asian Greens (Pak Choy, etc.) (35-45 days)** - High-value for premium salad markets.
+4.  **Cucumber / Zucchini (45-60 days)** - Quick cash turnover, especially in summer.
+5.  **Cherry Tomatoes (in Greenhouse) (70-85 days)** - Premium pricing and long harvest window.
+6.  **Green Onion / Spring Onion (60-75 days)** - Grown year-round with consistent demand.
+7.  **Mushrooms (Oyster or Button) (30-45 days)** - Top choice for limited space, produces continuously.
+8.  **Baby Carrots & Hakurei Turnips (40-60 days)** - Premium price in early season.
+9.  **Coriander & Dill Leaves (30-45 days)** - Continuous urban demand, good as a filler crop.
+10. **Okra (Bhindi) (60-75 days)** - Resilient to summer stress with multiple pickings.
 
 ---
 ### Other High-Value, Fast ROI Crops & Enterprises for Smallholders
@@ -97,13 +97,13 @@ You may also recommend from this list of common Indian crops if they fit the pro
 - Onion
 - Chilli / Mirchi
 - Ridge gourd (Beerakaya)
+- Bottle gourd (Sorakaya)
 - Marigold flowers (Banti Puvvulu)
 - Chrysanthemum flowers (Chamanti Puvvulu)
 - Carrot
 - Potato (Bangala Dumpa)
 - Beetroot
 - Sweet potato
-- Radish
 - Brinjal / Eggplant (Vankaya)
 - Spinach (Palakura)
 - Amaranthus (Thotakura)
