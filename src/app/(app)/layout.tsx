@@ -140,9 +140,16 @@ function AppHeader() {
 
 function AppSidebar() {
   const pathname = usePathname();
-  const { setOpen } = useSidebar();
+  const { setOpen, isMobile } = useSidebar();
+  
+  const handleLinkClick = () => {
+    if (!isMobile) {
+      setOpen(false);
+    }
+  }
+
   return (
-    <Sidebar className="border-r" collapsible="icon">
+    <Sidebar className="border-r h-full" collapsible="icon">
         <SidebarHeader>
             <Link href="/dashboard">
                 <Icons.logo className="w-8 h-8 text-primary" />
@@ -152,7 +159,7 @@ function AppSidebar() {
             <SidebarMenu>
                 {mainNavItems.map(item => (
                     <SidebarMenuItem key={item.href}>
-                         <Link href={item.href} onClick={() => setOpen(false)}>
+                         <Link href={item.href} onClick={handleLinkClick}>
                             <SidebarMenuButton
                                 tooltip={{children: item.label}}
                                 isActive={pathname.startsWith(item.href)}
