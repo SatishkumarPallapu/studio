@@ -1,7 +1,7 @@
 
 'use client';
 import { useState, useEffect } from 'react';
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams, useParams } from 'next/navigation';
 import {
   Card,
   CardContent,
@@ -78,45 +78,46 @@ const getCertifiedSeedInfo = async (cropName: string, language: Language) => {
 type SeedInfo = Awaited<ReturnType<typeof getCertifiedSeedInfo>>;
 
 
-export default function CropRoadmapPage({
-  params,
-}: {
-  params: { crop: string };
-}) {
+export default function CropRoadmapPage() {
   const searchParams = useSearchParams();
+  const params = useParams();
   const [roadmap, setRoadmap] = useState<CropRoadmapOutput | null>(null);
   const [seedInfo, setSeedInfo] = useState<SeedInfo | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const { language: currentLanguage } = useLanguage();
   
-  const cropName = params.crop ? decodeURIComponent(params.crop.replace(/-/g, ' ')) : '';
+  const rawCropName = params.crop;
+  const cropName = rawCropName && typeof rawCropName === 'string' ? decodeURIComponent(rawCropName.replace(/-/g, ' ')) : '';
   const farmingType = searchParams.get('farmingType') as FarmingType | null;
 
-  const fetchRoadmapAndSeeds = async () => {
-    if (!cropName) return;
-    
-    try {
-      setIsLoading(true);
-      const selectedLang = currentLanguage === 'te' ? 'Telugu' : currentLanguage === 'hi' ? 'Hindi' : 'English';
-      const roadmapInput = { cropName, farmingType: farmingType || 'Open Field' };
-
-      const [roadmapResult, seedResult] = await Promise.all([
-           generateCropRoadmap(roadmapInput),
-           getCertifiedSeedInfo(cropName, selectedLang)
-      ]);
-      setRoadmap(roadmapResult);
-      setSeedInfo(seedResult);
-    } catch (error) {
-      console.error("Failed to fetch crop roadmap:", error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
   useEffect(() => {
+    const fetchRoadmapAndSeeds = async () => {
+        if (!cropName) {
+            setIsLoading(false);
+            return;
+        };
+      
+      try {
+        setIsLoading(true);
+        const selectedLang = currentLanguage === 'te' ? 'Telugu' : currentLanguage === 'hi' ? 'Hindi' : 'English';
+        const roadmapInput = { cropName, farmingType: farmingType || 'Open Field' };
+
+        const [roadmapResult, seedResult] = await Promise.all([
+             generateCropRoadmap(roadmapInput),
+             getCertifiedSeedInfo(cropName, selectedLang)
+        ]);
+        setRoadmap(roadmapResult);
+        setSeedInfo(seedResult);
+      } catch (error) {
+        console.error("Failed to fetch crop roadmap:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    
     fetchRoadmapAndSeeds();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [cropName, currentLanguage]);
+  }, [cropName, farmingType, currentLanguage]);
   
   if (isLoading) {
     return (
