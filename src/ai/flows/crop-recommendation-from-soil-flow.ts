@@ -90,13 +90,13 @@ Other common crops: Tomato, Mint, Marigold, Maize, Paddy, Onion, Chilli, Gourds,
 ---
 
 **Category 1: Top Soil Matches**
-Recommend 3 crops that are the absolute best fit for the provided soil data (N, P, K, pH).
+Recommend 3 crops that are the absolute best fit for the provided soil data (N, P, K, pH) and location, based on your general agricultural knowledge. Do not be limited by the reference list above for this category.
 
 **Category 2: Fastest ROI Crops**
-Recommend 3 crops from the reference list with the shortest harvest durations (30-90 days) that are suitable for the farmer's location.
+Recommend 3 crops *from the reference list* with the shortest harvest durations (30-90 days) that are suitable for the farmer's location.
 
 **Category 3: High-Demand at Harvest**
-1.  Select 3 suitable crops for the location.
+1.  Select 3 suitable crops for the location, using the reference list as your primary source.
 2.  For each, calculate the harvest month based on its duration if planted today.
 3.  Based on general Indian market trends, predict which of these will have the highest demand in their calculated harvest month.
 4.  Recommend these 3 crops. Explain *why* their demand will be high (e.g., "Watermelon demand peaks in May due to summer heat.").
