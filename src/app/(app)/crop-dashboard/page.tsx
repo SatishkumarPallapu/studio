@@ -2,7 +2,7 @@
 'use client';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Sprout, Droplets, Leaf, Calendar, Bot, Satellite, ChevronDown } from 'lucide-react';
+import { Sprout, Droplets, Leaf, Calendar, Bot, Satellite, ChevronDown, Loader2 } from 'lucide-react';
 import MoistureMonitorPage from '../moisture-monitor/page';
 import CropHealthClient from '../crop-health/crop-health-client';
 import CalendarPage from '../calendar/page';
@@ -16,10 +16,31 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Button } from '@/components/ui/button';
+import { useEffect, useState } from 'react';
 
 export default function CropDashboardPage() {
     const mockFarmerPhone = '+919999999999'; 
     const { activeCrop, trackedCrops, setActiveCrop } = useActiveCrop();
+    const [isLoading, setIsLoading] = useState(true);
+
+    useEffect(() => {
+        // The useActiveCrop hook handles loading from localStorage.
+        // We just need to wait until activeCrop is either loaded or confirmed to be null.
+        // The hook initializes activeCrop to null and then updates it.
+        // So, if activeCrop is not null, or if it is null but there are no tracked crops, loading is done.
+        if (activeCrop || trackedCrops.length === 0) {
+            setIsLoading(false);
+        }
+    }, [activeCrop, trackedCrops]);
+
+
+    if (isLoading) {
+        return (
+            <div className="flex items-center justify-center h-96">
+                <Loader2 className="w-12 h-12 text-primary animate-spin" />
+            </div>
+        );
+    }
 
     if (!activeCrop) {
         return (
