@@ -41,6 +41,8 @@ export default function DroneHubClient() {
 
     const [isPlanDialogOpen, setIsPlanDialogOpen] = useState(false);
     const [isViewDialogOpen, setIsViewDialogOpen] = useState(false);
+    const [missionType, setMissionType] = useState<string>('');
+
 
     const missionsCollection = useMemo(() => {
         if (!user || !firestore) return null;
@@ -63,10 +65,13 @@ export default function DroneHubClient() {
 
     const handlePlanMission = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
-        if (!missionsCollection) return;
+        if (!missionsCollection || !user) {
+            toast({ variant: 'destructive', title: 'Error', description: 'You must be logged in to plan a mission.' });
+            return;
+        }
 
         const formData = new FormData(event.currentTarget);
-        const type = formData.get('type') as string;
+        const type = missionType;
         const date = formData.get('date') as string;
 
         if (!type || !date) {
@@ -79,10 +84,11 @@ export default function DroneHubClient() {
                 type,
                 date: new Date(date),
                 status: 'Pending',
-                userId: user?.uid,
+                userId: user.uid,
             });
             toast({ title: 'Mission Planned!', description: 'Your drone mission has been scheduled.' });
             setIsPlanDialogOpen(false);
+            setMissionType('');
         } catch (error) {
             console.error("Error planning mission:", error);
             toast({ variant: 'destructive', title: 'Error', description: 'Could not plan the mission.' });
@@ -169,8 +175,8 @@ export default function DroneHubClient() {
           </CardContent>
         </Card>
 
-        <Dialog open={isPlanDialogOpen} onOpenChange={setIsPlanDialogOpen}>
-            <Card>
+        
+        <Card>
             <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                 <Wind className="w-6 h-6 text-primary" />
@@ -193,39 +199,42 @@ export default function DroneHubClient() {
                         </div>
                     </div>
                 )}
-                <DialogTrigger asChild>
-                    <Button className="w-full">Plan New Mission</Button>
-                </DialogTrigger>
+                <Dialog open={isPlanDialogOpen} onOpenChange={setIsPlanDialogOpen}>
+                    <DialogTrigger asChild>
+                        <Button className="w-full">Plan New Mission</Button>
+                    </DialogTrigger>
+                    <DialogContent>
+                        <form id="plan-mission-form" onSubmit={handlePlanMission}>
+                            <DialogHeader>
+                                <DialogTitle>Plan a New Drone Mission</DialogTitle>
+                                <DialogDescription>Schedule a new operation for your drone.</DialogDescription>
+                            </DialogHeader>
+                            <div className="space-y-4 py-4">
+                                <div className="space-y-2">
+                                    <Label htmlFor="type">Mission Type</Label>
+                                    <Select name="type" onValueChange={setMissionType} required>
+                                        <SelectTrigger>
+                                            <SelectValue placeholder="Select a mission type" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="NDVI Scan">NDVI Scan</SelectItem>
+                                            <SelectItem value="Pesticide Spraying">Pesticide Spraying</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+                                <div className="space-y-2">
+                                    <Label htmlFor="date">Date</Label>
+                                    <Input id="date" name="date" type="date" required/>
+                                </div>
+                            </div>
+                            <DialogFooter>
+                                <Button type="submit" form="plan-mission-form">Schedule Mission</Button>
+                            </DialogFooter>
+                        </form>
+                    </DialogContent>
+                </Dialog>
             </CardContent>
-            </Card>
-             <DialogContent>
-                <DialogHeader>
-                    <DialogTitle>Plan a New Drone Mission</DialogTitle>
-                    <DialogDescription>Schedule a new operation for your drone.</DialogDescription>
-                </DialogHeader>
-                <form id="plan-mission-form" onSubmit={handlePlanMission} className="space-y-4 py-4">
-                    <div className="space-y-2">
-                        <Label htmlFor="type">Mission Type</Label>
-                        <Select name="type" required>
-                            <SelectTrigger>
-                                <SelectValue placeholder="Select a mission type" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value="NDVI Scan">NDVI Scan</SelectItem>
-                                <SelectItem value="Pesticide Spraying">Pesticide Spraying</SelectItem>
-                            </SelectContent>
-                        </Select>
-                    </div>
-                    <div className="space-y-2">
-                        <Label htmlFor="date">Date</Label>
-                        <Input id="date" name="date" type="date" required/>
-                    </div>
-                </form>
-                 <DialogFooter>
-                    <Button type="submit" form="plan-mission-form">Schedule Mission</Button>
-                </DialogFooter>
-            </DialogContent>
-        </Dialog>
+        </Card>
       </div>
 
        <Card>
@@ -260,3 +269,5 @@ export default function DroneHubClient() {
     </div>
   );
 }
+
+    
