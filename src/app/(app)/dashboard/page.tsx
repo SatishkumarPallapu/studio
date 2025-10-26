@@ -1,13 +1,13 @@
+
 'use client';
 import * as React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Cloud, Bot, MessageSquare, Layers, Calendar, Droplets, Thermometer, Sun, TrendingUp, Atom, Info } from 'lucide-react';
+import { Cloud, Bot, MessageSquare, Layers, Calendar, Droplets, Thermometer, Sun, TrendingUp, Atom, Info, Loader2 } from 'lucide-react';
 import Link from 'next/link';
+import type { WeatherData } from '@/lib/weather-data';
+import { getIconForCondition } from '@/lib/weather-data';
 
-const weatherData = {
-    current: { temp: 28, condition: 'Sunny', icon: <Sun className="w-5 h-5 text-yellow-500" /> },
-};
 
 const soilData = {
     moisture: 68,
@@ -22,6 +22,35 @@ const yieldData = {
 
 
 export default function DashboardPage() {
+  const [weatherData, setWeatherData] = React.useState<WeatherData | null>(null);
+  const [isLoading, setIsLoading] = React.useState(true);
+  const [error, setError] = React.useState<string | null>(null);
+
+  React.useEffect(() => {
+    const fetchWeatherData = async () => {
+      try {
+        setIsLoading(true);
+        const res = await fetch('/api/weather');
+        if (!res.ok) {
+          throw new Error('Failed to fetch weather data.');
+        }
+        const data: WeatherData = await res.json();
+        setWeatherData(data);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'An unknown error occurred.');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchWeatherData();
+  }, []);
+
+  const currentHour = weatherData?.daily[0]?.hourly.find(h => {
+    const hourDate = new Date(h.time);
+    return hourDate.getHours() === new Date().getHours();
+  }) || weatherData?.daily[0]?.hourly[0];
+
+
   return (
     <div className="space-y-6">
       <div>
@@ -37,7 +66,16 @@ export default function DashboardPage() {
             <CardTitle className="text-lg">7-Day Weather Forecast</CardTitle>
         </CardHeader>
         <CardContent>
-            <p className="text-muted-foreground">No forecast data available</p>
+            {isLoading && <p className="text-muted-foreground">Loading forecast...</p>}
+            {error && <p className="text-destructive">{error}</p>}
+            {weatherData && (
+                 <p className="text-muted-foreground">
+                    Weather data loaded successfully. View the full forecast on the <Link href="/weather" className="text-primary underline">Weather Page</Link>.
+                 </p>
+            )}
+             {!isLoading && !weatherData && !error && (
+                 <p className="text-muted-foreground">No forecast data available</p>
+             )}
         </CardContent>
       </Card>
 
@@ -85,8 +123,14 @@ export default function DashboardPage() {
                         <p>Temperature</p>
                         <Thermometer className="w-4 h-4"/>
                     </div>
-                    <p className="text-2xl font-bold text-primary mt-1">{weatherData.current.temp}°C</p>
-                    <p className="text-xs text-muted-foreground">Optimal</p>
+                    {isLoading ? <Loader2 className="w-6 h-6 animate-spin mt-1" /> : currentHour ? (
+                         <>
+                            <p className="text-2xl font-bold text-primary mt-1">{currentHour.temp}°C</p>
+                            <p className="text-xs text-muted-foreground">Optimal</p>
+                         </>
+                    ) : (
+                         <p className="text-sm text-muted-foreground mt-1">N/A</p>
+                    )}
                 </CardContent>
             </Card>
              <Card>
@@ -95,8 +139,14 @@ export default function DashboardPage() {
                         <p>Weather</p>
                         <Sun className="w-4 h-4"/>
                     </div>
-                    <p className="text-2xl font-bold text-primary mt-1">{weatherData.current.condition}</p>
-                    <p className="text-xs text-muted-foreground">Clear skies</p>
+                     {isLoading ? <Loader2 className="w-6 h-6 animate-spin mt-1" /> : currentHour ? (
+                         <>
+                            <p className="text-2xl font-bold text-primary mt-1">{currentHour.condition}</p>
+                            <p className="text-xs text-muted-foreground">Clear skies</p>
+                         </>
+                     ) : (
+                        <p className="text-sm text-muted-foreground mt-1">N/A</p>
+                     )}
                 </CardContent>
             </Card>
              <Card>
