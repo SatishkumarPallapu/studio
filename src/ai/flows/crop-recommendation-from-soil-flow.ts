@@ -33,6 +33,7 @@ const CropRecommendationFromSoilOutputSchema = z.object({
   top_soil_matches: z.array(CropInfoSchema).describe('A list of 3 crops that are the best match for the given soil conditions.'),
   short_duration_crops: z.array(CropInfoSchema).describe('A list of 3 crops with the fastest harvest cycles (30-90 days) for quick ROI.'),
   high_demand_at_harvest_crops: z.array(CropInfoSchema).describe('A list of 3 crops predicted to have high market demand during their calculated harvest month.'),
+  high_profit_demand_crops: z.array(CropInfoSchema).describe('A list of 3 crops that have both high profit potential and huge market demand.'),
   intercropping_suggestions: z.string().describe('A paragraph suggesting compatible crops that can be grown together to improve soil health and yield.'),
 });
 export type CropRecommendationFromSoilOutput = z.infer<typeof CropRecommendationFromSoilOutputSchema>;
@@ -61,7 +62,7 @@ Today's date is {{Date}}.
 - Language: {{{language}}}
 
 **Your Task:**
-Generate three distinct categories of crop recommendations (3 crops per category). For each crop, provide the requested information (name, vitamins, medicinal_value, harvesting_duration, peak_demand_month).
+Generate four distinct categories of crop recommendations (3 crops per category). For each crop, provide the requested information (name, vitamins, medicinal_value, harvesting_duration, peak_demand_month).
 
 **Reference Data for Short-Duration & High-ROI Crops:**
 ---
@@ -96,10 +97,13 @@ Recommend 3 crops that are the absolute best fit for the provided soil data (N, 
 Recommend 3 crops *from the reference list* with the shortest harvest durations (30-90 days) that are suitable for the farmer's location.
 
 **Category 3: High-Demand at Harvest**
-1.  Select 3 suitable crops for the location, using the reference list as your primary source.
-2.  For each, calculate the harvest month based on its duration if planted today.
-3.  Based on general Indian market trends, predict which of these will have the highest demand in their calculated harvest month.
-4.  Recommend these 3 crops. Explain *why* their demand will be high (e.g., "Watermelon demand peaks in May due to summer heat.").
+1.  Select 3 suitable crops for the location.
+2.  Calculate their harvest month if planted today.
+3.  Based on general Indian market trends, predict which will have high demand in their harvest month. **Crucially, consider seasonal demand (e.g., mangoes in summer, gourds in winter) and festival demand (e.g., marigolds/flowers for Diwali/Dussehra, sugarcane for Sankranti).**
+4.  Recommend these 3 crops, explaining *why* their demand will be high (e.g., "Watermelon demand peaks in May due to summer heat.").
+
+**Category 4: Highest Profit & Huge Demand**
+Select 3 crops from the reference list or your general knowledge that represent the best combination of high profitability (ROI) and consistent, huge market demand. These are the "star performer" crops.
 
 **Final Section: Intercropping Suggestions**
 Provide a paragraph with smart intercropping business suggestions in the requested language. Explain which recommended crops can be grown together to maximize land use and soil health.

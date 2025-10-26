@@ -7,14 +7,15 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { cropRecommendationFromSoil, type CropRecommendationFromSoilOutput } from '@/ai/flows/crop-recommendation-from-soil-flow';
-import { generateSoilBudgetTips, type SoilBudgetTipsOutput } from '@/ai/flows/soil-budget-tips-flow';
+import { generateSoilBudgetTips } from '@/ai/flows/soil-budget-tips-flow';
+import type { SoilBudgetTipsOutput } from '@/ai/flows/soil-budget-tips-flow';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
-import { Bot, Loader2, Info, Sprout, Leaf, Heart, Calendar, TrendingUp, CheckCircle, Flame, Droplets, Wallet, Brain, Clock, Zap } from 'lucide-react';
+import { Bot, Loader2, Info, Sprout, Leaf, Heart, Calendar, TrendingUp, CheckCircle, Flame, Droplets, Wallet, Brain, Clock, Zap, Star } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
@@ -297,11 +298,23 @@ export default function CropRecommendationClient() {
           <Card>
             <CardHeader>
               <CardTitle className='flex items-center gap-2'><Zap className="text-primary"/> High-Demand at Harvest</CardTitle>
-              <CardDescription>Crops predicted to have peak market demand when you harvest.</CardDescription>
+              <CardDescription>Crops predicted to have peak market demand when you harvest (seasonal & festive).</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 {recommendation.high_demand_at_harvest_crops.map(renderCropCard)}
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle className='flex items-center gap-2'><Star className="text-primary"/> Highest Profit & Demand</CardTitle>
+              <CardDescription>Star performers combining high profitability and huge market demand.</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                {recommendation.high_profit_demand_crops.map(renderCropCard)}
               </div>
             </CardContent>
           </Card>
@@ -403,5 +416,3 @@ const NutrientCard = ({data, icon}: {data: { heading: string, normal_range: stri
         </Card>
     )
 }
-
-    
