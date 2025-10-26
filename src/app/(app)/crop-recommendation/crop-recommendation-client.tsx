@@ -12,7 +12,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
-import { Bot, Loader2, Info, Sprout, Leaf, Heart } from 'lucide-react';
+import { Bot, Loader2, Info, Sprout, Leaf, Heart, Calendar, TrendingUp } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
@@ -29,6 +29,8 @@ type CropInfo = {
   name: string;
   vitamins: string;
   medicinal_value: string;
+  harvesting_duration: string;
+  peak_demand_month: string;
 };
 
 type Recommendation = {
@@ -214,10 +216,15 @@ export default function CropRecommendationClient() {
                                     </div>
                                 </div>
                             ) : (
-                                <div className="text-xs text-muted-foreground animate-in fade-in-50">
-                                    <p>Yield: High</p>
-                                    <p>Profit: Good</p>
-                                    <p>Suitability: 90%</p>
+                                <div className="text-xs text-muted-foreground animate-in fade-in-50 space-y-1">
+                                    <div className="flex items-center justify-center gap-1">
+                                        <Calendar className="w-3 h-3" />
+                                        <span>Harvest: <b>{crop.harvesting_duration}</b></span>
+                                    </div>
+                                    <div className="flex items-center justify-center gap-1">
+                                        <TrendingUp className="w-3 h-3" />
+                                        <span>Demand: <b>{crop.peak_demand_month}</b></span>
+                                    </div>
                                 </div>
                             )}
 
@@ -259,3 +266,4 @@ export default function CropRecommendationClient() {
   );
 }
 
+    

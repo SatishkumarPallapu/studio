@@ -1,3 +1,4 @@
+
 'use server';
 /**
  * @fileOverview An AI agent for crop recommendation based on soil data.
@@ -23,6 +24,8 @@ const CropInfoSchema = z.object({
     name: z.string().describe('The common name of the crop.'),
     vitamins: z.string().describe('Key vitamins found in the crop.'),
     medicinal_value: z.string().describe('A brief description of its medicinal properties or health benefits.'),
+    harvesting_duration: z.string().describe('The approximate time from planting to harvest (e.g., "30-45 days").'),
+    peak_demand_month: z.string().describe('The estimated calendar month of peak market demand if the crop is planted today.'),
 });
 
 const CropRecommendationFromSoilOutputSchema = z.object({
@@ -63,56 +66,39 @@ Your recommendations must be based on the following high-value, fast-ROI crops a
 ---
 ### Other High-Value, Fast ROI Crops & Enterprises for Smallholders
 
-1.  **Moringa (Drumstick)**
-    -   **ROI Time:** 5–6 months per cycle
-    -   **Why:** Drought-tolerant, low-input, used in exports, nutraceuticals, and powders. Excellent intercrop for vegetables.
-
-2.  **Stevia (Natural Sweetener Leaf)**
-    -   **ROI Time:** 4–5 months per harvest (multiple cuts/year)
-    -   **Why:** Heavy demand from health-conscious markets. Low water needs.
-
-3.  **Exotic Vegetables (in Polyhouse/Net House)**
-    -   **Best Crops:** Bell pepper, zucchini, broccoli, cherry tomato
-    -   **Why:** Premium prices from restaurants and hotels.
-
-4.  **Turmeric and Ginger**
-    -   **ROI Time:** 8–10 months
-    -   **Why:** Long shelf life, export potential, thrives in mixed-cropping.
-
-5.  **Medicinal & Herbal Crops (Ashwagandha, Aloe Vera, Lemongrass)**
-    -   **ROI Time:** 6–9 months
-    -   **Why:** Used in pharma, cosmetics. High foreign exchange value.
-
-6.  **Dragon Fruit Farming**
-    -   **ROI Time:** 8–12 months
-    -   **Why:** High export demand, survives arid zones, minimal pesticides.
+1.  **Moringa (Drumstick) (5–6 months)**
+2.  **Stevia (Natural Sweetener Leaf) (4–5 months)**
+3.  **Exotic Vegetables (in Polyhouse/Net House) (e.g., Bell pepper, zucchini, broccoli, cherry tomato)**
+4.  **Turmeric and Ginger (8–10 months)**
+5.  **Medicinal & Herbal Crops (Ashwagandha, Aloe Vera, Lemongrass) (6–9 months)**
+6.  **Dragon Fruit Farming (8–12 months)**
 
 ---
 You may also recommend from this list of common Indian crops if they fit the profitability and short-duration goal:
-- Tomato
-- Mint (Pudina)
-- Marigold (Kalya Maku)
-- Maize / Corn (Mokka Jonna)
-- Paddy (Rice crop)
-- Onion
-- Chilli / Mirchi
-- Ridge gourd (Beerakaya)
-- Bottle gourd (Sorakaya)
-- Marigold flowers (Banti Puvvulu)
-- Chrysanthemum flowers (Chamanti Puvvulu)
-- Carrot
-- Potato (Bangala Dumpa)
-- Beetroot
-- Sweet potato
-- Brinjal / Eggplant (Vankaya)
-- Spinach (Palakura)
-- Amaranthus (Thotakura)
-- Lady’s finger / Okra (Bendakaya)
-- Chickpea (Senaga)
-- Lentil (Masur)
-- Field Pea (Batani)
-- Horse Gram (Ulavalu)
-- Kidney Bean (Rajma)
+- Tomato (60-90 days)
+- Mint (Pudina) (60-90 days)
+- Marigold (Kalya Maku) (60-70 days)
+- Maize / Corn (Mokka Jonna) (90-100 days)
+- Paddy (Rice crop) (120-150 days)
+- Onion (90-120 days)
+- Chilli / Mirchi (70-100 days)
+- Ridge gourd (Beerakaya) (50-60 days)
+- Bottle gourd (Sorakaya) (60-70 days)
+- Marigold flowers (Banti Puvvulu) (60-70 days)
+- Chrysanthemum flowers (Chamanti Puvvulu) (90-120 days)
+- Carrot (70-80 days)
+- Potato (Bangala Dumpa) (90-120 days)
+- Beetroot (60-70 days)
+- Sweet potato (90-120 days)
+- Brinjal / Eggplant (Vankaya) (70-90 days)
+- Spinach (Palakura) (30-45 days)
+- Amaranthus (Thotakura) (30-40 days)
+- Lady’s finger / Okra (Bendakaya) (60-75 days)
+- Chickpea (Senaga) (90-100 days)
+- Lentil (Masur) (110-130 days)
+- Field Pea (Batani) (80-100 days)
+- Horse Gram (Ulavalu) (120-180 days)
+- Kidney Bean (Rajma) (90-120 days)
 
 Soil Data:
 - Nitrogen: {{{nitrogen}}} ppm
@@ -125,6 +111,8 @@ For each recommended crop, provide:
 1. Common Name
 2. Key Vitamins
 3. A brief description of its medicinal value or health benefits.
+4. **Harvesting Duration:** The time from planting to harvest, based on the provided lists (e.g., "30-45 days").
+5. **Peak Demand Month:** Based on the harvesting duration, calculate and state the calendar month of peak demand (e.g., if planted today, "September"). Assume today's date is {{Date}}.
 
 Additionally, provide a paragraph with smart intercropping business suggestions. Explain which of the recommended crops can be grown together to maximize land use, diversify income, and improve soil fertility (e.g., "Grow Coriander between rows of Tomatoes. The Coriander will be ready for harvest in 40 days, providing early income while the Tomatoes mature.").
 `,
@@ -141,3 +129,5 @@ const cropRecommendationFlow = ai.defineFlow(
     return output!;
   }
 );
+
+    
