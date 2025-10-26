@@ -1,11 +1,21 @@
-
 'use client';
+
 import * as React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Cloud, Bot, MessageSquare, Layers, Calendar, Droplets, Thermometer, Sun, TrendingUp, Atom, Info, Loader2, CloudSun, CloudRain, CloudLightning } from 'lucide-react';
+
+// --- START: Merged Imports ---
+// We've combined all icons from both branches
+import {
+  Cloud, Bot, MessageSquare, Layers, Calendar, Droplets, Thermometer, Sun, TrendingUp, Atom,
+  Info, Loader2, CloudSun, CloudRain, CloudLightning // From your HEAD branch
+} from 'lucide-react';
 import Link from 'next/link';
-import type { WeatherData, WeatherCondition } from '@/lib/weather-data';
+// We need all these types and functions
+import type { WeatherData, WeatherCondition } from '@/lib/weather-data'; // Kept WeatherCondition
+import { getIconForCondition } from '@/lib/weather-data'; // Kept imported function
+import { format } from 'date-fns'; // Kept from remote
+// --- END: Merged Imports ---
 
 
 const soilData = {
@@ -19,53 +29,64 @@ const yieldData = {
     trend: '+12%',
 };
 
-const getIconForCondition = (condition: WeatherCondition | undefined, className: string) => {
-    if (!condition) return <Sun className={className} />;
-    switch (condition) {
-        case 'Sunny':
-            return <Sun className={className} />;
-        case 'Partly Cloudy':
-            return <CloudSun className={className} />;
-        case 'Cloudy':
-            return <Cloud className={className} />;
-        case 'Rain':
-            return <CloudRain className={className} />;
-        case 'Thunderstorm':
-            return <CloudLightning className={className} />;
-        default:
-            return <Sun className={className} />;
-    }
-};
+// We are using the imported 'getIconForCondition'
+// The inline function has been removed to resolve the conflict.
 
 
 export default function DashboardPage() {
+  // --- START: Kept Remote (Live Location) State ---
+  // Using 'loading' from the remote branch
   const [weatherData, setWeatherData] = React.useState<WeatherData | null>(null);
-  const [isLoading, setIsLoading] = React.useState(true);
+  const [loading, setLoading] = React.useState(true);
   const [error, setError] = React.useState<string | null>(null);
 
+  // Default fallback coordinates (Hyderabad)
+  const FALLBACK_LAT = 17.3850;
+  const FALLBACK_LON = 78.4867;
+
   React.useEffect(() => {
-    const fetchWeatherData = async () => {
+    // This is the new location logic from the remote branch
+    const fetchWeather = async (lat: number, lon: number) => {
       try {
-        setIsLoading(true);
-        const res = await fetch('/api/weather');
+        setLoading(true);
+        const res = await fetch(`/api/weather?lat=${lat}&lon=${lon}`);
         if (!res.ok) {
-          throw new Error('Failed to fetch weather data.');
+          throw new Error('Failed to load forecast.');
         }
         const data: WeatherData = await res.json();
         setWeatherData(data);
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'An unknown error occurred.');
+        setError(err instanceof Error ? err.message : 'An unknown error occurred');
       } finally {
-        setIsLoading(false);
+        setLoading(false);
       }
     };
-    fetchWeatherData();
-  }, []);
 
-  const currentHour = weatherData?.daily[0]?.hourly.find(h => {
-    const hourDate = new Date(h.time);
-    return hourDate.getHours() === new Date().getHours();
-  }) || weatherData?.daily[0]?.hourly[0];
+    if (!navigator.geolocation) {
+      setError("Geolocation is not supported. Showing default weather.");
+      fetchWeather(FALLBACK_LAT, FALLBACK_LON);
+      return;
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        fetchWeather(position.coords.latitude, position.coords.longitude);
+      },
+      (err) => {
+        console.error("Geolocation error:", err.message);
+        setError("Location access denied. Showing default weather.");
+        fetchWeather(FALLBACK_LAT, FALLBACK_LON);
+      }
+    );
+  }, []); // Empty array ensures this runs only once
+  // --- END: Kept Remote (Live Location) State ---
+
+  
+
+  // Get current conditions from the *first available 3-hour block*
+  const currentHourData = weatherData?.daily[0]?.hourly[0];
+  const currentTemp = currentHourData?.temp;
+  const currentCondition = currentHourData?.condition;
 
 
   return (
@@ -77,24 +98,54 @@ export default function DashboardPage() {
         <p className="text-muted-foreground">Monitor your farm and get AI-powered insights</p>
       </div>
 
+      {/* Show the location error if one exists */}
+      {error && !weatherData && (
+        <Card className="border-destructive">
+          <CardHeader>
+            <CardTitle className="text-destructive">Weather Error</CardTitle>
+            <CardDescription>{error}</CardDescription>
+          </CardHeader>
+        </Card>
+      )}
+
       <Card>
-        <CardHeader className="flex-row items-center gap-4">
-            <Cloud className="w-6 h-6 text-primary" />
-            <CardTitle className="text-lg">7-Day Weather Forecast</CardTitle>
+        <CardHeader className="flex-row items-center justify-between">
+            <div className="flex items-center gap-4">
+              <Cloud className="w-6 h-6 text-primary" />
+              <CardTitle className="text-lg">5-Day Weather Forecast</CardTitle>
+            </div>
+            <Button asChild variant="link" className="pr-0">
+              <Link href="/weather">View Details</Link>
+            </Button>
         </CardHeader>
         <CardContent>
-            {isLoading && <p className="text-muted-foreground">Loading forecast...</p>}
-            {error && <p className="text-destructive">{error}</p>}
-            {weatherData && (
-                 <p className="text-muted-foreground">
-                    Weather data loaded successfully. View the full forecast on the <Link href="/weather" className="text-primary underline">Weather Page</Link>.
-                 </p>
+            {/* Kept remote (live location) version */}
+            {loading && <p className="text-muted-foreground">Getting location and forecast...</p>}
+            
+            {/* Show location error message inline */}
+            {error && weatherData && (
+              <p className="text-xs text-yellow-600 mb-2">{error}</p>
             )}
-             {!isLoading && !weatherData && !error && (
-                 <p className="text-muted-foreground">No forecast data available</p>
-             )}
+
+            {weatherData && (
+              <div className="flex items-center justify-between gap-2 overflow-x-auto py-2">
+                {weatherData.daily.map((day, index) => (
+                  <div key={index} className="flex flex-col items-center gap-1 text-center px-2">
+                    <p className="text-sm font-medium whitespace-nowrap">
+                      {index === 0 ? 'Today' : format(new Date(day.date), 'EEE')}
+                    </p>
+                    {/* Using imported getIconForCondition */}
+                    {getIconForCondition(day.condition, "w-6 h-6 text-muted-foreground")}
+                    <p className="text-sm font-semibold">{day.temp.max}°</p>
+                    <p className="text-xs text-muted-foreground">{day.temp.min}°</p>
+                  </div>
+                ))}
+              </div>
+            )}
         </CardContent>
       </Card>
+
+      {/* ... (Rest of your dashboard JSX is unchanged) ... */}
 
         <div className="grid grid-cols-2 gap-4">
             <Button asChild className="h-20 bg-primary hover:bg-primary/90 text-primary-foreground text-lg">
@@ -134,38 +185,42 @@ export default function DashboardPage() {
                     <p className="text-xs text-muted-foreground">Good level</p>
                 </CardContent>
             </Card>
+            
             <Card>
                 <CardContent className="p-4">
                     <div className="flex items-center justify-between text-sm text-muted-foreground">
                         <p>Temperature</p>
                         <Thermometer className="w-4 h-4"/>
                     </div>
-                    {isLoading ? <Loader2 className="w-6 h-6 animate-spin mt-1" /> : currentHour ? (
-                         <>
-                            <p className="text-2xl font-bold text-primary mt-1">{currentHour.temp}°C</p>
-                            <p className="text-xs text-muted-foreground">Optimal</p>
-                         </>
-                    ) : (
-                         <p className="text-sm text-muted-foreground mt-1">N/A</p>
-                     )}
+                    {/* Kept remote (live location) version */}
+                    <p className="text-2xl font-bold text-primary mt-1">
+                      {loading ? '...' : (currentTemp ? `${currentTemp}°C` : 'N/A')}
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      {loading ? 'Loading...' : 'Live'}
+                    </p>
                 </CardContent>
             </Card>
              <Card>
                 <CardContent className="p-4">
                     <div className="flex items-center justify-between text-sm text-muted-foreground">
                         <p>Weather</p>
-                        {getIconForCondition(currentHour ? currentHour.condition : undefined, "w-4 h-4")}
+                        {/* --- MERGED: Using dynamic icon from HEAD with remote's data --- */}
+                        {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : (
+                            // Using imported getIconForCondition
+                            getIconForCondition(currentCondition, "w-4 h-4")
+                        )}
                     </div>
-                     {isLoading ? <Loader2 className="w-6 h-6 animate-spin mt-1" /> : currentHour ? (
-                         <>
-                            <p className="text-2xl font-bold text-primary mt-1">{currentHour.condition}</p>
-                            <p className="text-xs text-muted-foreground">Clear skies</p>
-                         </>
-                     ) : (
-                        <p className="text-sm text-muted-foreground mt-1">N/A</p>
-                     )}
+                     {/* Kept remote (live location) version */}
+                    <p className="text-2xl font-bold text-primary mt-1">
+                      {loading ? '...' : currentCondition || 'N/A'}
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      {loading ? 'Loading...' : 'Current'}
+                    </p>
                 </CardContent>
             </Card>
+
              <Card>
                 <CardContent className="p-4">
                     <div className="flex items-center justify-between text-sm text-muted-foreground">

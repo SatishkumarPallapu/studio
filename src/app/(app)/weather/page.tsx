@@ -1,13 +1,14 @@
-
 'use client';
 
 import * as React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts';
-import type { WeatherData, DailyForecast, WeatherCondition } from '@/lib/weather-data';
-import { Thermometer, Umbrella, Wind, Sunrise, Sunset, Clock, Droplets, Sun, Cloud, CloudSun, CloudRain, CloudLightning } from 'lucide-react';
+import type { WeatherData, DailyForecast } from '@/lib/weather-data';
+import { getIconForCondition } from '@/lib/weather-data';
+import { Thermometer, Umbrella, Wind, Sunrise, Sunset, Clock, Droplets } from 'lucide-react';
 import { format } from 'date-fns';
 
+// The HourlyForecastChart component remains the same
 const HourlyForecastChart = ({ data }: { data: DailyForecast['hourly'] }) => (
   <div className="h-[200px] w-full">
     <ResponsiveContainer>
@@ -55,35 +56,25 @@ const HourlyForecastChart = ({ data }: { data: DailyForecast['hourly'] }) => (
   </div>
 );
 
-const getIconForCondition = (condition: WeatherCondition | undefined, className: string) => {
-    if (!condition) return <Sun className={className} />;
-    switch (condition) {
-        case 'Sunny':
-            return <Sun className={className} />;
-        case 'Partly Cloudy':
-            return <CloudSun className={className} />;
-        case 'Cloudy':
-            return <Cloud className={className} />;
-        case 'Rain':
-            return <CloudRain className={className} />;
-        case 'Thunderstorm':
-            return <CloudLightning className={className} />;
-        default:
-            return <Sun className={className} />;
-    }
-};
-
 
 export default function WeatherPage() {
+  // --- START: Data Fetching State ---
   const [data, setData] = React.useState<WeatherData | null>(null);
   const [loading, setLoading] = React.useState(true);
   const [error, setError] = React.useState<string | null>(null);
 
+  // Default fallback coordinates (Hyderabad)
+  const FALLBACK_LAT = 17.3850;
+  const FALLBACK_LON = 78.4867;
+
   React.useEffect(() => {
-    const fetchData = async () => {
+    // Define a function to fetch weather data
+    const fetchWeather = async (lat: number, lon: number) => {
       try {
+        // Set loading to true *every time* we fetch
         setLoading(true);
-        const res = await fetch('/api/weather');
+        // Pass coordinates to our API route
+        const res = await fetch(`/api/weather?lat=${lat}&lon=${lon}`);
         if (!res.ok) {
           throw new Error('Failed to load weather forecast.');
         }
@@ -96,23 +87,47 @@ export default function WeatherPage() {
       }
     };
 
-    fetchData();
-  }, []);
+    // 1. Check if geolocation is available
+    if (!navigator.geolocation) {
+      setError("Geolocation is not supported. Showing default weather.");
+      fetchWeather(FALLBACK_LAT, FALLBACK_LON);
+      return;
+    }
 
+    // 2. Try to get the user's position
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        // SUCCESS: Use their coordinates
+        fetchWeather(position.coords.latitude, position.coords.longitude);
+      },
+      (err) => {
+        // FAILURE: User denied or error occurred
+        console.error("Geolocation error:", err.message);
+        setError("Location access denied. Showing default weather.");
+        // Use fallback coordinates
+        fetchWeather(FALLBACK_LAT, FALLBACK_LON);
+      }
+    );
+  }, []); // Empty dependency array means this runs once on mount
+  // --- END: Data Fetching State ---
+
+  
+  // --- START: Loading and Error UI ---
   if (loading) {
     return (
       <div className="space-y-6">
         <Card>
           <CardHeader>
             <CardTitle>Weather Forecast</CardTitle>
-            <CardDescription>Loading current conditions and 7-day forecast...</CardDescription>
+            <CardDescription>Getting your location and forecast...</CardDescription>
           </CardHeader>
         </Card>
       </div>
     );
   }
 
-  if (error) {
+  if (error && !data) {
+    // Show a big error only if we failed to load *any* data
     return (
       <Card className="border-destructive">
         <CardHeader>
@@ -123,15 +138,19 @@ export default function WeatherPage() {
     );
   }
 
-  if (!data) {
+  if (!data || !data.daily[0]) {
     return <div>No weather data available.</div>;
   }
+  // --- END: Loading and Error UI ---
 
+  
   const today = data.daily[0];
-  const currentHour = today.hourly.find(h => {
-    const hourDate = new Date(h.time);
-    return hourDate.getHours() === new Date().getHours();
-  }) || today.hourly[0];
+  // The free API is in 3-hour blocks. We'll get the *first* block as "current".
+  const currentHour = today.hourly[0];
+
+  if (!currentHour) {
+    return <div>Weather data is incomplete.</div>;
+  }
 
   return (
     <div className="space-y-6">
@@ -139,9 +158,15 @@ export default function WeatherPage() {
         <CardHeader>
           <CardTitle>Weather Forecast</CardTitle>
           <CardDescription>
-            Current conditions and 7-day forecast for your farm location.
+            Current conditions and 5-day forecast for your location.
           </CardDescription>
         </CardHeader>
+        {/* Show a small error if we're using fallback data */}
+        {error && data && (
+            <CardContent className="-mt-4">
+              <p className="text-xs text-yellow-600">{error}</p>
+            </CardContent>
+        )}
       </Card>
       
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -159,7 +184,7 @@ export default function WeatherPage() {
         <Card className="lg:col-span-2">
            <CardHeader>
             <CardTitle>Today's Details</CardTitle>
-           </CardHeader>
+          </CardHeader>
           <CardContent className="grid grid-cols-2 md:grid-cols-4 gap-4">
               <div className="flex items-center gap-3">
                 <Thermometer className="w-6 h-6 text-red-500" />
@@ -182,27 +207,27 @@ export default function WeatherPage() {
                   <p className="font-bold">{today.wind} km/h</p>
                 </div>
               </div>
-               <div className="flex items-center gap-3">
+              <div className="flex items-center gap-3">
                 <Droplets className="w-6 h-6 text-sky-500" />
                 <div>
                   <p className="text-sm text-muted-foreground">Humidity</p>
                   <p className="font-bold">{today.humidity}%</p>
                 </div>
               </div>
-               <div className="flex items-center gap-3 col-span-2">
-                 <div className="flex items-center gap-2">
-                  <Sunrise className="w-6 h-6 text-orange-400" />
-                  <div>
-                    <p className="text-sm text-muted-foreground">Sunrise</p>
-                    <p className="font-bold">{today.sunrise}</p>
-                  </div>
+              <div className="flex items-center gap-3 col-span-2">
+                <div className="flex items-center gap-2">
+                    <Sunrise className="w-6 h-6 text-orange-400" />
+                    <div>
+                        <p className="text-sm text-muted-foreground">Sunrise</p>
+                        <p className="font-bold">{today.sunrise}</p>
+                    </div>
                 </div>
                 <div className="flex items-center gap-2">
-                  <Sunset className="w-6 h-6 text-orange-600" />
-                  <div>
-                    <p className="text-sm text-muted-foreground">Sunset</p>
-                    <p className="font-bold">{today.sunset}</p>
-                  </div>
+                    <Sunset className="w-6 h-6 text-orange-600" />
+                    <div>
+                        <p className="text-sm text-muted-foreground">Sunset</p>
+                        <p className="font-bold">{today.sunset}</p>
+                    </div>
                 </div>
               </div>
           </CardContent>
@@ -214,13 +239,14 @@ export default function WeatherPage() {
           <CardTitle className="flex items-center gap-2"><Clock className="w-5 h-5"/>Hourly Forecast (24h)</CardTitle>
         </CardHeader>
         <CardContent>
-          <HourlyForecastChart data={data.daily.flatMap(d => d.hourly).slice(0, 24)} />
+          {/* This will grab the first 8 3-hour blocks (24h) */}
+          <HourlyForecastChart data={data.daily.flatMap(d => d.hourly).slice(0, 8)} />
         </CardContent>
       </Card>
       
       <Card>
         <CardHeader>
-          <CardTitle>7-Day Forecast</CardTitle>
+          <CardTitle>5-Day Forecast</CardTitle>
         </CardHeader>
         <CardContent className="space-y-2">
           {data.daily.map((day, index) => (
@@ -235,8 +261,8 @@ export default function WeatherPage() {
                 <div 
                     className="h-full bg-gradient-to-r from-blue-400 to-red-500" 
                     style={{ 
-                        width: `${((day.temp.max - day.temp.min) / (data.maxTemp - data.minTemp)) * 100}%`,
-                        marginLeft: `${((day.temp.min - data.minTemp) / (data.maxTemp - data.minTemp)) * 100}%`
+                      width: `${((day.temp.max - day.temp.min) / (data.maxTemp - data.minTemp)) * 100}%`,
+                      marginLeft: `${((day.temp.min - data.minTemp) / (data.maxTemp - data.minTemp)) * 100}%`
                     }}
                 />
               </div>

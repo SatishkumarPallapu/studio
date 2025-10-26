@@ -1,21 +1,32 @@
-import { NextResponse } from 'next/server';
+import { NextResponse, NextRequest } from 'next/server';
 import { transformOpenWeatherData } from '@/lib/weather-data';
 
-// TODO: Replace with your farm's coordinates
-const LAT = '17.3850'; // Hyderabad latitude
-const LON = '78.4867'; // Hyderabad longitude
+// We removed the hard-coded LAT/LON from here.
+// The base URL for the free tier API
+const API_BASE_URL = `https://api.openweathermap.org/data/2.5/forecast?units=metric`;
 
-const API_URL = `https://api.openweathermap.org/data/3.0/onecall?lat=${LAT}&lon=${LON}&exclude=minutely,alerts&units=metric`;
+export async function GET(request: NextRequest) {
+  // Get the lat/lon from the query parameters
+  const { searchParams } = request.nextUrl;
+  const lat = searchParams.get('lat');
+  const lon = searchParams.get('lon');
 
-export async function GET() {
+  // Add error handling if coordinates are missing
+  if (!lat || !lon) {
+    return NextResponse.json({ error: 'Latitude and longitude query parameters are required' }, { status: 400 });
+  }
+
   const apiKey = process.env.WEATHER_API_KEY;
 
   if (!apiKey) {
     return NextResponse.json({ error: 'Weather API key not configured' }, { status: 500 });
   }
 
+  // Build the final API URL dynamically
+  const API_URL = `${API_BASE_URL}&lat=${lat}&lon=${lon}&appid=${apiKey}`;
+
   try {
-    const res = await fetch(`${API_URL}&appid=${apiKey}`, {
+    const res = await fetch(API_URL, {
       next: { revalidate: 3600 } // Cache data for 1 hour
     });
 
@@ -26,7 +37,7 @@ export async function GET() {
 
     const rawData = await res.json();
     
-    // Transform the data into the format our UI expects
+    // The rest of your logic stays the same!
     const formattedData = transformOpenWeatherData(rawData);
 
     return NextResponse.json(formattedData);
