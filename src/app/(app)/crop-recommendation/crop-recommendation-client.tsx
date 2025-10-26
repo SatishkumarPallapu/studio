@@ -154,28 +154,28 @@ export default function CropRecommendationClient() {
                   <FormField control={form.control} name="nitrogen" render={({ field }) => (
                     <FormItem>
                       <FormLabel>Nitrogen (ppm)</FormLabel>
-                      <FormControl><Input type="number" placeholder="e.g., 120" {...field} value={field.value ?? ''} /></FormControl>
+                      <FormControl><Input suppressHydrationWarning type="number" placeholder="e.g., 120" {...field} value={field.value ?? ''} /></FormControl>
                       <FormMessage />
                     </FormItem>
                   )} />
                   <FormField control={form.control} name="phosphorus" render={({ field }) => (
                     <FormItem>
                       <FormLabel>Phosphorus (ppm)</FormLabel>
-                      <FormControl><Input type="number" placeholder="e.g., 50" {...field} value={field.value ?? ''} /></FormControl>
+                      <FormControl><Input suppressHydrationWarning type="number" placeholder="e.g., 50" {...field} value={field.value ?? ''} /></FormControl>
                       <FormMessage />
                     </FormItem>
                   )} />
                   <FormField control={form.control} name="potassium" render={({ field }) => (
                     <FormItem>
                       <FormLabel>Potassium (ppm)</FormLabel>
-                      <FormControl><Input type="number" placeholder="e.g., 75" {...field} value={field.value ?? ''} /></FormControl>
+                      <FormControl><Input suppressHydrationWarning type="number" placeholder="e.g., 75" {...field} value={field.value ?? ''} /></FormControl>
                       <FormMessage />
                     </FormItem>
                   )} />
                   <FormField control={form.control} name="ph" render={({ field }) => (
                     <FormItem>
                       <FormLabel>pH Level</FormLabel>
-                      <FormControl><Input type="number" step="0.1" placeholder="e.g., 6.8" {...field} value={field.value ?? ''} /></FormControl>
+                      <FormControl><Input suppressHydrationWarning type="number" step="0.1" placeholder="e.g., 6.8" {...field} value={field.value ?? ''} /></FormControl>
                       <FormMessage />
                     </FormItem>
                   )} />
@@ -183,11 +183,11 @@ export default function CropRecommendationClient() {
                 <FormField control={form.control} name="location" render={({ field }) => (
                     <FormItem>
                       <FormLabel>Farm Location</FormLabel>
-                      <FormControl><Input placeholder="e.g., Anantapur, Andhra Pradesh" {...field} /></FormControl>
+                      <FormControl><Input suppressHydrationWarning placeholder="e.g., Anantapur, Andhra Pradesh" {...field} /></FormControl>
                       <FormMessage />
                     </FormItem>
                   )} />
-                <Button type="submit" disabled={isLoading} className="w-full">
+                <Button suppressHydrationWarning type="submit" disabled={isLoading} className="w-full">
                   {isLoading ? (
                     <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Getting Recommendations...</>
                   ) : 'Get Recommendations'}
