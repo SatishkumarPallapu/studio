@@ -14,10 +14,11 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
-import { Bot, Loader2, Info, Sprout, Leaf, Heart, Calendar, TrendingUp, CheckCircle, Flame, Droplets, Wallet, Brain } from 'lucide-react';
+import { Bot, Loader2, Info, Sprout, Leaf, Heart, Calendar, TrendingUp, CheckCircle, Flame, Droplets, Wallet, Brain, Clock, Zap } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
+import { useLanguage } from '@/contexts/language-context';
 
 const formSchema = z.object({
   nitrogen: z.coerce.number().min(0, 'Nitrogen must be positive.'),
@@ -36,13 +37,16 @@ type CropInfo = {
 };
 
 type Recommendation = {
-  recommended_crops: CropInfo[];
+  top_soil_matches: CropInfo[];
+  short_duration_crops: CropInfo[];
+  high_demand_at_harvest_crops: CropInfo[];
   intercropping_suggestions: string;
 };
 
 export default function CropRecommendationClient() {
   const searchParams = useSearchParams();
   const router = useRouter();
+  const { language } = useLanguage();
   const [recommendation, setRecommendation] = useState<Recommendation | null>(null);
   const [budgetTips, setBudgetTips] = useState<SoilBudgetTipsOutput | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -94,7 +98,8 @@ export default function CropRecommendationClient() {
           phosphorus: values.phosphorus!,
           potassium: values.potassium!,
           ph: values.ph!,
-          location: values.location
+          location: values.location,
+          language: language === 'te' ? 'Telugu' : language === 'hi' ? 'Hindi' : 'English',
       });
       setRecommendation(result);
       toast({
@@ -103,11 +108,11 @@ export default function CropRecommendationClient() {
       });
 
       // Now, fetch budget tips for the first recommended crop
-      if (result.recommended_crops.length > 0) {
+      if (result.top_soil_matches.length > 0) {
         setIsTipsLoading(true);
         const tips = await generateSoilBudgetTips({
             ...values,
-            cropName: result.recommended_crops[0].name
+            cropName: result.top_soil_matches[0].name
         });
         setBudgetTips(tips);
         setIsTipsLoading(false);
@@ -136,6 +141,46 @@ export default function CropRecommendationClient() {
         [cropName]: !prev[cropName]
     }));
   };
+
+  const renderCropCard = (crop: CropInfo) => (
+    <Card 
+        key={crop.name} 
+        onClick={() => handleCardFlip(crop.name)}
+        className="p-4 flex flex-col items-center text-center space-y-3 hover:bg-accent hover:shadow-md transition-all cursor-pointer"
+    >
+        <Sprout className="w-10 h-10 text-primary"/>
+        <p className="font-semibold text-lg">{crop.name}</p>
+
+        {flippedCards[crop.name] ? (
+            <div className="space-y-3 text-xs text-left w-full animate-in fade-in-50">
+                <div>
+                    <p className="font-bold flex items-center gap-1"><Leaf className="w-3 h-3 text-green-500" /> Vitamins</p>
+                    <p className="text-muted-foreground">{crop.vitamins}</p>
+                </div>
+                <div>
+                    <p className="font-bold flex items-center gap-1"><Heart className="w-3 h-3 text-red-500" /> Health Benefits</p>
+                    <p className="text-muted-foreground">{crop.medicinal_value}</p>
+                </div>
+            </div>
+        ) : (
+            <div className="text-xs text-muted-foreground animate-in fade-in-50 space-y-1">
+                <div className="flex items-center justify-center gap-1">
+                    <Calendar className="w-3 h-3" />
+                    <span>Harvest: <b>{crop.harvesting_duration}</b></span>
+                </div>
+                <div className="flex items-center justify-center gap-1">
+                    <TrendingUp className="w-3 h-3" />
+                    <span>Demand: <b>{crop.peak_demand_month}</b></span>
+                </div>
+            </div>
+        )}
+
+        <div className="w-full pt-2">
+            <Button size="sm" className="w-full text-xs sm:text-sm" onClick={(e) => handleCropSelection(e, crop.name)}>View Roadmap</Button>
+        </div>
+    </Card>
+  );
+
 
   return (
     <div className="space-y-8">
@@ -204,68 +249,7 @@ export default function CropRecommendationClient() {
                   <p className="text-muted-foreground">Our AI is analyzing your farm data to find the perfect crops...</p>
               </div>
           )}
-          {!isLoading && recommendation ? (
-            <>
-              <Card>
-                <CardHeader>
-                  <CardTitle>Top Recommended Crops</CardTitle>
-                  <CardDescription>Tap a card for nutritional info. Select a crop to generate its roadmap.</CardDescription>
-                </CardHeader>
-                <CardContent>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                      {recommendation.recommended_crops.slice(0, 3).map((crop) => (
-                         <Card 
-                              key={crop.name} 
-                              onClick={() => handleCardFlip(crop.name)}
-                              className="p-4 flex flex-col items-center text-center space-y-3 hover:bg-accent hover:shadow-md transition-all cursor-pointer"
-                          >
-                              <Sprout className="w-10 h-10 text-primary"/>
-                              <p className="font-semibold text-lg">{crop.name}</p>
-
-                              {flippedCards[crop.name] ? (
-                                  <div className="space-y-3 text-xs text-left w-full animate-in fade-in-50">
-                                      <div>
-                                          <p className="font-bold flex items-center gap-1"><Leaf className="w-3 h-3 text-green-500" /> Vitamins</p>
-                                          <p className="text-muted-foreground">{crop.vitamins}</p>
-                                      </div>
-                                      <div>
-                                          <p className="font-bold flex items-center gap-1"><Heart className="w-3 h-3 text-red-500" /> Health Benefits</p>
-                                          <p className="text-muted-foreground">{crop.medicinal_value}</p>
-                                      </div>
-                                  </div>
-                              ) : (
-                                  <div className="text-xs text-muted-foreground animate-in fade-in-50 space-y-1">
-                                      <div className="flex items-center justify-center gap-1">
-                                          <Calendar className="w-3 h-3" />
-                                          <span>Harvest: <b>{crop.harvesting_duration}</b></span>
-                                      </div>
-                                      <div className="flex items-center justify-center gap-1">
-                                          <TrendingUp className="w-3 h-3" />
-                                          <span>Demand: <b>{crop.peak_demand_month}</b></span>
-                                      </div>
-                                  </div>
-                              )}
-
-                              <div className="w-full pt-2">
-                                  <Button size="sm" className="w-full text-xs sm:text-sm" onClick={(e) => handleCropSelection(e, crop.name)}>View Roadmap</Button>
-                              </div>
-                          </Card>
-                      ))}
-                    </div>
-                </CardContent>
-              </Card>
-
-              <Card>
-                  <CardHeader>
-                      <CardTitle>Intercropping Suggestions</CardTitle>
-                      <CardDescription>Boost yield and soil health by planting these together.</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                      <p>{recommendation.intercropping_suggestions}</p>
-                  </CardContent>
-              </Card>
-            </>
-          ) : !isLoading && !recommendation && cropImage && (
+          {!isLoading && !recommendation && cropImage && (
                <div className="w-full h-full relative aspect-video rounded-lg overflow-hidden">
                   <Image
                       src={cropImage.imageUrl}
@@ -281,6 +265,56 @@ export default function CropRecommendationClient() {
           )}
         </div>
       </div>
+
+      {!isLoading && recommendation && (
+        <div className='space-y-8'>
+          <Card>
+            <CardHeader>
+              <CardTitle className='flex items-center gap-2'><Sprout className="text-primary"/> Top Soil Matches</CardTitle>
+              <CardDescription>Crops best suited for your specific soil composition.</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                {recommendation.top_soil_matches.map(renderCropCard)}
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle className='flex items-center gap-2'><Clock className="text-primary"/> Fastest ROI Crops</CardTitle>
+              <CardDescription>Short-duration crops (30-90 days) for quick cash flow.</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                {recommendation.short_duration_crops.map(renderCropCard)}
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle className='flex items-center gap-2'><Zap className="text-primary"/> High-Demand at Harvest</CardTitle>
+              <CardDescription>Crops predicted to have peak market demand when you harvest.</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                {recommendation.high_demand_at_harvest_crops.map(renderCropCard)}
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+              <CardHeader>
+                  <CardTitle>Intercropping Suggestions</CardTitle>
+                  <CardDescription>Boost yield and soil health by planting these together.</CardDescription>
+              </CardHeader>
+              <CardContent>
+                  <p>{recommendation.intercropping_suggestions}</p>
+              </CardContent>
+          </Card>
+        </div>
+      )}
       
       {(isTipsLoading || budgetTips) && (
         <Card>
@@ -367,5 +401,3 @@ const NutrientCard = ({data, icon}: {data: { heading: string, normal_range: stri
         </Card>
     )
 }
-
-    
