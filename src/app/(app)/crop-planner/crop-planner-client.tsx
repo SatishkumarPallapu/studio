@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState } from 'react';
@@ -112,17 +113,18 @@ export default function CropPlannerClient() {
                         {cropInputs.map((crop, index) => (
                             <div key={index} className="flex items-center gap-2">
                                 <Input 
+                                    suppressHydrationWarning
                                     placeholder="e.g., Maize" 
                                     value={crop}
                                     onChange={(e) => handleCropInputChange(index, e.target.value)}
                                 />
-                                <Button type="button" variant="ghost" size="icon" onClick={() => handleRemoveCropInput(index)} disabled={cropInputs.length <= 1}>
+                                <Button suppressHydrationWarning type="button" variant="ghost" size="icon" onClick={() => handleRemoveCropInput(index)} disabled={cropInputs.length <= 1}>
                                     <Trash className="h-4 w-4" />
                                 </Button>
                             </div>
                         ))}
                     </div>
-                    <Button type="button" variant="outline" size="sm" onClick={handleAddCropInput} className="mt-2">
+                    <Button suppressHydrationWarning type="button" variant="outline" size="sm" onClick={handleAddCropInput} className="mt-2">
                         <Plus className="mr-2 h-4 w-4" /> Add another crop
                     </Button>
                 </div>
@@ -133,12 +135,12 @@ export default function CropPlannerClient() {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Farm Location</FormLabel>
-                    <FormControl><Input placeholder="e.g., Anantapur, Andhra Pradesh" {...field} /></FormControl>
+                    <FormControl><Input suppressHydrationWarning placeholder="e.g., Anantapur, Andhra Pradesh" {...field} /></FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
-              <Button type="submit" disabled={isLoading} className="w-full">
+              <Button suppressHydrationWarning type="submit" disabled={isLoading} className="w-full">
                 {isLoading ? (
                   <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Generating Plan...</>
                 ) : 'Generate Intercropping Plan'}
