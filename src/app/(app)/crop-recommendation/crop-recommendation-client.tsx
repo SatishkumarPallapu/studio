@@ -6,7 +6,7 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { cropRecommendationFromSoil } from '@/ai/flows/crop-recommendation-from-soil-flow';
+import { cropRecommendationFromSoil, type CropRecommendationFromSoilOutput } from '@/ai/flows/crop-recommendation-from-soil-flow';
 import { generateSoilBudgetTips, type SoilBudgetTipsOutput } from '@/ai/flows/soil-budget-tips-flow';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -28,20 +28,9 @@ const formSchema = z.object({
   location: z.string().min(3, 'Location is required.'),
 });
 
-type CropInfo = {
-  name: string;
-  vitamins: string;
-  medicinal_value: string;
-  harvesting_duration: string;
-  peak_demand_month: string;
-};
+type CropInfo = CropRecommendationFromSoilOutput['top_soil_matches'][0];
+type Recommendation = CropRecommendationFromSoilOutput;
 
-type Recommendation = {
-  top_soil_matches: CropInfo[];
-  short_duration_crops: CropInfo[];
-  high_demand_at_harvest_crops: CropInfo[];
-  intercropping_suggestions: string;
-};
 
 export default function CropRecommendationClient() {
   const searchParams = useSearchParams();
@@ -66,28 +55,7 @@ export default function CropRecommendationClient() {
     },
   });
 
-  useEffect(() => {
-    const N = searchParams.get('N');
-    const P = searchParams.get('P');
-    const K = searchParams.get('K');
-    const pH = searchParams.get('pH');
-    
-    form.reset({
-      nitrogen: N ? parseFloat(N) : undefined,
-      phosphorus: P ? parseFloat(P) : undefined,
-      potassium: K ? parseFloat(K) : undefined,
-      ph: pH ? parseFloat(pH) : undefined,
-      location: form.getValues('location') || '',
-    });
-
-    if (N && P && K && pH && form.getValues('location')) {
-        setTimeout(() => {
-            form.handleSubmit(onSubmit)();
-        }, 100);
-    }
-  }, [searchParams, form]);
-
-  async function onSubmit(values: z.infer<typeof formSchema>) {
+  const getRecommendations = async (values: z.infer<typeof formSchema>) => {
     setIsLoading(true);
     setRecommendation(null);
     setBudgetTips(null);
@@ -107,7 +75,6 @@ export default function CropRecommendationClient() {
         description: "We've found some suitable crops for your farm.",
       });
 
-      // Now, fetch budget tips for the first recommended crop
       if (result.top_soil_matches.length > 0) {
         setIsTipsLoading(true);
         const tips = await generateSoilBudgetTips({
@@ -128,6 +95,41 @@ export default function CropRecommendationClient() {
     } finally {
       setIsLoading(false);
     }
+  }
+
+  useEffect(() => {
+    const N = searchParams.get('N');
+    const P = searchParams.get('P');
+    const K = searchParams.get('K');
+    const pH = searchParams.get('pH');
+    
+    form.reset({
+      nitrogen: N ? parseFloat(N) : undefined,
+      phosphorus: P ? parseFloat(P) : undefined,
+      potassium: K ? parseFloat(K) : undefined,
+      ph: pH ? parseFloat(pH) : undefined,
+      location: form.getValues('location') || '',
+    });
+
+    if (N && P && K && pH && form.getValues('location')) {
+        setTimeout(() => {
+            form.handleSubmit(getRecommendations)();
+        }, 100);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchParams]);
+  
+  // Re-fetch recommendations when language changes
+  useEffect(() => {
+      if(recommendation && form.formState.isSubmitted) {
+          getRecommendations(form.getValues());
+      }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [language]);
+
+
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    await getRecommendations(values);
   }
 
   const handleCropSelection = (e: React.MouseEvent, cropName: string) => {
@@ -401,3 +403,5 @@ const NutrientCard = ({data, icon}: {data: { heading: string, normal_range: stri
         </Card>
     )
 }
+
+    

@@ -18,9 +18,12 @@ import {
 } from "@/components/ui/accordion"
 import StartTrackingButton from './start-tracking-button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useLanguage } from '@/contexts/language-context';
+
+type Language = 'English' | 'Telugu' | 'Hindi';
 
 // Mock AI function for certified seeds. In a real app, this would be a Genkit flow.
-const getCertifiedSeedInfo = async (cropName: string, language: 'English' | 'Telugu' | 'Hindi') => {
+const getCertifiedSeedInfo = async (cropName: string, language: Language) => {
     // This is a placeholder. A real implementation would call an AI flow.
     await new Promise(resolve => setTimeout(resolve, 500)); 
     if (language === 'Telugu') {
@@ -28,13 +31,13 @@ const getCertifiedSeedInfo = async (cropName: string, language: 'English' | 'Tel
             title: `${cropName} కోసం ధృవీకరించబడిన విత్తనాలు`,
             description: `లాభదాయకమైన పంట కోసం, మీ ప్రాంతానికి సిఫార్సు చేయబడిన ప్రభుత్వ-ధృవీకరించబడిన, అధిక-దిగుబడి ఇచ్చే విత్తన రకాలను ఉపయోగించండి.`,
             seeds: [
-                { name: 'Arka Rakshak (F1 Hybrid)', details: 'ఇది ట్రిపుల్ వ్యాధి నిరోధకత కలిగిన అధిక దిగుబడి రకం. బాక్టీరియా వడలు, టమోటా ఆకు ముడత వైరస్, మరియు తొలి ముడత తెగులును నివారిస్తుంది.' },
-                { name: 'Pusa Ruby', details: 'ఇది ప్రారంభ రకం, ప్రాసెసింగ్ మరియు తాజా మార్కెట్ రెండింటికీ అనుకూలం. పండ్లు మధ్యస్థ పరిమాణంలో, చదునుగా ఉంటాయి.' },
+                { name: 'అర్కా రక్షక్ (F1 హైబ్రిడ్)', details: 'ఇది ట్రిపుల్ వ్యాధి నిరోధకత కలిగిన అధిక దిగుబడి రకం. బాక్టీరియా వడలు, టమోటా ఆకు ముడత వైరస్, మరియు తొలి ముడత తెగులును నివారిస్తుంది.' },
+                { name: 'పూసా రూబీ', details: 'ఇది ప్రారంభ రకం, ప్రాసెసింగ్ మరియు తాజా మార్కెట్ రెండింటికీ అనుకూలం. పండ్లు మధ్యస్థ పరిమాణంలో, చదునుగా ఉంటాయి.' },
             ],
             usage_tips_title: 'విత్తన వినియోగ చిట్కాలు',
             usage_tips: [
                 'విత్తన శుద్ధి: నాటడానికి ముందు విత్తనాలను ట్రైకోడెర్మా విరిడి @ 4 గ్రా/కేజీ లేదా కార్బెండజిమ్ @ 2 గ్రా/కేజీతో శుద్ధి చేయండి.',
-                'నారుమడి యాజమాన్యం: ఆరోగ్యకరమైన నారు కోసం ఎత్తైన నారుమడులను ఉపయోగించండి மற்றும் నీటి ఎద్దడిని నివారించండి.',
+                'నారుమడి యాజమాన్యం: ఆరోగ్యకరమైన నారు కోసం ఎత్తైన నారుమడులను ఉపయోగించండి మరియు నీటి ఎద్దడిని నివారించండి.',
                 'నాటడం దూరం: మొక్కల మధ్య సరైన గాలి ప్రసరణ మరియు సూర్యరశ్మి కోసం సిఫార్సు చేయబడిన దూరాన్ని పాటించండి.',
             ]
         };
@@ -81,31 +84,33 @@ export default function CropRoadmapPage({
   const [roadmap, setRoadmap] = useState<CropRoadmapOutput | null>(null);
   const [seedInfo, setSeedInfo] = useState<SeedInfo | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const { language: currentLanguage } = useLanguage();
   
-  // Safely decode the crop name from params
   const cropName = params.crop ? decodeURIComponent(params.crop.replace(/-/g, ' ')) : '';
 
+  const fetchRoadmapAndSeeds = async () => {
+    if (!cropName) return;
+    
+    try {
+      setIsLoading(true);
+      const selectedLang = currentLanguage === 'te' ? 'Telugu' : currentLanguage === 'hi' ? 'Hindi' : 'English';
+      const [roadmapResult, seedResult] = await Promise.all([
+           generateCropRoadmap({ cropName }), // Assuming this flow can be enhanced to accept language
+           getCertifiedSeedInfo(cropName, selectedLang)
+      ]);
+      setRoadmap(roadmapResult);
+      setSeedInfo(seedResult);
+    } catch (error) {
+      console.error("Failed to fetch crop roadmap:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   useEffect(() => {
-    if (!cropName) return; // Don't fetch if cropName is not available
-
-    const fetchRoadmap = async () => {
-      try {
-        setIsLoading(true);
-        const [roadmapResult, seedResult] = await Promise.all([
-             generateCropRoadmap({ cropName }),
-             getCertifiedSeedInfo(cropName, 'English') // Placeholder, will use language from context
-        ]);
-        setRoadmap(roadmapResult);
-        setSeedInfo(seedResult);
-      } catch (error) {
-        console.error("Failed to fetch crop roadmap:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchRoadmap();
-  }, [cropName]);
+    fetchRoadmapAndSeeds();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [cropName, currentLanguage]);
   
   if (isLoading) {
     return (
@@ -223,3 +228,5 @@ export default function CropRoadmapPage({
     </div>
   );
 }
+
+    
