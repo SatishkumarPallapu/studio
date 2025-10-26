@@ -1,4 +1,3 @@
-import { Sun, Cloud, CloudRain, CloudLightning, CloudSun } from 'lucide-react';
 import { format } from 'date-fns';
 
 // --- TYPE DEFINITIONS ---
@@ -43,25 +42,6 @@ const mapOwmCondition = (owmCondition: string): WeatherCondition => {
   
   return 'Cloudy';
 };
-
-// --- HELPER: Returns a string identifier for an icon ---
-export const getIconStringForCondition = (condition: WeatherCondition): IconCondition => {
-    switch (condition) {
-        case 'Sunny':
-            return 'Sunny';
-        case 'Partly Cloudy':
-            return 'Partly Cloudy';
-        case 'Cloudy':
-            return 'Cloudy';
-        case 'Rain':
-            return 'Rain';
-        case 'Thunderstorm':
-            return 'Thunderstorm';
-        default:
-            return 'Sunny';
-    }
-};
-
 
 // --- Data Transformation Function ---
 export const transformOpenWeatherData = (owmData: any): WeatherData => {

@@ -4,8 +4,7 @@
 import * as React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts';
-import type { WeatherData, DailyForecast, IconCondition } from '@/lib/weather-data';
-import { getIconStringForCondition } from '@/lib/weather-data';
+import type { WeatherData, DailyForecast, WeatherCondition } from '@/lib/weather-data';
 import { Thermometer, Umbrella, Wind, Sunrise, Sunset, Clock, Droplets, Sun, Cloud, CloudSun, CloudRain, CloudLightning } from 'lucide-react';
 import { format } from 'date-fns';
 
@@ -56,7 +55,8 @@ const HourlyForecastChart = ({ data }: { data: DailyForecast['hourly'] }) => (
   </div>
 );
 
-const getIconForCondition = (condition: IconCondition, className: string) => {
+const getIconForCondition = (condition: WeatherCondition | undefined, className: string) => {
+    if (!condition) return <Sun className={className} />;
     switch (condition) {
         case 'Sunny':
             return <Sun className={className} />;
@@ -150,7 +150,7 @@ export default function WeatherPage() {
             <CardTitle>Now</CardTitle>
           </CardHeader>
           <CardContent className="flex flex-col items-center text-center">
-            {getIconForCondition(getIconStringForCondition(currentHour.condition), "w-20 h-20 text-primary mb-4")}
+            {getIconForCondition(currentHour.condition, "w-20 h-20 text-primary mb-4")}
             <p className="text-6xl font-bold">{currentHour.temp}°</p>
             <p className="text-muted-foreground">{currentHour.condition}</p>
           </CardContent>
@@ -227,7 +227,7 @@ export default function WeatherPage() {
             <div key={index} className="flex items-center justify-between p-3 rounded-lg hover:bg-muted/50 transition-colors">
               <p className="font-semibold w-24">{index === 0 ? 'Today' : format(new Date(day.date), 'EEEE')}</p>
               <div className="flex items-center gap-2">
-                {getIconForCondition(getIconStringForCondition(day.condition), "w-8 h-8 text-muted-foreground")}
+                {getIconForCondition(day.condition, "w-8 h-8 text-muted-foreground")}
                 <p className="hidden sm:block text-muted-foreground">{day.condition}</p>
               </div>
               <p className="font-medium text-muted-foreground">{day.temp.min}°</p>

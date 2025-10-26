@@ -5,8 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Cloud, Bot, MessageSquare, Layers, Calendar, Droplets, Thermometer, Sun, TrendingUp, Atom, Info, Loader2, CloudSun, CloudRain, CloudLightning } from 'lucide-react';
 import Link from 'next/link';
-import type { WeatherData, IconCondition } from '@/lib/weather-data';
-import { getIconStringForCondition } from '@/lib/weather-data';
+import type { WeatherData, WeatherCondition } from '@/lib/weather-data';
 
 
 const soilData = {
@@ -20,7 +19,8 @@ const yieldData = {
     trend: '+12%',
 };
 
-const getIconForCondition = (condition: IconCondition, className: string) => {
+const getIconForCondition = (condition: WeatherCondition | undefined, className: string) => {
+    if (!condition) return <Sun className={className} />;
     switch (condition) {
         case 'Sunny':
             return <Sun className={className} />;
@@ -154,7 +154,7 @@ export default function DashboardPage() {
                 <CardContent className="p-4">
                     <div className="flex items-center justify-between text-sm text-muted-foreground">
                         <p>Weather</p>
-                        {currentHour ? getIconForCondition(getIconStringForCondition(currentHour.condition), "w-4 h-4") : <Sun className="w-4 h-4"/>}
+                        {getIconForCondition(currentHour ? currentHour.condition : undefined, "w-4 h-4")}
                     </div>
                      {isLoading ? <Loader2 className="w-6 h-6 animate-spin mt-1" /> : currentHour ? (
                          <>
