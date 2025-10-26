@@ -10,7 +10,7 @@
 import {ai} from '@/ai/genkit';
 import {z} from 'zod';
 
-export const SoilBudgetTipsInputSchema = z.object({
+const SoilBudgetTipsInputSchema = z.object({
   nitrogen: z.number().describe('Nitrogen content in ppm.'),
   phosphorus: z.number().describe('Phosphorus content in ppm.'),
   potassium: z.number().describe('Potassium content in ppm.'),
@@ -75,7 +75,7 @@ const BestPracticesSchema = z.object({
 });
 
 
-export const SoilBudgetTipsOutputSchema = z.object({
+const SoilBudgetTipsOutputSchema = z.object({
   interpretation_guide: InterpretationGuideSchema,
   balancing_recommendations: BalancingRecommendationSchema,
   dosing_advice: DosingAdviceSchema,
