@@ -11,7 +11,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
-import { Bot, Loader2, Plus, Sprout, Tangent, Trash, Recycle } from 'lucide-react';
+import { Bot, Loader2, Plus, Sprout, Tangent, Trash, Recycle, Share2 } from 'lucide-react';
 import Image from 'next/image';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { Label } from '@/components/ui/label';
@@ -36,6 +36,23 @@ type PlanOutput = {
   plans: IntercroppingPlan[];
   synergy_benefits: string;
 };
+
+const WhatsAppIcon = () => (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className="h-4 w-4"
+    >
+      <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path>
+    </svg>
+  );
 
 export default function CropPlannerClient() {
   const [plan, setPlan] = useState<PlanOutput | null>(null);
@@ -94,6 +111,19 @@ export default function CropPlannerClient() {
       setIsLoading(false);
     }
   }
+
+  const handleSharePlan = (plan: IntercroppingPlan) => {
+    let message = `*Intercropping Plan for ${plan.primaryCrop}*\n\n`;
+    message += "*Companion Crops:*\n";
+    plan.companionCrops.forEach(c => {
+        message += `- *${c.name}:* ${c.benefits}\n`;
+    });
+    message += `\n*Layout Suggestion:*\n${plan.layout_suggestion}`;
+
+    const encodedMessage = encodeURIComponent(message);
+    const whatsappUrl = `https://wa.me/?text=${encodedMessage}`;
+    window.open(whatsappUrl, '_blank', 'noopener,noreferrer');
+  };
 
   return (
     <div className="grid gap-8 md:grid-cols-2">
@@ -174,11 +204,14 @@ export default function CropPlannerClient() {
 
             {plan.plans.map((p, index) => (
                 <Card key={index}>
-                    <CardHeader>
+                    <CardHeader className="flex flex-row items-center justify-between">
                         <CardTitle className="flex items-center gap-3">
                             <Sprout className="w-7 h-7 text-green-600"/>
                             Plan for {p.primaryCrop}
                         </CardTitle>
+                        <Button variant="outline" size="sm" onClick={() => handleSharePlan(p)}>
+                            <WhatsAppIcon /> Share
+                        </Button>
                     </CardHeader>
                     <CardContent className="space-y-4">
                         <div className="space-y-2">
