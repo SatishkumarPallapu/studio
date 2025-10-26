@@ -123,12 +123,12 @@ export default function SoilHealthClient() {
         </CardHeader>
         <CardContent>
           <div className="flex gap-4 mb-6">
-              <Button onClick={() => document.getElementById('soil-report-upload')?.click()} className="flex-1" variant="outline">
+              <Button onClick={() => document.getElementById('soil-report-upload')?.click()} className="flex-1 py-6 text-base" variant="outline">
                 <Upload className="mr-2 h-4 w-4" /> Upload Report
               </Button>
               <input id="soil-report-upload" type="file" accept="image/*,application/pdf" onChange={handleFileChange} className="hidden" />
 
-              <Button className="flex-1">
+              <Button className="flex-1 py-6 text-base">
                 <Droplets className="mr-2 h-4 w-4" /> Get Live Data
               </Button>
           </div>
