@@ -94,7 +94,7 @@ export default function ChatClient({ farmerPhone }: ChatClientProps) {
 
   const handleSendMessage = async (e?: React.FormEvent) => {
     e?.preventDefault();
-    if (!input.trim()) return;
+    if (!input.trim() || !activeCrop) return;
 
     const userMessage: Message = { role: 'user', content: input };
     setMessages((prev) => [...prev, userMessage]);
@@ -307,14 +307,14 @@ export default function ChatClient({ farmerPhone }: ChatClientProps) {
             value={input}
             onChange={(e) => setInput(e.target.value)}
             placeholder={translations.chat.inputPlaceholder}
-            disabled={isLoading}
+            disabled={isLoading || !activeCrop}
           />
           <Button
             type="button"
             size="icon"
             variant="outline"
             onClick={handleVoiceInput}
-            disabled={isLoading}
+            disabled={isLoading || !activeCrop}
           >
             <Mic
               className={`h-5 w-5 ${
@@ -325,7 +325,7 @@ export default function ChatClient({ farmerPhone }: ChatClientProps) {
           <Button
             type="submit"
             size="icon"
-            disabled={isLoading || !input.trim()}
+            disabled={isLoading || !input.trim() || !activeCrop}
           >
             {isLoading ? (
               <Loader2 className="h-5 w-5 animate-spin" />

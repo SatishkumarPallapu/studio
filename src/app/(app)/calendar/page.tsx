@@ -18,10 +18,14 @@ export default function CalendarPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
   
-  const cropName = activeCrop.name;
+  const cropName = activeCrop?.name;
 
   useEffect(() => {
-    if (!cropName) return;
+    if (!cropName) {
+      setIsLoading(false);
+      setRoadmap(null);
+      return;
+    };
     const fetchRoadmap = async () => {
       try {
         setIsLoading(true);
@@ -55,6 +59,19 @@ export default function CalendarPage() {
     ? activitiesByDate[format(selectedDate, 'yyyy-MM-dd')] || [] 
     : [];
 
+  if (!activeCrop) {
+      return (
+           <Card>
+            <CardHeader>
+              <CardTitle className="capitalize">Smart Calendar</CardTitle>
+              <CardDescription>
+                No active crop selected. Please select a crop to see its schedule.
+              </CardDescription>
+            </CardHeader>
+           </Card>
+      )
+  }
+
   return (
     <div className="space-y-6">
       <Card>
@@ -66,7 +83,7 @@ export default function CalendarPage() {
         </CardHeader>
         <CardContent className="grid gap-8 md:grid-cols-2">
           {isLoading ? (
-            <div className="flex items-center justify-center h-64">
+            <div className="flex items-center justify-center h-64 md:h-full">
               <Loader2 className="w-12 h-12 text-primary animate-spin" />
             </div>
           ) : (

@@ -8,7 +8,7 @@ import { useRouter } from "next/navigation";
 
 export default function StartTrackingButton({ cropName }: { cropName: string }) {
     const { toast } = useToast();
-    const { setActiveCrop } = useActiveCrop();
+    const { addTrackedCrop } = useActiveCrop();
     const router = useRouter();
 
     const handleStartTracking = () => {
@@ -16,11 +16,11 @@ export default function StartTrackingButton({ cropName }: { cropName: string }) 
             id: `${cropName.toLowerCase().replace(/ /g, '-')}-${Date.now()}`,
             name: cropName,
         };
-        setActiveCrop(newCrop);
+        addTrackedCrop(newCrop);
 
         toast({
             title: "Crop Tracking Enabled!",
-            description: `You are now tracking the progress of ${cropName}. View progress in your dashboard.`,
+            description: `You are now tracking ${cropName}. View its progress in the Crop Lifecycle dashboard.`,
         });
 
         router.push('/crop-dashboard');

@@ -4,10 +4,9 @@
 import * as React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-
+import { Sun, Cloud, CloudRain, CloudLightning, CloudSun } from 'lucide-react';
 import {
-  Cloud, Bot, MessageSquare, Layers, Calendar, Droplets, Thermometer, Sun, TrendingUp, Atom,
-  Info, Loader2, CloudSun, CloudRain, CloudLightning
+  Bot, MessageSquare, Layers, Calendar, Droplets, Thermometer, TrendingUp, Atom,
 } from 'lucide-react';
 import Link from 'next/link';
 import type { WeatherData, WeatherCondition } from '@/lib/weather-data';
@@ -166,9 +165,9 @@ export default function DashboardPage() {
                 </Link>
             </Button>
             <Button asChild variant="outline" className="h-16">
-                <Link href="/calendar">
+                <Link href="/crop-dashboard">
                     <Calendar className="mr-2 h-5 w-5" />
-                    Calendar
+                    Crop Lifecycle
                 </Link>
             </Button>
         </div>
@@ -203,7 +202,7 @@ export default function DashboardPage() {
                 <CardContent className="p-4">
                     <div className="flex items-center justify-between text-sm text-muted-foreground">
                         <p>Weather</p>
-                        {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : (
+                        {loading ? <div className="w-4 h-4" /> : (
                             getIconForCondition(currentCondition, "w-4 h-4")
                         )}
                     </div>
@@ -264,7 +263,8 @@ export default function DashboardPage() {
                 <div>
                     <CardTitle className="text-base mb-1">AI Recommendation</CardTitle>
                     <p className="text-sm text-muted-foreground capitalize">
-                        Based on your soil analysis, consider planting {activeCrop.name} this season. Market demand is predicted to increase by 15%.
+                        {activeCrop ? `Based on your soil analysis, continue to monitor your ${activeCrop.name} crop. Market demand is predicted to increase by 15%.`
+                         : "Get a crop recommendation to see AI insights here."}
                     </p>
                 </div>
             </CardContent>
