@@ -2,12 +2,11 @@
 import * as React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Cloud, Bot, MessageSquare, Layers, Calendar, Droplets, Thermometer, Sun, TrendingUp, Atom, Info } from 'lucide-react';
+import { Cloud, Bot, MessageSquare, Layers, Calendar, Droplets, Thermometer, Sun, TrendingUp, Atom } from 'lucide-react';
 import Link from 'next/link';
-
-const weatherData = {
-    current: { temp: 28, condition: 'Sunny', icon: <Sun className="w-5 h-5 text-yellow-500" /> },
-};
+import type { WeatherData } from '@/lib/weather-data';
+import { getIconForCondition } from '@/lib/weather-data';
+import { format } from 'date-fns';
 
 const soilData = {
     moisture: 68,
@@ -22,6 +21,66 @@ const yieldData = {
 
 
 export default function DashboardPage() {
+  const [weatherData, setWeatherData] = React.useState<WeatherData | null>(null);
+  const [loading, setLoading] = React.useState(true);
+  const [error, setError] = React.useState<string | null>(null);
+
+  // Default fallback coordinates (Hyderabad)
+  const FALLBACK_LAT = 17.3850;
+  const FALLBACK_LON = 78.4867;
+
+  React.useEffect(() => {
+    // --- START: New Location Logic ---
+
+    // Define a function to fetch weather data
+    const fetchWeather = async (lat: number, lon: number) => {
+      try {
+        setLoading(true);
+        // Pass coordinates to our API route
+        const res = await fetch(`/api/weather?lat=${lat}&lon=${lon}`);
+        if (!res.ok) {
+          throw new Error('Failed to load forecast.');
+        }
+        const data: WeatherData = await res.json();
+        setWeatherData(data);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'An unknown error occurred');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    // 1. Check if geolocation is available
+    if (!navigator.geolocation) {
+      setError("Geolocation is not supported. Showing default weather.");
+      fetchWeather(FALLBACK_LAT, FALLBACK_LON);
+      return;
+    }
+
+    // 2. Try to get the user's position
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        // SUCCESS: Use their coordinates
+        fetchWeather(position.coords.latitude, position.coords.longitude);
+      },
+      (err) => {
+        // FAILURE: User denied or error occurred
+        console.error("Geolocation error:", err.message);
+        setError("Location access denied. Showing default weather.");
+        // Use fallback coordinates
+        fetchWeather(FALLBACK_LAT, FALLBACK_LON);
+      }
+    );
+    // --- END: New Location Logic ---
+  }, []); // Empty array ensures this runs only once
+
+  
+  // Get current conditions from the *first available 3-hour block*
+  const currentHourData = weatherData?.daily[0]?.hourly[0];
+  const currentTemp = currentHourData?.temp;
+  const currentCondition = currentHourData?.condition;
+
+
   return (
     <div className="space-y-6">
       <div>
@@ -31,15 +90,52 @@ export default function DashboardPage() {
         <p className="text-muted-foreground">Monitor your farm and get AI-powered insights</p>
       </div>
 
+      {/* Show the location error if one exists */}
+      {error && !weatherData && (
+        <Card className="border-destructive">
+          <CardHeader>
+            <CardTitle className="text-destructive">Weather Error</CardTitle>
+            <CardDescription>{error}</CardDescription>
+          </CardHeader>
+        </Card>
+      )}
+
       <Card>
-        <CardHeader className="flex-row items-center gap-4">
-            <Cloud className="w-6 h-6 text-primary" />
-            <CardTitle className="text-lg">7-Day Weather Forecast</CardTitle>
+        <CardHeader className="flex-row items-center justify-between">
+            <div className="flex items-center gap-4">
+              <Cloud className="w-6 h-6 text-primary" />
+              <CardTitle className="text-lg">5-Day Weather Forecast</CardTitle>
+            </div>
+            <Button asChild variant="link" className="pr-0">
+              <Link href="/weather">View Details</Link>
+            </Button>
         </CardHeader>
         <CardContent>
-            <p className="text-muted-foreground">No forecast data available</p>
+            {loading && <p className="text-muted-foreground">Getting location and forecast...</p>}
+            
+            {/* Show location error message inline */}
+            {error && weatherData && (
+              <p className="text-xs text-yellow-600 mb-2">{error}</p>
+            )}
+
+            {weatherData && (
+              <div className="flex items-center justify-between gap-2 overflow-x-auto py-2">
+                {weatherData.daily.map((day, index) => (
+                  <div key={index} className="flex flex-col items-center gap-1 text-center px-2">
+                    <p className="text-sm font-medium whitespace-nowrap">
+                      {index === 0 ? 'Today' : format(new Date(day.date), 'EEE')}
+                    </p>
+                    {getIconForCondition(day.condition, "w-6 h-6 text-muted-foreground")}
+                    <p className="text-sm font-semibold">{day.temp.max}°</p>
+                    <p className="text-xs text-muted-foreground">{day.temp.min}°</p>
+                  </div>
+                ))}
+              </div>
+            )}
         </CardContent>
       </Card>
+
+      {/* ... (Rest of your dashboard JSX is unchanged) ... */}
 
         <div className="grid grid-cols-2 gap-4">
             <Button asChild className="h-20 bg-primary hover:bg-primary/90 text-primary-foreground text-lg">
@@ -79,14 +175,19 @@ export default function DashboardPage() {
                     <p className="text-xs text-muted-foreground">Good level</p>
                 </CardContent>
             </Card>
+            
             <Card>
                 <CardContent className="p-4">
                     <div className="flex items-center justify-between text-sm text-muted-foreground">
                         <p>Temperature</p>
                         <Thermometer className="w-4 h-4"/>
                     </div>
-                    <p className="text-2xl font-bold text-primary mt-1">{weatherData.current.temp}°C</p>
-                    <p className="text-xs text-muted-foreground">Optimal</p>
+                    <p className="text-2xl font-bold text-primary mt-1">
+                      {loading ? '...' : `${currentTemp}°C`}
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      {loading ? 'Loading...' : 'Live'}
+                    </p>
                 </CardContent>
             </Card>
              <Card>
@@ -95,10 +196,15 @@ export default function DashboardPage() {
                         <p>Weather</p>
                         <Sun className="w-4 h-4"/>
                     </div>
-                    <p className="text-2xl font-bold text-primary mt-1">{weatherData.current.condition}</p>
-                    <p className="text-xs text-muted-foreground">Clear skies</p>
+                    <p className="text-2xl font-bold text-primary mt-1">
+                      {loading ? '...' : currentCondition}
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      {loading ? 'Loading...' : 'Current'}
+                    </p>
                 </CardContent>
             </Card>
+
              <Card>
                 <CardContent className="p-4">
                     <div className="flex items-center justify-between text-sm text-muted-foreground">
