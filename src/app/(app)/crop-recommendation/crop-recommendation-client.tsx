@@ -15,7 +15,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
-import { Bot, Loader2, Info, Sprout, Leaf, Heart, Calendar, TrendingUp, CheckCircle, Flame, Droplets, Wallet, Brain, Clock, Zap, Star } from 'lucide-react';
+import { Bot, Loader2, Info, Sprout, Leaf, Heart, Calendar, TrendingUp, CheckCircle, Flame, Droplets, Wallet, Brain, Clock, Zap, Star, Home } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
@@ -133,10 +133,13 @@ export default function CropRecommendationClient() {
     await getRecommendations(values);
   }
 
-  const handleCropSelection = (e: React.MouseEvent, cropName: string) => {
+  const handleCropSelection = (e: React.MouseEvent, crop: CropInfo) => {
     e.stopPropagation(); // Prevent card flip when clicking button
-    router.push(`/crop-roadmap/${encodeURIComponent(cropName.toLowerCase().replace(/ /g, '-'))}`);
-  };
+    const cropName = crop.name.toLowerCase().replace(/ /g, '-');
+    const farmingType = crop.farming_type;
+    router.push(`/crop-roadmap/${cropName}?farmingType=${farmingType}`);
+};
+
 
   const handleCardFlip = (cropName: string) => {
     setFlippedCards(prev => ({
@@ -164,6 +167,10 @@ export default function CropRecommendationClient() {
                     <p className="font-bold flex items-center gap-1"><Heart className="w-3 h-3 text-red-500" /> Health Benefits</p>
                     <p className="text-muted-foreground">{crop.medicinal_value}</p>
                 </div>
+                 <div>
+                    <p className="font-bold flex items-center gap-1"><Home className="w-3 h-3 text-blue-500" /> Farming Type</p>
+                    <p className="text-muted-foreground">{crop.farming_type}</p>
+                </div>
             </div>
         ) : (
             <div className="text-xs text-muted-foreground animate-in fade-in-50 space-y-1">
@@ -179,7 +186,7 @@ export default function CropRecommendationClient() {
         )}
 
         <div className="w-full pt-2">
-            <Button size="sm" className="w-full text-xs sm:text-sm" onClick={(e) => handleCropSelection(e, crop.name)}>View Roadmap</Button>
+            <Button size="sm" className="w-full text-xs sm:text-sm" onClick={(e) => handleCropSelection(e, crop)}>View Roadmap</Button>
         </div>
     </Card>
   );
@@ -277,7 +284,7 @@ export default function CropRecommendationClient() {
               <CardDescription>Crops best suited for your specific soil composition.</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                 {recommendation.top_soil_matches.map(renderCropCard)}
               </div>
             </CardContent>
@@ -289,7 +296,7 @@ export default function CropRecommendationClient() {
               <CardDescription>Short-duration crops (30-90 days) for quick cash flow.</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                 {recommendation.short_duration_crops.map(renderCropCard)}
               </div>
             </CardContent>
@@ -301,7 +308,7 @@ export default function CropRecommendationClient() {
               <CardDescription>Crops predicted to have peak market demand when you harvest (seasonal & festive).</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                 {recommendation.high_demand_at_harvest_crops.map(renderCropCard)}
               </div>
             </CardContent>
@@ -313,11 +320,24 @@ export default function CropRecommendationClient() {
               <CardDescription>Star performers combining high profitability and huge market demand.</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                 {recommendation.high_profit_demand_crops.map(renderCropCard)}
               </div>
             </CardContent>
           </Card>
+          
+          <Card>
+            <CardHeader>
+              <CardTitle className='flex items-center gap-2'><Home className="text-primary"/> Indoor Farming Champions</CardTitle>
+              <CardDescription>Crops ideal for indoor or soilless farming with easy setup and high demand.</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                {recommendation.indoor_farming_crops.map(renderCropCard)}
+              </div>
+            </CardContent>
+          </Card>
+
 
           <Card>
               <CardHeader>

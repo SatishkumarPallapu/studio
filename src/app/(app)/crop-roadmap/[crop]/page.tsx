@@ -1,6 +1,7 @@
 
 'use client';
 import { useState, useEffect } from 'react';
+import { useSearchParams } from 'next/navigation';
 import {
   Card,
   CardContent,
@@ -21,6 +22,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useLanguage } from '@/contexts/language-context';
 
 type Language = 'English' | 'Telugu' | 'Hindi';
+type FarmingType = 'Open Field' | 'Indoor/Soilless' | 'Both';
 
 // Mock AI function for certified seeds. In a real app, this would be a Genkit flow.
 const getCertifiedSeedInfo = async (cropName: string, language: Language) => {
@@ -81,12 +83,14 @@ export default function CropRoadmapPage({
 }: {
   params: { crop: string };
 }) {
+  const searchParams = useSearchParams();
   const [roadmap, setRoadmap] = useState<CropRoadmapOutput | null>(null);
   const [seedInfo, setSeedInfo] = useState<SeedInfo | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const { language: currentLanguage } = useLanguage();
   
   const cropName = params.crop ? decodeURIComponent(params.crop.replace(/-/g, ' ')) : '';
+  const farmingType = searchParams.get('farmingType') as FarmingType | null;
 
   const fetchRoadmapAndSeeds = async () => {
     if (!cropName) return;
@@ -94,8 +98,10 @@ export default function CropRoadmapPage({
     try {
       setIsLoading(true);
       const selectedLang = currentLanguage === 'te' ? 'Telugu' : currentLanguage === 'hi' ? 'Hindi' : 'English';
+      const roadmapInput = { cropName, farmingType: farmingType || 'Open Field' };
+
       const [roadmapResult, seedResult] = await Promise.all([
-           generateCropRoadmap({ cropName }), // Assuming this flow can be enhanced to accept language
+           generateCropRoadmap(roadmapInput),
            getCertifiedSeedInfo(cropName, selectedLang)
       ]);
       setRoadmap(roadmapResult);
@@ -228,5 +234,3 @@ export default function CropRoadmapPage({
     </div>
   );
 }
-
-    

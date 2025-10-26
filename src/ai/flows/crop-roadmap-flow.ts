@@ -1,3 +1,4 @@
+
 'use server';
 /**
  * @fileOverview Generates a day-wise farming roadmap for a given crop.
@@ -12,6 +13,7 @@ import {z} from 'genkit';
 
 const CropRoadmapInputSchema = z.object({
   cropName: z.string().describe('The name of the crop for which to generate a roadmap.'),
+  farmingType: z.enum(['Open Field', 'Indoor/Soilless', 'Both']).optional().describe("The context of farming. If 'Indoor/Soilless', instructions must be for an indoor setup."),
 });
 export type CropRoadmapInput = z.infer<typeof CropRoadmapInputSchema>;
 
@@ -38,10 +40,17 @@ const prompt = ai.definePrompt({
   output: {schema: CropRoadmapOutputSchema},
   prompt: `You are an expert agriculturalist who creates detailed farming plans for Indian crops.
 
-Generate a comprehensive, day-wise farming roadmap for '{{{cropName}}}'. The roadmap should cover the entire lifecycle from land preparation to post-harvest.
+Generate a comprehensive, day-wise farming roadmap for '{{{cropName}}}'.
+
+**CRITICAL CONTEXT:** The farming type is '{{{farmingType}}}'.
+- If 'farmingType' is 'Indoor/Soilless', all instructions MUST be for an indoor setup. This means:
+    - Replace "land preparation" with "container/system setup".
+    - Instructions should be about hydroponics, grow mediums (coco peat), nutrient solutions, and grow lights, NOT about open fields, soil, or plowing.
+    - Example for sowing: "Place seeds in rockwool cubes soaked in pH-balanced water."
+- If 'farmingType' is 'Open Field' or not specified, provide standard instructions for traditional farming.
 
 Group activities into the following stages:
-- land_preparation
+- land_preparation (or system_setup for indoor)
 - sowing_planting
 - vegetative_growth
 - flowering_fruiting
@@ -65,7 +74,12 @@ const cropRoadmapFlow = ai.defineFlow(
     outputSchema: CropRoadmapOutputSchema,
   },
   async input => {
-    const {output} = await prompt(input);
+    // If farmingType is not provided, default to 'Open Field'
+    const finalInput = {
+      ...input,
+      farmingType: input.farmingType || 'Open Field',
+    };
+    const {output} = await prompt(finalInput);
     return output!;
   }
 );
