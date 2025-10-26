@@ -7,7 +7,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { cropRecommendationFromSoil } from '@/ai/flows/crop-recommendation-from-soil-flow';
-import { generateSoilBudgetTips, SoilBudgetTipsOutput } from '@/ai/flows/soil-budget-tips-flow';
+import { generateSoilBudgetTips, type SoilBudgetTipsOutput } from '@/ai/flows/soil-budget-tips-flow';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
@@ -247,7 +247,7 @@ export default function CropRecommendationClient() {
                               )}
 
                               <div className="w-full pt-2">
-                                  <Button size="sm" className="w-full" onClick={(e) => handleCropSelection(e, crop.name)}>View Roadmap</Button>
+                                  <Button size="sm" className="w-full text-xs sm:text-sm" onClick={(e) => handleCropSelection(e, crop.name)}>View Roadmap</Button>
                               </div>
                           </Card>
                       ))}
@@ -367,3 +367,5 @@ const NutrientCard = ({data, icon}: {data: { heading: string, normal_range: stri
         </Card>
     )
 }
+
+    
