@@ -71,9 +71,9 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   return (
     <LanguageProvider>
       <SidebarProvider>
-        <div className="flex min-h-screen w-full flex-col bg-muted/40">
+        <div className="flex min-h-screen w-full bg-muted/40">
           <AppSidebar />
-          <div className="flex flex-col sm:gap-4 sm:py-4 sm:pl-14">
+          <div className="flex flex-col flex-1">
             <AppHeader />
             <main className="flex-1 p-4 sm:px-6 sm:py-0 md:gap-8 mb-16 sm:mb-0">
                 {children}
@@ -154,7 +154,7 @@ function AppSidebar() {
   }
 
   return (
-    <Sidebar className="border-r h-full" collapsible="icon">
+    <Sidebar className="border-r h-full hidden sm:flex" collapsible="icon">
         <SidebarHeader>
             <Link href="/dashboard">
                 <Icons.logo className="w-8 h-8 text-primary" />
