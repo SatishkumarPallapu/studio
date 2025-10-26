@@ -18,40 +18,45 @@ interface ActiveCropContextType {
 
 const ActiveCropContext = createContext<ActiveCropContextType | undefined>(undefined);
 
-export function ActiveCropProvider({ children }: { children: ReactNode }) {
-  const [trackedCrops, setTrackedCrops] = useState<Crop[]>(() => {
-    if (typeof window === 'undefined') return [{ id: 'tomato-default', name: 'Tomato' }];
-    try {
-      const item = window.localStorage.getItem('trackedCrops');
-      return item ? JSON.parse(item) : [{ id: 'tomato-default', name: 'Tomato' }];
-    } catch (error) {
-      console.error(error);
-      return [{ id: 'tomato-default', name: 'Tomato' }];
-    }
-  });
+const getDefaultCrops = (): Crop[] => [{ id: 'tomato-default', name: 'Tomato' }];
 
-  const [activeCrop, _setActiveCrop] = useState<Crop | null>(() => {
-     if (trackedCrops.length > 0) return trackedCrops[0];
-     return null;
-  });
-  
+export function ActiveCropProvider({ children }: { children: ReactNode }) {
+  const [trackedCrops, setTrackedCrops] = useState<Crop[]>([]);
+  const [activeCrop, _setActiveCrop] = useState<Crop | null>(null);
+  const [isLoaded, setIsLoaded] = useState(false);
   const { toast } = useToast();
 
+  // Effect to load from localStorage only on the client side
   useEffect(() => {
+    try {
+      const item = window.localStorage.getItem('trackedCrops');
+      const loadedCrops = item ? JSON.parse(item) : getDefaultCrops();
+      if (loadedCrops.length > 0) {
+        setTrackedCrops(loadedCrops);
+        _setActiveCrop(loadedCrops[0]);
+      } else {
+        // Ensure there's always at least one default crop if storage is empty
+        setTrackedCrops(getDefaultCrops());
+        _setActiveCrop(getDefaultCrops()[0]);
+      }
+    } catch (error) {
+      console.error(error);
+      const defaultCrops = getDefaultCrops();
+      setTrackedCrops(defaultCrops);
+      _setActiveCrop(defaultCrops[0]);
+    }
+    setIsLoaded(true);
+  }, []);
+
+  // Effect to save to localStorage whenever trackedCrops changes
+  useEffect(() => {
+    if (!isLoaded) return; // Don't save until loaded from storage
     try {
       window.localStorage.setItem('trackedCrops', JSON.stringify(trackedCrops));
     } catch (error) {
       console.error("Could not save tracked crops to localStorage", error);
     }
-  }, [trackedCrops]);
-  
-  useEffect(() => {
-    if (trackedCrops.length > 0 && !activeCrop) {
-        _setActiveCrop(trackedCrops[0]);
-    } else if (trackedCrops.length === 0) {
-        _setActiveCrop(null);
-    }
-  }, [trackedCrops, activeCrop]);
+  }, [trackedCrops, isLoaded]);
 
   const addTrackedCrop = (crop: Crop) => {
     setTrackedCrops((prevCrops) => {
