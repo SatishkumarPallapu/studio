@@ -4,13 +4,11 @@
 import * as React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts';
-// Import TYPES and the icon HELPER, not the mock data object
-import type { WeatherData, DailyForecast } from '@/lib/weather-data.tsx';
-import { getIconForCondition } from '@/lib/weather-data.tsx';
-import { Thermometer, Umbrella, Wind, Sunrise, Sunset, Clock, Droplets } from 'lucide-react';
+import type { WeatherData, DailyForecast, IconCondition } from '@/lib/weather-data';
+import { getIconStringForCondition } from '@/lib/weather-data';
+import { Thermometer, Umbrella, Wind, Sunrise, Sunset, Clock, Droplets, Sun, Cloud, CloudSun, CloudRain, CloudLightning } from 'lucide-react';
 import { format } from 'date-fns';
 
-// The HourlyForecastChart component remains the same
 const HourlyForecastChart = ({ data }: { data: DailyForecast['hourly'] }) => (
   <div className="h-[200px] w-full">
     <ResponsiveContainer>
@@ -58,9 +56,25 @@ const HourlyForecastChart = ({ data }: { data: DailyForecast['hourly'] }) => (
   </div>
 );
 
+const getIconForCondition = (condition: IconCondition, className: string) => {
+    switch (condition) {
+        case 'Sunny':
+            return <Sun className={className} />;
+        case 'Partly Cloudy':
+            return <CloudSun className={className} />;
+        case 'Cloudy':
+            return <Cloud className={className} />;
+        case 'Rain':
+            return <CloudRain className={className} />;
+        case 'Thunderstorm':
+            return <CloudLightning className={className} />;
+        default:
+            return <Sun className={className} />;
+    }
+};
+
 
 export default function WeatherPage() {
-  // --- START: Data Fetching State ---
   const [data, setData] = React.useState<WeatherData | null>(null);
   const [loading, setLoading] = React.useState(true);
   const [error, setError] = React.useState<string | null>(null);
@@ -69,7 +83,7 @@ export default function WeatherPage() {
     const fetchData = async () => {
       try {
         setLoading(true);
-        const res = await fetch('/api/weather'); // Fetch from our new API route
+        const res = await fetch('/api/weather');
         if (!res.ok) {
           throw new Error('Failed to load weather forecast.');
         }
@@ -83,10 +97,8 @@ export default function WeatherPage() {
     };
 
     fetchData();
-  }, []); // Empty dependency array means this runs once on mount
-  // --- END: Data Fetching State ---
+  }, []);
 
-  // --- START: Loading and Error UI ---
   if (loading) {
     return (
       <div className="space-y-6">
@@ -96,7 +108,6 @@ export default function WeatherPage() {
             <CardDescription>Loading current conditions and 7-day forecast...</CardDescription>
           </CardHeader>
         </Card>
-        {/* You could add skeleton loaders here */}
       </div>
     );
   }
@@ -115,12 +126,8 @@ export default function WeatherPage() {
   if (!data) {
     return <div>No weather data available.</div>;
   }
-  // --- END: Loading and Error UI ---
 
-
-  // --- Use fetched `data` instead of mock `weatherData` ---
   const today = data.daily[0];
-  // Find the current hour, or default to the first hour in the list
   const currentHour = today.hourly.find(h => {
     const hourDate = new Date(h.time);
     return hourDate.getHours() === new Date().getHours();
@@ -143,7 +150,7 @@ export default function WeatherPage() {
             <CardTitle>Now</CardTitle>
           </CardHeader>
           <CardContent className="flex flex-col items-center text-center">
-            {getIconForCondition(currentHour.condition, "w-20 h-20 text-primary mb-4")}
+            {getIconForCondition(getIconStringForCondition(currentHour.condition), "w-20 h-20 text-primary mb-4")}
             <p className="text-6xl font-bold">{currentHour.temp}°</p>
             <p className="text-muted-foreground">{currentHour.condition}</p>
           </CardContent>
@@ -207,7 +214,6 @@ export default function WeatherPage() {
           <CardTitle className="flex items-center gap-2"><Clock className="w-5 h-5"/>Hourly Forecast (24h)</CardTitle>
         </CardHeader>
         <CardContent>
-          {/* Use the fetched `data` here */}
           <HourlyForecastChart data={data.daily.flatMap(d => d.hourly).slice(0, 24)} />
         </CardContent>
       </Card>
@@ -217,12 +223,11 @@ export default function WeatherPage() {
           <CardTitle>7-Day Forecast</CardTitle>
         </CardHeader>
         <CardContent className="space-y-2">
-          {/* Use the fetched `data` here */}
           {data.daily.map((day, index) => (
             <div key={index} className="flex items-center justify-between p-3 rounded-lg hover:bg-muted/50 transition-colors">
               <p className="font-semibold w-24">{index === 0 ? 'Today' : format(new Date(day.date), 'EEEE')}</p>
               <div className="flex items-center gap-2">
-                {getIconForCondition(day.condition, "w-8 h-8 text-muted-foreground")}
+                {getIconForCondition(getIconStringForCondition(day.condition), "w-8 h-8 text-muted-foreground")}
                 <p className="hidden sm:block text-muted-foreground">{day.condition}</p>
               </div>
               <p className="font-medium text-muted-foreground">{day.temp.min}°</p>
@@ -230,7 +235,6 @@ export default function WeatherPage() {
                 <div 
                     className="h-full bg-gradient-to-r from-blue-400 to-red-500" 
                     style={{ 
-                      // Use the fetched `data` here for min/max temp
                         width: `${((day.temp.max - day.temp.min) / (data.maxTemp - data.minTemp)) * 100}%`,
                         marginLeft: `${((day.temp.min - data.minTemp) / (data.maxTemp - data.minTemp)) * 100}%`
                     }}

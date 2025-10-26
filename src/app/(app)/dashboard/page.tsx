@@ -3,10 +3,10 @@
 import * as React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Cloud, Bot, MessageSquare, Layers, Calendar, Droplets, Thermometer, Sun, TrendingUp, Atom, Info, Loader2 } from 'lucide-react';
+import { Cloud, Bot, MessageSquare, Layers, Calendar, Droplets, Thermometer, Sun, TrendingUp, Atom, Info, Loader2, CloudSun, CloudRain, CloudLightning } from 'lucide-react';
 import Link from 'next/link';
-import type { WeatherData } from '@/lib/weather-data.tsx';
-import { getIconForCondition } from '@/lib/weather-data.tsx';
+import type { WeatherData, IconCondition } from '@/lib/weather-data';
+import { getIconStringForCondition } from '@/lib/weather-data';
 
 
 const soilData = {
@@ -18,6 +18,23 @@ const soilData = {
 
 const yieldData = {
     trend: '+12%',
+};
+
+const getIconForCondition = (condition: IconCondition, className: string) => {
+    switch (condition) {
+        case 'Sunny':
+            return <Sun className={className} />;
+        case 'Partly Cloudy':
+            return <CloudSun className={className} />;
+        case 'Cloudy':
+            return <Cloud className={className} />;
+        case 'Rain':
+            return <CloudRain className={className} />;
+        case 'Thunderstorm':
+            return <CloudLightning className={className} />;
+        default:
+            return <Sun className={className} />;
+    }
 };
 
 
@@ -130,14 +147,14 @@ export default function DashboardPage() {
                          </>
                     ) : (
                          <p className="text-sm text-muted-foreground mt-1">N/A</p>
-                    )}
+                     )}
                 </CardContent>
             </Card>
              <Card>
                 <CardContent className="p-4">
                     <div className="flex items-center justify-between text-sm text-muted-foreground">
                         <p>Weather</p>
-                        <Sun className="w-4 h-4"/>
+                        {currentHour ? getIconForCondition(getIconStringForCondition(currentHour.condition), "w-4 h-4") : <Sun className="w-4 h-4"/>}
                     </div>
                      {isLoading ? <Loader2 className="w-6 h-6 animate-spin mt-1" /> : currentHour ? (
                          <>

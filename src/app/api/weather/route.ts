@@ -1,6 +1,5 @@
-
 import { NextResponse } from 'next/server';
-import { transformOpenWeatherData } from '@/lib/weather-data.tsx';
+import { transformOpenWeatherData } from '@/lib/weather-data';
 
 // TODO: Replace with your farm's coordinates
 const LAT = '17.3850'; // Hyderabad latitude
