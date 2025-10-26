@@ -217,7 +217,7 @@ export default function MarketplaceClient() {
             </div>
             <Dialog open={isListDialogOpen} onOpenChange={setIsListDialogOpen}>
                 <DialogTrigger asChild>
-                    <Button>
+                    <Button suppressHydrationWarning>
                         <PlusCircle className="mr-2 h-4 w-4" />
                         List for Sale
                     </Button>
@@ -252,6 +252,7 @@ export default function MarketplaceClient() {
             <div className="relative flex-1">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
                 <Input
+                suppressHydrationWarning
                 placeholder="Search for a crop..."
                 className="pl-10"
                 value={searchTerm}
@@ -259,9 +260,9 @@ export default function MarketplaceClient() {
                 />
             </div>
             <div className="flex items-center gap-2 overflow-x-auto pb-2">
-                <Button variant={!selectedCategory ? 'default' : 'outline'} onClick={() => setSelectedCategory(null)} className="shrink-0">All</Button>
+                <Button suppressHydrationWarning variant={!selectedCategory ? 'default' : 'outline'} onClick={() => setSelectedCategory(null)} className="shrink-0">All</Button>
                 {categories.map(category => (
-                    <Button key={category} variant={selectedCategory === category ? 'default' : 'outline'} onClick={() => setSelectedCategory(category)} className="shrink-0">
+                    <Button key={category} suppressHydrationWarning variant={selectedCategory === category ? 'default' : 'outline'} onClick={() => setSelectedCategory(category)} className="shrink-0">
                         {category}
                     </Button>
                 ))}
@@ -302,7 +303,7 @@ export default function MarketplaceClient() {
                             </div>
                         )}
                     </div>
-                     <Button className="w-full mt-2" onClick={() => handleContactSeller(crop)}>
+                     <Button suppressHydrationWarning className="w-full mt-2" onClick={() => handleContactSeller(crop)}>
                         <WhatsAppIcon /> Contact Seller
                     </Button>
                 </CardContent>
@@ -319,5 +320,7 @@ export default function MarketplaceClient() {
     </div>
   );
 }
+
+    
 
     
