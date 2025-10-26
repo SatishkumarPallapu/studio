@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState } from 'react';
@@ -122,13 +123,13 @@ export default function SoilHealthClient() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="flex gap-4 mb-6">
-              <Button onClick={() => document.getElementById('soil-report-upload')?.click()} className="flex-1 py-6 text-base" variant="outline">
+          <div className="flex flex-col sm:flex-row items-center gap-4 mb-6">
+              <Button onClick={() => document.getElementById('soil-report-upload')?.click()} className="w-full sm:w-auto flex-1 py-6 text-base" variant="outline">
                 <Upload className="mr-2 h-4 w-4" /> Upload Report
               </Button>
               <input id="soil-report-upload" type="file" accept="image/*,application/pdf" onChange={handleFileChange} className="hidden" />
 
-              <Button className="flex-1 py-6 text-base">
+              <Button className="w-full sm:w-auto flex-1 py-6 text-base">
                 <Droplets className="mr-2 h-4 w-4" /> Get Live Data
               </Button>
           </div>
