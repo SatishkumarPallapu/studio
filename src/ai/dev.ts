@@ -10,3 +10,4 @@ import '@/ai/flows/crop-roadmap-flow.ts';
 import '@/ai/flows/chatbot-flow.ts';
 import '@/ai/flows/crop-planner-flow.ts';
 import '@/ai/flows/weekly-report-flow.ts';
+import '@/ai/flows/soil-budget-tips-flow.ts';
