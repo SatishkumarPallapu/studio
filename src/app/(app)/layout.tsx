@@ -39,6 +39,7 @@ import {
   SidebarInset,
   useSidebar,
 } from '@/components/ui/sidebar';
+import { ActiveCropProvider } from '@/contexts/active-crop-context';
 
 const bottomNavItems = [
     { href: '/dashboard', icon: Home, label: 'Home' },
@@ -70,18 +71,20 @@ const mainNavItems = [
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   return (
     <LanguageProvider>
-      <SidebarProvider>
-        <div className="flex min-h-screen w-full bg-muted/40">
-          <AppSidebar />
-          <div className="flex flex-col flex-1">
-            <AppHeader />
-            <main className="flex-1 p-4 sm:px-6 sm:py-0 md:gap-8 mb-16 sm:mb-0">
-                {children}
-            </main>
+      <ActiveCropProvider>
+        <SidebarProvider>
+          <div className="flex flex-row min-h-screen w-full bg-muted/40">
+            <AppSidebar />
+            <div className="flex flex-col flex-1">
+              <AppHeader />
+              <main className="flex-1 p-4 sm:px-6 sm:py-0 md:gap-8 mb-16 sm:mb-0">
+                  {children}
+              </main>
+            </div>
           </div>
           <BottomNavBar />
-        </div>
-      </SidebarProvider>
+        </SidebarProvider>
+      </ActiveCropProvider>
     </LanguageProvider>
   );
 }

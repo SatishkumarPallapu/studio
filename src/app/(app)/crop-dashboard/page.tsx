@@ -1,4 +1,5 @@
 
+'use client';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Sprout, Droplets, Leaf, Calendar, Bot, Satellite } from 'lucide-react';
@@ -7,11 +8,13 @@ import CropHealthClient from '../crop-health/crop-health-client';
 import CalendarPage from '../calendar/page';
 import ChatClient from '../chat/chat-client';
 import SatelliteHealthPage from './satellite-health/page';
+import { useActiveCrop } from '@/contexts/active-crop-context';
 
 export default function CropDashboardPage() {
     // In a real application, you would fetch the authenticated user's
     // phone number from your database (e.g., Firestore).
     const mockFarmerPhone = '+919999999999'; // Replace with a real number for testing
+    const { activeCrop } = useActiveCrop();
 
   return (
     <div className="space-y-6">
@@ -20,7 +23,7 @@ export default function CropDashboardPage() {
           <div className="flex items-center gap-4">
             <Sprout className="w-10 h-10 text-primary" />
             <div>
-              <CardTitle className="text-3xl">Crop Lifecycle: Tomato</CardTitle>
+              <CardTitle className="text-3xl capitalize">Crop Lifecycle: {activeCrop.name}</CardTitle>
               <CardDescription>
                 Manage everything for your active crop, from monitoring to health alerts.
               </CardDescription>

@@ -1,18 +1,29 @@
+
 'use client';
 
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
+import { useActiveCrop } from "@/contexts/active-crop-context";
+import { useRouter } from "next/navigation";
 
 export default function StartTrackingButton({ cropName }: { cropName: string }) {
     const { toast } = useToast();
+    const { setActiveCrop } = useActiveCrop();
+    const router = useRouter();
 
     const handleStartTracking = () => {
-        // In a real app, this would likely involve a database mutation
-        // to create a new crop tracking entry for the current user.
+        const newCrop = {
+            id: `${cropName.toLowerCase().replace(/ /g, '-')}-${Date.now()}`,
+            name: cropName,
+        };
+        setActiveCrop(newCrop);
+
         toast({
             title: "Crop Tracking Enabled!",
             description: `You are now tracking the progress of ${cropName}. View progress in your dashboard.`,
         });
+
+        router.push('/crop-dashboard');
     };
 
     return (

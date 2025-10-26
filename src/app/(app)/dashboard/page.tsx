@@ -1,22 +1,19 @@
+
 'use client';
 
 import * as React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 
-// --- START: Merged Imports ---
-// We've combined all icons from both branches
 import {
   Cloud, Bot, MessageSquare, Layers, Calendar, Droplets, Thermometer, Sun, TrendingUp, Atom,
-  Info, Loader2, CloudSun, CloudRain, CloudLightning // From your HEAD branch
+  Info, Loader2, CloudSun, CloudRain, CloudLightning
 } from 'lucide-react';
 import Link from 'next/link';
-// We need all these types and functions
-import type { WeatherData, WeatherCondition } from '@/lib/weather-data'; // Kept WeatherCondition
-import { getIconForCondition } from '@/lib/weather-data'; // Kept imported function
-import { format } from 'date-fns'; // Kept from remote
-// --- END: Merged Imports ---
-
+import type { WeatherData, WeatherCondition } from '@/lib/weather-data';
+import { transformOpenWeatherData } from '@/lib/weather-data';
+import { format } from 'date-fns';
+import { useActiveCrop } from '@/contexts/active-crop-context';
 
 const soilData = {
     moisture: 68,
@@ -29,23 +26,34 @@ const yieldData = {
     trend: '+12%',
 };
 
-// We are using the imported 'getIconForCondition'
-// The inline function has been removed to resolve the conflict.
-
+const getIconForCondition = (condition: WeatherCondition | undefined, className: string) => {
+    if (!condition) return <Sun className={className} />;
+    switch (condition) {
+        case 'Sunny':
+            return <Sun className={className} />;
+        case 'Partly Cloudy':
+            return <CloudSun className={className} />;
+        case 'Cloudy':
+            return <Cloud className={className} />;
+        case 'Rain':
+            return <CloudRain className={className} />;
+        case 'Thunderstorm':
+            return <CloudLightning className={className} />;
+        default:
+            return <Sun className={className} />;
+    }
+};
 
 export default function DashboardPage() {
-  // --- START: Kept Remote (Live Location) State ---
-  // Using 'loading' from the remote branch
+  const { activeCrop } = useActiveCrop();
   const [weatherData, setWeatherData] = React.useState<WeatherData | null>(null);
   const [loading, setLoading] = React.useState(true);
   const [error, setError] = React.useState<string | null>(null);
 
-  // Default fallback coordinates (Hyderabad)
   const FALLBACK_LAT = 17.3850;
   const FALLBACK_LON = 78.4867;
 
   React.useEffect(() => {
-    // This is the new location logic from the remote branch
     const fetchWeather = async (lat: number, lon: number) => {
       try {
         setLoading(true);
@@ -78,12 +86,8 @@ export default function DashboardPage() {
         fetchWeather(FALLBACK_LAT, FALLBACK_LON);
       }
     );
-  }, []); // Empty array ensures this runs only once
-  // --- END: Kept Remote (Live Location) State ---
+  }, []);
 
-  
-
-  // Get current conditions from the *first available 3-hour block*
   const currentHourData = weatherData?.daily[0]?.hourly[0];
   const currentTemp = currentHourData?.temp;
   const currentCondition = currentHourData?.condition;
@@ -98,7 +102,6 @@ export default function DashboardPage() {
         <p className="text-muted-foreground">Monitor your farm and get AI-powered insights</p>
       </div>
 
-      {/* Show the location error if one exists */}
       {error && !weatherData && (
         <Card className="border-destructive">
           <CardHeader>
@@ -119,10 +122,8 @@ export default function DashboardPage() {
             </Button>
         </CardHeader>
         <CardContent>
-            {/* Kept remote (live location) version */}
             {loading && <p className="text-muted-foreground">Getting location and forecast...</p>}
             
-            {/* Show location error message inline */}
             {error && weatherData && (
               <p className="text-xs text-yellow-600 mb-2">{error}</p>
             )}
@@ -134,7 +135,6 @@ export default function DashboardPage() {
                     <p className="text-sm font-medium whitespace-nowrap">
                       {index === 0 ? 'Today' : format(new Date(day.date), 'EEE')}
                     </p>
-                    {/* Using imported getIconForCondition */}
                     {getIconForCondition(day.condition, "w-6 h-6 text-muted-foreground")}
                     <p className="text-sm font-semibold">{day.temp.max}°</p>
                     <p className="text-xs text-muted-foreground">{day.temp.min}°</p>
@@ -145,7 +145,6 @@ export default function DashboardPage() {
         </CardContent>
       </Card>
 
-      {/* ... (Rest of your dashboard JSX is unchanged) ... */}
 
         <div className="grid grid-cols-2 gap-4">
             <Button asChild className="h-20 bg-primary hover:bg-primary/90 text-primary-foreground text-lg">
@@ -192,7 +191,6 @@ export default function DashboardPage() {
                         <p>Temperature</p>
                         <Thermometer className="w-4 h-4"/>
                     </div>
-                    {/* Kept remote (live location) version */}
                     <p className="text-2xl font-bold text-primary mt-1">
                       {loading ? '...' : (currentTemp ? `${currentTemp}°C` : 'N/A')}
                     </p>
@@ -205,13 +203,10 @@ export default function DashboardPage() {
                 <CardContent className="p-4">
                     <div className="flex items-center justify-between text-sm text-muted-foreground">
                         <p>Weather</p>
-                        {/* --- MERGED: Using dynamic icon from HEAD with remote's data --- */}
                         {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : (
-                            // Using imported getIconForCondition
                             getIconForCondition(currentCondition, "w-4 h-4")
                         )}
                     </div>
-                     {/* Kept remote (live location) version */}
                     <p className="text-2xl font-bold text-primary mt-1">
                       {loading ? '...' : currentCondition || 'N/A'}
                     </p>
@@ -268,8 +263,8 @@ export default function DashboardPage() {
                 </div>
                 <div>
                     <CardTitle className="text-base mb-1">AI Recommendation</CardTitle>
-                    <p className="text-sm text-muted-foreground">
-                        Based on your soil analysis, consider planting tomatoes this season. Market demand is predicted to increase by 15%.
+                    <p className="text-sm text-muted-foreground capitalize">
+                        Based on your soil analysis, consider planting {activeCrop.name} this season. Market demand is predicted to increase by 15%.
                     </p>
                 </div>
             </CardContent>

@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useEffect, useState } from 'react';
@@ -7,17 +8,20 @@ import { generateCropRoadmap, type CropRoadmapOutput, type Activity } from '@/ai
 import { Badge } from '@/components/ui/badge';
 import { Loader2, CheckCircle2 } from 'lucide-react';
 import { format } from 'date-fns';
+import { useActiveCrop } from '@/contexts/active-crop-context';
 
 type ActivityWithDate = Activity & { date: Date };
 
 export default function CalendarPage() {
+  const { activeCrop } = useActiveCrop();
   const [roadmap, setRoadmap] = useState<CropRoadmapOutput | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
   
-  const cropName = "Tomato"; // Hardcoded for the active crop dashboard
+  const cropName = activeCrop.name;
 
   useEffect(() => {
+    if (!cropName) return;
     const fetchRoadmap = async () => {
       try {
         setIsLoading(true);
