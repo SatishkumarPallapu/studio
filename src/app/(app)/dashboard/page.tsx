@@ -80,7 +80,6 @@ export default function DashboardPage() {
         fetchWeather(position.coords.latitude, position.coords.longitude);
       },
       (err) => {
-        console.error("Geolocation error:", err.message);
         setError("Location access denied. Showing default weather.");
         fetchWeather(FALLBACK_LAT, FALLBACK_LON);
       }
@@ -149,13 +148,13 @@ export default function DashboardPage() {
             <Button asChild className="h-20 bg-primary hover:bg-primary/90 text-primary-foreground">
                 <Link href="/crop-recommendation" className="flex flex-col items-center justify-center text-center">
                     <Atom className="mb-1 h-5 w-5" />
-                    AI Recommendations
+                    <span className="text-sm sm:text-base">AI Recommendations</span>
                 </Link>
             </Button>
             <Button asChild className="h-20 bg-accent hover:bg-accent/90 text-accent-foreground">
                  <Link href="/chat" className="flex flex-col items-center justify-center text-center">
                     <MessageSquare className="mb-1 h-5 w-5" />
-                    Voice Chat
+                    <span className="text-sm sm:text-base">Voice Chat</span>
                 </Link>
             </Button>
             <Button asChild variant="outline" className="h-16">
