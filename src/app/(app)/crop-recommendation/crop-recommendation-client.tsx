@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -11,11 +12,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
-import { Bot, Loader2, Info, Sprout } from 'lucide-react';
+import { Bot, Loader2, Info, Sprout, Leaf, Heart } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 const formSchema = z.object({
   nitrogen: z.coerce.number().min(0, 'Nitrogen must be positive.'),
@@ -43,6 +43,7 @@ export default function CropRecommendationClient() {
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
   const cropImage = PlaceHolderImages.find(img => img.id === 'crop-recommendation');
+  const [flippedCards, setFlippedCards] = useState<Record<string, boolean>>({});
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -70,7 +71,6 @@ export default function CropRecommendationClient() {
     });
 
     if (N && P && K && pH && form.getValues('location')) {
-        // Automatically submit if params are present and location is set
         setTimeout(() => {
             form.handleSubmit(onSubmit)();
         }, 100);
@@ -80,6 +80,7 @@ export default function CropRecommendationClient() {
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsLoading(true);
     setRecommendation(null);
+    setFlippedCards({});
     try {
       const result = await cropRecommendationFromSoil({
           nitrogen: values.nitrogen!,
@@ -105,8 +106,16 @@ export default function CropRecommendationClient() {
     }
   }
 
-  const handleCropSelection = (cropName: string) => {
+  const handleCropSelection = (e: React.MouseEvent, cropName: string) => {
+    e.stopPropagation(); // Prevent card flip when clicking button
     router.push(`/crop-roadmap/${encodeURIComponent(cropName.toLowerCase().replace(/ /g, '-'))}`);
+  };
+
+  const handleCardFlip = (cropName: string) => {
+    setFlippedCards(prev => ({
+        ...prev,
+        [cropName]: !prev[cropName]
+    }));
   };
 
   return (
@@ -179,36 +188,45 @@ export default function CropRecommendationClient() {
           <>
             <Card>
               <CardHeader>
-                <CardTitle>Top 3 Recommended Crops</CardTitle>
-                <CardDescription>Select a crop to generate a detailed farming roadmap.</CardDescription>
+                <CardTitle>Top Recommended Crops</CardTitle>
+                <CardDescription>Tap a card for nutritional info. Select a crop to generate its roadmap.</CardDescription>
               </CardHeader>
               <CardContent>
-                <TooltipProvider>
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                     {recommendation.recommended_crops.slice(0, 3).map((crop) => (
-                       <Card key={crop.name} className="p-4 flex flex-col items-center justify-center text-center space-y-3 hover:bg-accent hover:shadow-md transition-all">
+                       <Card 
+                            key={crop.name} 
+                            onClick={() => handleCardFlip(crop.name)}
+                            className="p-4 flex flex-col items-center text-center space-y-3 hover:bg-accent hover:shadow-md transition-all cursor-pointer"
+                        >
                             <Sprout className="w-10 h-10 text-primary"/>
                             <p className="font-semibold text-lg">{crop.name}</p>
-                            <div className="text-xs text-muted-foreground">
-                                <p>Yield: High</p>
-                                <p>Profit: Good</p>
-                                <p>Suitability: 90%</p>
+
+                            {flippedCards[crop.name] ? (
+                                <div className="space-y-3 text-xs text-left w-full animate-in fade-in-50">
+                                    <div>
+                                        <p className="font-bold flex items-center gap-1"><Leaf className="w-3 h-3 text-green-500" /> Vitamins</p>
+                                        <p className="text-muted-foreground">{crop.vitamins}</p>
+                                    </div>
+                                    <div>
+                                        <p className="font-bold flex items-center gap-1"><Heart className="w-3 h-3 text-red-500" /> Health Benefits</p>
+                                        <p className="text-muted-foreground">{crop.medicinal_value}</p>
+                                    </div>
+                                </div>
+                            ) : (
+                                <div className="text-xs text-muted-foreground animate-in fade-in-50">
+                                    <p>Yield: High</p>
+                                    <p>Profit: Good</p>
+                                    <p>Suitability: 90%</p>
+                                </div>
+                            )}
+
+                            <div className="w-full pt-2">
+                                <Button size="sm" className="w-full" onClick={(e) => handleCropSelection(e, crop.name)}>View Roadmap</Button>
                             </div>
-                            <Tooltip>
-                                <TooltipTrigger asChild>
-                                    <Button variant="ghost" size="sm"><Info className="w-4 h-4 mr-1" /> Info</Button>
-                                </TooltipTrigger>
-                                <TooltipContent side="bottom" className="max-w-xs text-center">
-                                <p className="font-bold mb-2">Nutritional Info</p>
-                                <p><strong>Vitamins:</strong> {crop.vitamins}</p>
-                                <p><strong>Medicinal Value:</strong> {crop.medicinal_value}</p>
-                                </TooltipContent>
-                            </Tooltip>
-                            <Button size="sm" className="w-full" onClick={() => handleCropSelection(crop.name)}>View Roadmap</Button>
                         </Card>
                     ))}
                   </div>
-                </TooltipProvider>
               </CardContent>
             </Card>
 
@@ -240,3 +258,4 @@ export default function CropRecommendationClient() {
     </div>
   );
 }
+
