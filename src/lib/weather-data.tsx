@@ -1,4 +1,3 @@
-
 import { Sun, Cloud, CloudRain, CloudLightning, CloudSun } from 'lucide-react';
 import { format } from 'date-fns';
 
