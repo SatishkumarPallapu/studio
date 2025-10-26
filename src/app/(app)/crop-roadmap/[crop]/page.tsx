@@ -24,9 +24,13 @@ export default function CropRoadmapPage({
 }) {
   const [roadmap, setRoadmap] = useState<CropRoadmapOutput | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const cropName = decodeURIComponent(params.crop.replace(/-/g, ' '));
+  
+  // Safely decode the crop name from params
+  const cropName = params.crop ? decodeURIComponent(params.crop.replace(/-/g, ' ')) : '';
 
   useEffect(() => {
+    if (!cropName) return; // Don't fetch if cropName is not available
+
     const fetchRoadmap = async () => {
       try {
         setIsLoading(true);
