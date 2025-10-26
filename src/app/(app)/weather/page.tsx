@@ -1,11 +1,12 @@
+
 'use client';
 
 import * as React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts';
 // Import TYPES and the icon HELPER, not the mock data object
-import type { WeatherData, DailyForecast } from '@/lib/weather-data';
-import { getIconForCondition } from '@/lib/weather-data';
+import type { WeatherData, DailyForecast } from '@/lib/weather-data.tsx';
+import { getIconForCondition } from '@/lib/weather-data.tsx';
 import { Thermometer, Umbrella, Wind, Sunrise, Sunset, Clock, Droplets } from 'lucide-react';
 import { format } from 'date-fns';
 

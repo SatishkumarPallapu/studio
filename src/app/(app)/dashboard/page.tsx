@@ -5,8 +5,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Cloud, Bot, MessageSquare, Layers, Calendar, Droplets, Thermometer, Sun, TrendingUp, Atom, Info, Loader2 } from 'lucide-react';
 import Link from 'next/link';
-import type { WeatherData } from '@/lib/weather-data';
-import { getIconForCondition } from '@/lib/weather-data';
+import type { WeatherData } from '@/lib/weather-data.tsx';
+import { getIconForCondition } from '@/lib/weather-data.tsx';
 
 
 const soilData = {
