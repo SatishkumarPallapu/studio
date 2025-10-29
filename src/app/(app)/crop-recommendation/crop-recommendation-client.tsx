@@ -15,9 +15,8 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
-import { Bot, Loader2, Info, Sprout, Leaf, Heart, Calendar, TrendingUp, CheckCircle, Flame, Droplets, Wallet, Brain, Clock, Zap, Star, Home, AlertTriangle } from 'lucide-react';
+import { Bot, Loader2, Sprout, Leaf, Heart, Calendar, TrendingUp, Flame, Droplets, Wallet, Brain, Clock, Zap, Star, Home } from 'lucide-react';
 import Image from 'next/image';
-import Link from 'next/link';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { useLanguage } from '@/contexts/language-context';
 
@@ -36,7 +35,7 @@ type Recommendation = CropRecommendationFromSoilOutput;
 export default function CropRecommendationClient() {
   const searchParams = useSearchParams();
   const router = useRouter();
-  const { language } = useLanguage();
+  const { language, translations } = useLanguage();
   const [recommendation, setRecommendation] = useState<Recommendation | null>(null);
   const [budgetTips, setBudgetTips] = useState<SoilBudgetTipsOutput | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -72,8 +71,8 @@ export default function CropRecommendationClient() {
       });
       setRecommendation(result);
       toast({
-        title: "Recommendations Ready!",
-        description: "We've found some suitable crops for your farm.",
+        title: translations.crop_recommendation.recs_ready,
+        description: translations.crop_recommendation.recs_ready_desc,
       });
 
       if (result.top_soil_matches.length > 0) {
@@ -90,8 +89,8 @@ export default function CropRecommendationClient() {
       console.error('Error getting crop recommendation:', error);
       toast({
         variant: 'destructive',
-        title: 'Error',
-        description: 'Failed to get crop recommendation. Please try again.',
+        title: translations.crop_recommendation.error_title,
+        description: translations.crop_recommendation.error_desc,
       });
     } finally {
       setIsLoading(false);
@@ -160,15 +159,15 @@ export default function CropRecommendationClient() {
         {flippedCards[crop.name] ? (
             <div className="space-y-3 text-xs text-left w-full animate-in fade-in-50">
                 <div>
-                    <p className="font-bold flex items-center gap-1"><Leaf className="w-3 h-3 text-green-500" /> Vitamins</p>
+                    <p className="font-bold flex items-center gap-1"><Leaf className="w-3 h-3 text-green-500" /> {translations.crop_recommendation.vitamins}</p>
                     <p className="text-muted-foreground">{crop.vitamins}</p>
                 </div>
                 <div>
-                    <p className="font-bold flex items-center gap-1"><Heart className="w-3 h-3 text-red-500" /> Health Benefits</p>
+                    <p className="font-bold flex items-center gap-1"><Heart className="w-3 h-3 text-red-500" /> {translations.crop_recommendation.health_benefits}</p>
                     <p className="text-muted-foreground">{crop.medicinal_value}</p>
                 </div>
                  <div>
-                    <p className="font-bold flex items-center gap-1"><Home className="w-3 h-3 text-blue-500" /> Farming Type</p>
+                    <p className="font-bold flex items-center gap-1"><Home className="w-3 h-3 text-blue-500" /> {translations.crop_recommendation.farming_type}</p>
                     <p className="text-muted-foreground">{crop.farming_type}</p>
                 </div>
             </div>
@@ -176,17 +175,17 @@ export default function CropRecommendationClient() {
             <div className="text-xs text-muted-foreground animate-in fade-in-50 space-y-1">
                 <div className="flex items-center justify-center gap-1">
                     <Calendar className="w-3 h-3" />
-                    <span>Harvest: <b>{crop.harvesting_duration}</b></span>
+                    <span>{translations.crop_recommendation.harvest}: <b>{crop.harvesting_duration}</b></span>
                 </div>
                 <div className="flex items-center justify-center gap-1">
                     <TrendingUp className="w-3 h-3" />
-                    <span>Demand: <b>{crop.peak_demand_month}</b></span>
+                    <span>{translations.crop_recommendation.demand}: <b>{crop.peak_demand_month}</b></span>
                 </div>
             </div>
         )}
 
         <div className="w-full pt-2">
-            <Button size="sm" className="w-full text-xs sm:text-sm" onClick={(e) => handleCropSelection(e, crop)}>View Roadmap</Button>
+            <Button size="sm" className="w-full text-xs sm:text-sm" onClick={(e) => handleCropSelection(e, crop)}>{translations.crop_recommendation.view_roadmap}</Button>
         </div>
     </Card>
   );
@@ -197,9 +196,9 @@ export default function CropRecommendationClient() {
       <div className="grid gap-8 md:grid-cols-2">
         <Card>
           <CardHeader>
-            <CardTitle>AI Crop Recommendation</CardTitle>
+            <CardTitle>{translations.crop_recommendation.title}</CardTitle>
             <CardDescription>
-              Enter your soil data and location to get personalized crop suggestions from our AI. Data from soil analysis is pre-filled.
+              {translations.crop_recommendation.description}
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -208,28 +207,28 @@ export default function CropRecommendationClient() {
                 <div className="grid grid-cols-2 gap-4">
                   <FormField control={form.control} name="nitrogen" render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Nitrogen (ppm)</FormLabel>
+                      <FormLabel>{translations.crop_recommendation.nitrogen}</FormLabel>
                       <FormControl><Input suppressHydrationWarning type="number" placeholder="e.g., 120" {...field} value={field.value ?? ''} /></FormControl>
                       <FormMessage />
                     </FormItem>
                   )} />
                   <FormField control={form.control} name="phosphorus" render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Phosphorus (ppm)</FormLabel>
+                      <FormLabel>{translations.crop_recommendation.phosphorus}</FormLabel>
                       <FormControl><Input suppressHydrationWarning type="number" placeholder="e.g., 50" {...field} value={field.value ?? ''} /></FormControl>
                       <FormMessage />
                     </FormItem>
                   )} />
                   <FormField control={form.control} name="potassium" render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Potassium (ppm)</FormLabel>
+                      <FormLabel>{translations.crop_recommendation.potassium}</FormLabel>
                       <FormControl><Input suppressHydrationWarning type="number" placeholder="e.g., 75" {...field} value={field.value ?? ''} /></FormControl>
                       <FormMessage />
                     </FormItem>
                   )} />
                   <FormField control={form.control} name="ph" render={({ field }) => (
                     <FormItem>
-                      <FormLabel>pH Level</FormLabel>
+                      <FormLabel>{translations.crop_recommendation.ph}</FormLabel>
                       <FormControl><Input suppressHydrationWarning type="number" step="0.1" placeholder="e.g., 6.8" {...field} value={field.value ?? ''} /></FormControl>
                       <FormMessage />
                     </FormItem>
@@ -237,15 +236,15 @@ export default function CropRecommendationClient() {
                 </div>
                 <FormField control={form.control} name="location" render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Farm Location</FormLabel>
-                      <FormControl><Input suppressHydrationWarning placeholder="e.g., Anantapur, Andhra Pradesh" {...field} /></FormControl>
+                      <FormLabel>{translations.crop_recommendation.location}</FormLabel>
+                      <FormControl><Input suppressHydrationWarning placeholder={translations.crop_recommendation.location_placeholder} {...field} /></FormControl>
                       <FormMessage />
                     </FormItem>
                   )} />
                 <Button suppressHydrationWarning type="submit" disabled={isLoading} className="w-full">
                   {isLoading ? (
-                    <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Getting Recommendations...</>
-                  ) : 'Get Recommendations'}
+                    <><Loader2 className="mr-2 h-4 w-4 animate-spin" />{translations.crop_recommendation.getting_recs_button}</>
+                  ) : translations.crop_recommendation.get_recs_button}
                 </Button>
               </form>
             </Form>
@@ -256,7 +255,7 @@ export default function CropRecommendationClient() {
           {isLoading && (
               <div className="flex flex-col items-center justify-center h-full gap-4 text-center">
                   <Bot className="w-16 h-16 animate-bounce text-primary" />
-                  <p className="text-muted-foreground">Our AI is analyzing your farm data to find the perfect crops...</p>
+                  <p className="text-muted-foreground">{translations.crop_recommendation.ai_analyzing}</p>
               </div>
           )}
           {!isLoading && !recommendation && cropImage && (
@@ -269,7 +268,7 @@ export default function CropRecommendationClient() {
                       data-ai-hint={cropImage.imageHint}
                   />
                   <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
-                      <p className="text-white text-lg font-semibold text-center p-4">Your crop recommendations will appear here.</p>
+                      <p className="text-white text-lg font-semibold text-center p-4">{translations.crop_recommendation.placeholder}</p>
                   </div>
               </div>
           )}
@@ -280,8 +279,8 @@ export default function CropRecommendationClient() {
         <div className='space-y-8'>
           <Card>
             <CardHeader>
-              <CardTitle className='flex items-center gap-2'><Sprout className="text-primary"/> Top Soil Matches</CardTitle>
-              <CardDescription>Crops best suited for your specific soil composition.</CardDescription>
+              <CardTitle className='flex items-center gap-2'><Sprout className="text-primary"/> {translations.crop_recommendation.soil_matches}</CardTitle>
+              <CardDescription>{translations.crop_recommendation.soil_matches_desc}</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -292,8 +291,8 @@ export default function CropRecommendationClient() {
 
           <Card>
             <CardHeader>
-              <CardTitle className='flex items-center gap-2'><Clock className="text-primary"/> Fastest ROI Crops</CardTitle>
-              <CardDescription>Short-duration crops (30-90 days) for quick cash flow.</CardDescription>
+              <CardTitle className='flex items-center gap-2'><Clock className="text-primary"/> {translations.crop_recommendation.fast_roi}</CardTitle>
+              <CardDescription>{translations.crop_recommendation.fast_roi_desc}</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -304,8 +303,8 @@ export default function CropRecommendationClient() {
 
           <Card>
             <CardHeader>
-              <CardTitle className='flex items-center gap-2'><Zap className="text-primary"/> High-Demand at Harvest</CardTitle>
-              <CardDescription>Crops predicted to have peak market demand when you harvest (seasonal & festive).</CardDescription>
+              <CardTitle className='flex items-center gap-2'><Zap className="text-primary"/> {translations.crop_recommendation.high_demand}</CardTitle>
+              <CardDescription>{translations.crop_recommendation.high_demand_desc}</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -316,8 +315,8 @@ export default function CropRecommendationClient() {
 
           <Card>
             <CardHeader>
-              <CardTitle className='flex items-center gap-2'><Star className="text-primary"/> Highest Profit & Demand</CardTitle>
-              <CardDescription>Star performers combining high profitability and huge market demand.</CardDescription>
+              <CardTitle className='flex items-center gap-2'><Star className="text-primary"/> {translations.crop_recommendation.high_profit}</CardTitle>
+              <CardDescription>{translations.crop_recommendation.high_profit_desc}</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -328,8 +327,8 @@ export default function CropRecommendationClient() {
           
           <Card>
             <CardHeader>
-              <CardTitle className='flex items-center gap-2'><Home className="text-primary"/> Indoor Farming Champions</CardTitle>
-              <CardDescription>Crops ideal for indoor or soilless farming with easy setup and high demand.</CardDescription>
+              <CardTitle className='flex items-center gap-2'><Home className="text-primary"/> {translations.crop_recommendation.indoor}</CardTitle>
+              <CardDescription>{translations.crop_recommendation.indoor_desc}</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -341,8 +340,8 @@ export default function CropRecommendationClient() {
 
           <Card>
               <CardHeader>
-                  <CardTitle>Intercropping Suggestions</CardTitle>
-                  <CardDescription>Boost yield and soil health by planting these together.</CardDescription>
+                  <CardTitle>{translations.crop_recommendation.intercropping}</CardTitle>
+                  <CardDescription>{translations.crop_recommendation.intercropping_desc}</CardDescription>
               </CardHeader>
               <CardContent>
                   <p>{recommendation.intercropping_suggestions}</p>
@@ -354,8 +353,8 @@ export default function CropRecommendationClient() {
       {(isTipsLoading || budgetTips) && (
         <Card>
           <CardHeader>
-            <CardTitle>Soil Diagnosis & Budget Tips</CardTitle>
-            <CardDescription>From an Expert Agronomist Who Thinks Like a Farmer</CardDescription>
+            <CardTitle>{translations.crop_recommendation.soil_tips_title}</CardTitle>
+            <CardDescription>{translations.crop_recommendation.soil_tips_desc}</CardDescription>
           </CardHeader>
           <CardContent>
             {isTipsLoading ? (
@@ -394,7 +393,7 @@ export default function CropRecommendationClient() {
                   </AccordionContent>
                 </AccordionItem>
                  <AccordionItem value="item-4">
-                  <AccordionTrigger className="text-lg font-semibold flex items-center gap-2"><Wallet/> {budgetTips.budget_principles.title}</AccordionTrigger>
+                  <AccordionTrigger className="text-lg font-semibold flex items-center gap-2"><Wallet/> {translations.crop_recommendation.budget_rules_title}</AccordionTrigger>
                   <AccordionContent>
                     <ul className="list-disc pl-5 space-y-2 text-muted-foreground">
                         {budgetTips.budget_principles.principles.map((p, i) => <li key={i}>{p}</li>)}
@@ -402,7 +401,7 @@ export default function CropRecommendationClient() {
                   </AccordionContent>
                 </AccordionItem>
                  <AccordionItem value="item-5">
-                  <AccordionTrigger className="text-lg font-semibold flex items-center gap-2"><Brain /> {budgetTips.best_practices.title}</AccordionTrigger>
+                  <AccordionTrigger className="text-lg font-semibold flex items-center gap-2"><Brain /> {translations.crop_recommendation.farmer_mindset_title}</AccordionTrigger>
                   <AccordionContent>
                     <ul className="list-disc pl-5 space-y-2 text-muted-foreground">
                        {budgetTips.best_practices.practices.map((p, i) => <li key={i}>{p}</li>)}

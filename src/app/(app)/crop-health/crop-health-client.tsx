@@ -10,6 +10,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Bot, Leaf, Loader2, Upload } from 'lucide-react';
 import Image from 'next/image';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
+import { useLanguage } from '@/contexts/language-context';
 
 type Diagnosis = {
   diagnosis: string;
@@ -36,9 +37,10 @@ const WhatsAppIcon = () => (
 export default function CropHealthClient() {
   const [diagnosis, setDiagnosis] = useState<Diagnosis | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [preview, setPreview] = useState<string | null>(null);
+  const [preview, setPreview] useState<string | null>(null);
   const [file, setFile] = useState<File | null>(null);
   const { toast } = useToast();
+  const { translations } = useLanguage();
   const pestImage = PlaceHolderImages.find(img => img.id === 'pest-detection');
 
 
@@ -59,8 +61,8 @@ export default function CropHealthClient() {
     if (!file || !preview) {
       toast({
         variant: 'destructive',
-        title: 'No file selected',
-        description: 'Please upload an image of the affected crop.',
+        title: translations.crop_health.no_file,
+        description: translations.crop_health.no_file_desc,
       });
       return;
     }
@@ -75,8 +77,8 @@ export default function CropHealthClient() {
       console.error('Error diagnosing pest/disease:', error);
       toast({
         variant: 'destructive',
-        title: 'Error',
-        description: 'Failed to diagnose. Please try a different image.',
+        title: translations.crop_health.error_title,
+        description: translations.crop_health.error_desc,
       });
     } finally {
       setIsLoading(false);
@@ -103,7 +105,7 @@ export default function CropHealthClient() {
                 />
             </div>
         )}
-        <p className="text-muted-foreground">Diagnosis results will appear here.</p>
+        <p className="text-muted-foreground">{translations.crop_health.placeholder}</p>
     </div>
   );
 
@@ -111,15 +113,15 @@ export default function CropHealthClient() {
     <div className="grid gap-8 md:grid-cols-2">
       <Card>
         <CardHeader>
-          <CardTitle>AI Crop Health Analysis</CardTitle>
+          <CardTitle>{translations.crop_health.title}</CardTitle>
           <CardDescription>
-            Upload a photo of an affected crop, and our AI will diagnose the issue and suggest organic remedies.
+            {translations.crop_health.description}
           </CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="grid w-full max-w-sm items-center gap-1.5">
-              <Label htmlFor="picture">Crop Picture</Label>
+              <Label htmlFor="picture">{translations.crop_health.form_label}</Label>
               <div className="flex items-center gap-2">
                 <Input id="picture" type="file" accept="image/*" onChange={handleFileChange} />
               </div>
@@ -127,7 +129,7 @@ export default function CropHealthClient() {
 
             {preview && (
               <div>
-                <Label>Image Preview</Label>
+                <Label>{translations.crop_health.preview_label}</Label>
                 <div className="mt-2 relative aspect-video w-full overflow-hidden rounded-lg border">
                   <Image src={preview} alt="Crop preview" fill className="object-cover" />
                 </div>
@@ -138,10 +140,10 @@ export default function CropHealthClient() {
               {isLoading ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Diagnosing...
+                  {translations.crop_health.diagnosing}
                 </>
               ) : (
-                'Diagnose Crop'
+                translations.crop_health.diagnose_button
               )}
             </Button>
           </form>
@@ -152,14 +154,14 @@ export default function CropHealthClient() {
         {isLoading ? (
             <div className="flex flex-col items-center justify-center h-full gap-4">
                 <Bot className="w-16 h-16 animate-pulse text-primary" />
-                <p className="text-muted-foreground">Our AI is inspecting your crop...</p>
+                <p className="text-muted-foreground">{translations.crop_health.ai_inspecting}</p>
             </div>
         ) : diagnosis ? (
           <>
             {preview && (
               <Card>
                 <CardHeader>
-                  <CardTitle>Your Uploaded Image</CardTitle>
+                  <CardTitle>{translations.crop_health.your_image}</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="relative aspect-video w-full overflow-hidden rounded-lg">
@@ -170,7 +172,7 @@ export default function CropHealthClient() {
             )}
             <Card>
                 <CardHeader className="flex-row items-center justify-between">
-                    <CardTitle>AI Diagnosis</CardTitle>
+                    <CardTitle>{translations.crop_health.ai_diagnosis}</CardTitle>
                     <Button variant="ghost" size="icon" onClick={() => handleShareOnWhatsApp(diagnosis)}>
                         <WhatsAppIcon />
                     </Button>
@@ -181,7 +183,7 @@ export default function CropHealthClient() {
             </Card>
             <Card>
               <CardHeader>
-                <CardTitle>Suggested Organic Remedies</CardTitle>
+                <CardTitle>{translations.crop_health.remedies}</CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="leading-relaxed">{diagnosis.remedies}</p>

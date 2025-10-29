@@ -12,7 +12,7 @@ export interface Crop {
 interface ActiveCropContextType {
   activeCrop: Crop | null;
   trackedCrops: Crop[];
-  addTrackedCrop: (crop: Crop) => void;
+  addTrackedCrop: (crop: Crop) => boolean; // Returns true if already tracked
   setActiveCrop: (cropId: string) => void;
 }
 
@@ -58,23 +58,21 @@ export function ActiveCropProvider({ children }: { children: ReactNode }) {
     }
   }, [trackedCrops, isLoaded]);
 
-  const addTrackedCrop = (crop: Crop) => {
+  const addTrackedCrop = (crop: Crop): boolean => {
+    let alreadyTracked = false;
     setTrackedCrops((prevCrops) => {
       const isAlreadyTracked = prevCrops.some(c => c.name.toLowerCase() === crop.name.toLowerCase());
       if (isAlreadyTracked) {
-        toast({
-          variant: 'default',
-          title: "Already Tracked",
-          description: `You are already tracking ${crop.name}.`,
-        });
         const existingCrop = prevCrops.find(c => c.name.toLowerCase() === crop.name.toLowerCase())!;
         _setActiveCrop(existingCrop);
+        alreadyTracked = true;
         return prevCrops;
       }
       const newCrops = [...prevCrops, crop];
       _setActiveCrop(crop);
       return newCrops;
     });
+    return alreadyTracked;
   };
   
   const setActiveCrop = (cropId: string) => {

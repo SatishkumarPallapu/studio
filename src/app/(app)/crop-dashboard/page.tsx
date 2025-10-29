@@ -17,17 +17,15 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Button } from '@/components/ui/button';
 import { useEffect, useState } from 'react';
+import { useLanguage } from '@/contexts/language-context';
 
 export default function CropDashboardPage() {
+    const { translations } = useLanguage();
     const mockFarmerPhone = '+919999999999'; 
     const { activeCrop, trackedCrops, setActiveCrop } = useActiveCrop();
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
-        // The useActiveCrop hook handles loading from localStorage.
-        // We just need to wait until activeCrop is either loaded or confirmed to be null.
-        // The hook initializes activeCrop to null and then updates it.
-        // So, if activeCrop is not null, or if it is null but there are no tracked crops, loading is done.
         if (activeCrop || trackedCrops.length === 0) {
             setIsLoading(false);
         }
@@ -38,6 +36,7 @@ export default function CropDashboardPage() {
         return (
             <div className="flex items-center justify-center h-96">
                 <Loader2 className="w-12 h-12 text-primary animate-spin" />
+                <span className="sr-only">{translations.crop_dashboard.loading}</span>
             </div>
         );
     }
@@ -47,9 +46,9 @@ export default function CropDashboardPage() {
             <div className="space-y-6">
                 <Card>
                     <CardHeader>
-                        <CardTitle>Crop Lifecycle Dashboard</CardTitle>
+                        <CardTitle>{translations.crop_dashboard.no_crop_title}</CardTitle>
                         <CardDescription>
-                            You are not tracking any crops yet. Find a crop and start tracking it to see its lifecycle here.
+                            {translations.crop_dashboard.no_crop_description}
                         </CardDescription>
                     </CardHeader>
                 </Card>
@@ -65,9 +64,9 @@ export default function CropDashboardPage() {
             <div className="flex items-center gap-4">
               <Sprout className="w-10 h-10 text-primary" />
               <div>
-                <CardTitle className="text-3xl capitalize">Crop Lifecycle: {activeCrop.name}</CardTitle>
+                <CardTitle className="text-3xl capitalize">{translations.crop_dashboard.title}: {activeCrop.name}</CardTitle>
                 <CardDescription>
-                  Manage everything for your active crop, from monitoring to health alerts.
+                  {translations.crop_dashboard.description}
                 </CardDescription>
               </div>
             </div>
@@ -75,7 +74,7 @@ export default function CropDashboardPage() {
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                         <Button variant="outline">
-                            Switch Crop <ChevronDown className="ml-2 h-4 w-4" />
+                            {translations.crop_dashboard.switch_crop} <ChevronDown className="ml-2 h-4 w-4" />
                         </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent>
@@ -95,11 +94,11 @@ export default function CropDashboardPage() {
         <div className="relative">
           <div className="overflow-x-auto pb-2">
             <TabsList className="inline-flex items-center justify-start w-max space-x-1.5 h-auto">
-              <TabsTrigger value="iot"><Droplets className="mr-2 h-4 w-4" />IoT Monitor</TabsTrigger>
-              <TabsTrigger value="satellite"><Satellite className="mr-2 h-4 w-4" />Satellite</TabsTrigger>
-              <TabsTrigger value="health"><Leaf className="mr-2 h-4 w-4" />Crop Health</TabsTrigger>
-              <TabsTrigger value="calendar"><Calendar className="mr-2 h-4 w-4" />Calendar</TabsTrigger>
-              <TabsTrigger value="assistant"><Bot className="mr-2 h-4 w-4" />AI Assistant</TabsTrigger>
+              <TabsTrigger value="iot"><Droplets className="mr-2 h-4 w-4" />{translations.crop_dashboard.iot_monitor}</TabsTrigger>
+              <TabsTrigger value="satellite"><Satellite className="mr-2 h-4 w-4" />{translations.crop_dashboard.satellite}</TabsTrigger>
+              <TabsTrigger value="health"><Leaf className="mr-2 h-4 w-4" />{translations.crop_dashboard.crop_health}</TabsTrigger>
+              <TabsTrigger value="calendar"><Calendar className="mr-2 h-4 w-4" />{translations.crop_dashboard.calendar}</TabsTrigger>
+              <TabsTrigger value="assistant"><Bot className="mr-2 h-4 w-4" />{translations.crop_dashboard.ai_assistant}</TabsTrigger>
             </TabsList>
           </div>
         </div>

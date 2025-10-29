@@ -9,7 +9,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { generateCropRoadmap, CropRoadmapOutput, Activity } from '@/ai/flows/crop-roadmap-flow';
+import { generateCropRoadmap, CropRoadmapOutput } from '@/ai/flows/crop-roadmap-flow';
 import { CheckCircle2, Sprout, Loader2, BookOpen, ScrollText } from 'lucide-react';
 import {
   Accordion,
@@ -84,7 +84,7 @@ export default function CropRoadmapPage() {
   const [roadmap, setRoadmap] = useState<CropRoadmapOutput | null>(null);
   const [seedInfo, setSeedInfo] = useState<SeedInfo | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const { language: currentLanguage } = useLanguage();
+  const { language: currentLanguage, translations } = useLanguage();
   
   const rawCropName = params.crop;
   const cropName = rawCropName && typeof rawCropName === 'string' ? decodeURIComponent(rawCropName.replace(/-/g, ' ')) : '';
@@ -123,12 +123,13 @@ export default function CropRoadmapPage() {
     return (
         <div className="flex items-center justify-center h-96">
             <Loader2 className="w-12 h-12 text-primary animate-spin" />
+            <span className="sr-only">{translations.crop_roadmap.loading}</span>
         </div>
     );
   }
 
   if (!roadmap) {
-    return <p>Failed to load roadmap.</p>;
+    return <p>{translations.crop_roadmap.failed}</p>;
   }
 
   const activitiesByStage = roadmap.activities.reduce((acc, activity) => {
@@ -149,10 +150,10 @@ export default function CropRoadmapPage() {
             <Sprout className="w-10 h-10 text-primary" />
             <div>
               <CardTitle className="text-3xl capitalize">
-                Farming Roadmap for {cropName}
+                {translations.crop_roadmap.title} {cropName}
               </CardTitle>
               <CardDescription>
-                Your complete guide from sowing to harvest, including seed recommendations.
+                {translations.crop_roadmap.description}
               </CardDescription>
             </div>
           </div>
@@ -164,8 +165,8 @@ export default function CropRoadmapPage() {
 
       <Tabs defaultValue="schedule" className="w-full">
         <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="schedule"><ScrollText className="mr-2 h-4 w-4"/>Farming Schedule</TabsTrigger>
-          <TabsTrigger value="seeds"><BookOpen className="mr-2 h-4 w-4"/>Certified Seeds</TabsTrigger>
+          <TabsTrigger value="schedule"><ScrollText className="mr-2 h-4 w-4"/>{translations.crop_roadmap.tab_schedule}</TabsTrigger>
+          <TabsTrigger value="seeds"><BookOpen className="mr-2 h-4 w-4"/>{translations.crop_roadmap.tab_seeds}</TabsTrigger>
         </TabsList>
         <TabsContent value="schedule" className="mt-6">
             <Accordion type="single" collapsible defaultValue={Object.keys(activitiesByStage)[0]} className="w-full">
@@ -228,7 +229,7 @@ export default function CropRoadmapPage() {
                     </CardContent>
                 </Card>
             ) : (
-                <p>Loading seed information...</p>
+                <p>{translations.crop_roadmap.loading}</p>
             )}
         </TabsContent>
       </Tabs>

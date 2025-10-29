@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import * as React from 'react';
@@ -36,60 +35,68 @@ import {
   SidebarMenuButton,
   SidebarProvider,
   SidebarTrigger,
-  SidebarInset,
   useSidebar,
 } from '@/components/ui/sidebar';
 import { ActiveCropProvider } from '@/contexts/active-crop-context';
 
-const bottomNavItems = [
-    { href: '/dashboard', icon: Home, label: 'Home' },
-    { href: '/soil-analysis', icon: Sprout, label: 'Soil' },
-    { href: '/marketplace', icon: ShoppingCart, label: 'Market' },
-    { href: '/chat', icon: Bot, label: 'Chat' },
-    { href: '/profile', icon: User, label: 'Profile' },
-];
 
-const mainNavItems = [
-    { href: '/dashboard', icon: Home, label: 'Dashboard' },
-    { href: '/soil-analysis', icon: Sprout, label: 'Soil Analysis' },
-    { href: '/crop-recommendation', icon: Leaf, label: 'Crop Recs' },
-    { href: '/crop-planner', icon: Tangent, label: 'Multi-Crop Planner' },
-    { href: '/crop-dashboard', icon: Calendar, label: 'Crop Lifecycle' },
-    { href: '/drone-hub', icon: Wind, label: 'Drone Hub'},
-    { href: '/reports', icon: FileText, label: 'Weekly Reports'},
-    { href: '/traceability', icon: ScanEye, label: 'Traceability'},
-    { href: '/harvest', icon: CheckCircle, label: 'Harvest' },
-    { href: '/marketplace', icon: ShoppingCart, label: 'Marketplace' },
-    { href: '/analytics', icon: BarChart, label: 'Analytics' },
-    { href: '/subsidies', icon: Bell, label: 'Subsidies' },
-    { href: '/weather', icon: Thermometer, label: 'Weather' },
-    { href: '/profile', icon: User, label: 'Profile' },
-    { href: '/chat', icon: Bot, label: 'AI Assistant' },
-];
+function AppLayoutClient({ children }: { children: React.ReactNode }) {
+    const { translations } = useLanguage();
 
+    const mainNavItems = [
+        { href: '/dashboard', icon: Home, label: translations.nav.dashboard },
+        { href: '/soil-analysis', icon: Sprout, label: translations.nav.soil_analysis },
+        { href: '/crop-recommendation', icon: Leaf, label: translations.nav.crop_recs },
+        { href: '/crop-planner', icon: Tangent, label: translations.nav.multi_crop_planner },
+        { href: '/crop-dashboard', icon: Calendar, label: translations.nav.crop_lifecycle },
+        { href: '/drone-hub', icon: Wind, label: translations.nav.drone_hub },
+        { href: '/reports', icon: FileText, label: translations.nav.weekly_reports },
+        { href: '/traceability', icon: ScanEye, label: translations.nav.traceability },
+        { href: '/harvest', icon: CheckCircle, label: translations.nav.harvest },
+        { href: '/marketplace', icon: ShoppingCart, label: translations.nav.marketplace },
+        { href: '/analytics', icon: BarChart, label: translations.nav.analytics },
+        { href: '/subsidies', icon: Bell, label: translations.nav.subsidies },
+        { href: '/weather', icon: Thermometer, label: translations.nav.weather },
+        { href: '/profile', icon: User, label: translations.nav.profile },
+        { href: '/chat', icon: Bot, label: translations.nav.ai_assistant },
+    ];
 
-export default function AppLayout({ children }: { children: React.ReactNode }) {
-  return (
-    <LanguageProvider>
-      <ActiveCropProvider>
+    const bottomNavItems = [
+        { href: '/dashboard', icon: Home, label: translations.nav.home },
+        { href: '/soil-analysis', icon: Sprout, label: translations.nav.soil },
+        { href: '/marketplace', icon: ShoppingCart, label: translations.nav.market },
+        { href: '/chat', icon: Bot, label: translations.nav.chat },
+        { href: '/profile', icon: User, label: translations.nav.profile },
+    ];
+
+    return (
         <SidebarProvider>
-          <div className="flex flex-row min-h-screen w-full bg-muted/40">
-            <AppSidebar />
-            <div className="flex flex-col flex-1">
-              <AppHeader />
-              <main className="flex-1 p-4 sm:px-6 sm:py-0 md:gap-8 mb-16 sm:mb-0">
-                  {children}
-              </main>
+            <div className="flex flex-row min-h-screen w-full bg-muted/40">
+                <AppSidebar navItems={mainNavItems} />
+                <div className="flex flex-col flex-1">
+                    <AppHeader navItems={mainNavItems} />
+                    <main className="flex-1 p-4 sm:px-6 sm:py-0 md:gap-8 mb-16 sm:mb-0">
+                        {children}
+                    </main>
+                </div>
             </div>
-          </div>
-          <BottomNavBar />
+            <BottomNavBar navItems={bottomNavItems} />
         </SidebarProvider>
-      </ActiveCropProvider>
-    </LanguageProvider>
-  );
+    );
 }
 
-function AppHeader() {
+export default function AppLayout({ children }: { children: React.ReactNode }) {
+    return (
+        <LanguageProvider>
+            <ActiveCropProvider>
+                <AppLayoutClient>{children}</AppLayoutClient>
+            </ActiveCropProvider>
+        </LanguageProvider>
+    );
+}
+
+
+function AppHeader({ navItems }: { navItems: { href: string, icon: React.ElementType, label: string }[] }) {
   const { language, setLanguage } = useLanguage();
 
   return (
@@ -115,7 +122,7 @@ function AppHeader() {
                     <Icons.logo className="h-5 w-5 transition-all group-hover:scale-110" />
                     <span className="sr-only">AI Rythu Mitra</span>
                     </Link>
-                    {mainNavItems.map(item => (
+                    {navItems.map(item => (
                         <Link key={item.href} href={item.href} className="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-foreground">
                             <item.icon className="h-5 w-5" />
                             {item.label}
@@ -146,7 +153,7 @@ function AppHeader() {
   );
 }
 
-function AppSidebar() {
+function AppSidebar({ navItems }: { navItems: { href: string, icon: React.ElementType, label: string }[] }) {
   const pathname = usePathname();
   const { setOpen, isMobile } = useSidebar();
   
@@ -165,7 +172,7 @@ function AppSidebar() {
         </SidebarHeader>
         <SidebarContent className="h-full group-data-[collapsible=icon]:overflow-hidden">
             <SidebarMenu>
-                {mainNavItems.map(item => (
+                {navItems.map(item => (
                     <SidebarMenuItem key={item.href}>
                          <Link href={item.href} onClick={handleLinkClick}>
                             <SidebarMenuButton
@@ -184,12 +191,12 @@ function AppSidebar() {
   )
 }
 
-function BottomNavBar() {
+function BottomNavBar({ navItems }: { navItems: { href: string, icon: React.ElementType, label: string }[] }) {
   const pathname = usePathname();
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-40 border-t bg-background sm:hidden">
       <div className="grid h-16 grid-cols-5 items-center justify-items-center">
-        {bottomNavItems.map((item) => (
+        {navItems.map((item) => (
           <Link
             key={item.href}
             href={item.href}

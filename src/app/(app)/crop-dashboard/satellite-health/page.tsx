@@ -4,11 +4,11 @@
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
-import { Badge } from '@/components/ui/badge';
 import { AlertCircle, CheckCircle, TrendingUp, Zap } from 'lucide-react';
 import { useFirebase, useUser, useMemoFirebase } from '@/firebase';
 import { useCollection } from '@/firebase/firestore/use-collection';
 import { collection, query, orderBy, limit } from 'firebase/firestore';
+import { useLanguage } from '@/contexts/language-context';
 
 type SatelliteHealthData = {
     date: string;
@@ -58,6 +58,7 @@ const getStatusInfo = (status: SatelliteHealthData['healthStatus']) => {
 export default function SatelliteHealthPage() {
     const { firestore } = useFirebase();
     const { user, isUserLoading } = useUser();
+    const { translations } = useLanguage();
     
     // Hardcoded for prototype, but will use real user ID when available
     const cropId = 'tomato-123';
@@ -96,7 +97,7 @@ export default function SatelliteHealthPage() {
     if (isUserLoading) {
         return (
             <div className="flex justify-center items-center h-64">
-                <p className="text-muted-foreground">Authenticating user...</p>
+                <p className="text-muted-foreground">{translations.satellite_health.authenticating}</p>
             </div>
         );
     }
@@ -106,15 +107,15 @@ export default function SatelliteHealthPage() {
         <div className="space-y-6">
             <Card>
                 <CardHeader>
-                    <CardTitle>Satellite Health Monitoring (NDVI)</CardTitle>
-                    <CardDescription>Weekly crop health analysis based on satellite imagery.</CardDescription>
+                    <CardTitle>{translations.satellite_health.title}</CardTitle>
+                    <CardDescription>{translations.satellite_health.description}</CardDescription>
                 </CardHeader>
             </Card>
 
             {latestData && (
                 <Card className={statusInfo.className}>
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium">Latest Health Status</CardTitle>
+                        <CardTitle className="text-sm font-medium">{translations.satellite_health.latest_status}</CardTitle>
                         {statusInfo.icon}
                     </CardHeader>
                     <CardContent>
@@ -128,9 +129,9 @@ export default function SatelliteHealthPage() {
                 <CardHeader>
                     <CardTitle className="flex items-center gap-2">
                         <TrendingUp className="w-5 h-5" />
-                        NDVI Health Trend
+                        {translations.satellite_health.trend_title}
                     </CardTitle>
-                    <CardDescription>Visualizing crop health over the last few weeks.</CardDescription>
+                    <CardDescription>{translations.satellite_health.trend_description}</CardDescription>
                 </CardHeader>
                 <CardContent>
                     <div className="h-[250px] w-full">

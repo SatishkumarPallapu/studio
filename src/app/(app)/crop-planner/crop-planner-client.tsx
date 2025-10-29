@@ -15,6 +15,7 @@ import { Bot, Loader2, Plus, Sprout, Tangent, Trash, Recycle, Share2 } from 'luc
 import Image from 'next/image';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { Label } from '@/components/ui/label';
+import { useLanguage } from '@/contexts/language-context';
 
 const formSchema = z.object({
   crops: z.array(z.string().min(2, "Crop name must be at least 2 characters.")).min(1, "Please enter at least one crop."),
@@ -59,6 +60,7 @@ export default function CropPlannerClient() {
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
   const [cropInputs, setCropInputs] = useState<string[]>(['']);
+  const { translations } = useLanguage();
   const cropImage = PlaceHolderImages.find(img => img.id === 'crop-recommendation');
 
   const form = useForm<{ location: string }>({
@@ -89,8 +91,8 @@ export default function CropPlannerClient() {
     if (validatedCrops.length === 0) {
         toast({
             variant: 'destructive',
-            title: 'Invalid Input',
-            description: 'Please enter at least one valid crop name.',
+            title: translations.crop_planner.invalid_input,
+            description: translations.crop_planner.invalid_input_desc,
         });
         return;
     }
@@ -104,8 +106,8 @@ export default function CropPlannerClient() {
       console.error('Error generating crop plan:', error);
       toast({
         variant: 'destructive',
-        title: 'Error',
-        description: 'Failed to generate a crop plan. Please try again.',
+        title: translations.crop_planner.error_title,
+        description: translations.crop_planner.error_desc,
       });
     } finally {
       setIsLoading(false);
@@ -129,16 +131,16 @@ export default function CropPlannerClient() {
     <div className="grid gap-8 md:grid-cols-2">
       <Card>
         <CardHeader>
-          <CardTitle>AI Multi-Crop Planner</CardTitle>
+          <CardTitle>{translations.crop_planner.title}</CardTitle>
           <CardDescription>
-            Get smart intercropping and companion planting suggestions to boost your farm's health and yield.
+            {translations.crop_planner.description}
           </CardDescription>
         </CardHeader>
         <CardContent>
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
                 <div>
-                    <Label>Primary Crops</Label>
+                    <Label>{translations.crop_planner.primary_crops_label}</Label>
                     <div className="space-y-2 mt-2">
                         {cropInputs.map((crop, index) => (
                             <div key={index} className="flex items-center gap-2">
@@ -155,7 +157,7 @@ export default function CropPlannerClient() {
                         ))}
                     </div>
                     <Button suppressHydrationWarning type="button" variant="outline" size="sm" onClick={handleAddCropInput} className="mt-2">
-                        <Plus className="mr-2 h-4 w-4" /> Add another crop
+                        <Plus className="mr-2 h-4 w-4" /> {translations.crop_planner.add_crop_button}
                     </Button>
                 </div>
 
@@ -164,16 +166,16 @@ export default function CropPlannerClient() {
                 name="location"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Farm Location</FormLabel>
-                    <FormControl><Input suppressHydrationWarning placeholder="e.g., Anantapur, Andhra Pradesh" {...field} /></FormControl>
+                    <FormLabel>{translations.crop_planner.location_label}</FormLabel>
+                    <FormControl><Input suppressHydrationWarning placeholder={translations.crop_planner.location_placeholder} {...field} /></FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
               <Button suppressHydrationWarning type="submit" disabled={isLoading} className="w-full">
                 {isLoading ? (
-                  <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Generating Plan...</>
-                ) : 'Generate Intercropping Plan'}
+                  <><Loader2 className="mr-2 h-4 w-4 animate-spin" />{translations.crop_planner.generating_button}</>
+                ) : translations.crop_planner.generate_button}
               </Button>
             </form>
           </Form>
@@ -184,7 +186,7 @@ export default function CropPlannerClient() {
         {isLoading && (
           <div className="flex flex-col items-center justify-center h-full gap-4 text-center">
             <Bot className="w-16 h-16 animate-bounce text-primary" />
-            <p className="text-muted-foreground">Our AI is designing a synergistic planting strategy...</p>
+            <p className="text-muted-foreground">{translations.crop_planner.ai_designing}</p>
           </div>
         )}
 
@@ -194,7 +196,7 @@ export default function CropPlannerClient() {
                 <CardHeader>
                     <CardTitle className="flex items-center gap-2">
                         <Recycle className="w-6 h-6 text-primary"/>
-                        Overall Synergy Benefits
+                        {translations.crop_planner.synergy_title}
                     </CardTitle>
                 </CardHeader>
                 <CardContent>
@@ -207,15 +209,15 @@ export default function CropPlannerClient() {
                     <CardHeader className="flex flex-row items-center justify-between">
                         <CardTitle className="flex items-center gap-3">
                             <Sprout className="w-7 h-7 text-green-600"/>
-                            Plan for {p.primaryCrop}
+                            {translations.crop_planner.plan_for} {p.primaryCrop}
                         </CardTitle>
                         <Button variant="outline" size="sm" onClick={() => handleSharePlan(p)}>
-                            <WhatsAppIcon /> Share
+                            <WhatsAppIcon /> {translations.crop_planner.share_button}
                         </Button>
                     </CardHeader>
                     <CardContent className="space-y-4">
                         <div className="space-y-2">
-                            <h4 className="font-semibold">Companion Crops:</h4>
+                            <h4 className="font-semibold">{translations.crop_planner.companions}</h4>
                             <div className="grid grid-cols-2 gap-4">
                             {p.companionCrops.map(cc => (
                                 <div key={cc.name} className="p-3 border rounded-md bg-muted/50">
@@ -228,7 +230,7 @@ export default function CropPlannerClient() {
                         <div>
                            <h4 className="font-semibold flex items-center gap-2">
                                 <Tangent className="w-5 h-5"/>
-                                Layout Suggestion:
+                                {translations.crop_planner.layout_suggestion}
                             </h4>
                            <p className="text-muted-foreground mt-1">{p.layout_suggestion}</p>
                         </div>
@@ -246,7 +248,7 @@ export default function CropPlannerClient() {
                     data-ai-hint={cropImage.imageHint}
                 />
                 <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
-                    <p className="text-white text-lg font-semibold text-center p-4">Your multi-crop plan will appear here.</p>
+                    <p className="text-white text-lg font-semibold text-center p-4">{translations.crop_planner.placeholder}</p>
                 </div>
             </div>
         )}

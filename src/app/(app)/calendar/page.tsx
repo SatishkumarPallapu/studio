@@ -9,6 +9,7 @@ import { Badge } from '@/components/ui/badge';
 import { Loader2, CheckCircle2 } from 'lucide-react';
 import { format } from 'date-fns';
 import { useActiveCrop } from '@/contexts/active-crop-context';
+import { useLanguage } from '@/contexts/language-context';
 
 type ActivityWithDate = Activity & { date: Date };
 
@@ -17,6 +18,7 @@ export default function CalendarPage() {
   const [roadmap, setRoadmap] = useState<CropRoadmapOutput | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
+  const { translations } = useLanguage();
   
   const cropName = activeCrop?.name;
 
@@ -63,9 +65,9 @@ export default function CalendarPage() {
       return (
            <Card>
             <CardHeader>
-              <CardTitle className="capitalize">Smart Calendar</CardTitle>
+              <CardTitle className="capitalize">{translations.calendar.title}</CardTitle>
               <CardDescription>
-                No active crop selected. Please select a crop to see its schedule.
+                {translations.calendar.no_crop}
               </CardDescription>
             </CardHeader>
            </Card>
@@ -76,9 +78,9 @@ export default function CalendarPage() {
     <div className="space-y-6">
       <Card>
         <CardHeader>
-          <CardTitle className="capitalize">Smart Calendar: {cropName} Schedule</CardTitle>
+          <CardTitle className="capitalize">{translations.calendar.schedule_for}: {cropName}</CardTitle>
           <CardDescription>
-            This calendar displays your AI-generated farming schedule. Days with activities are highlighted.
+            {translations.calendar.description}
           </CardDescription>
         </CardHeader>
         <CardContent className="grid gap-8 md:grid-cols-2">
@@ -106,7 +108,7 @@ export default function CalendarPage() {
 
           <div className="space-y-4">
             <h3 className="text-lg font-semibold">
-              Tasks for {selectedDate ? format(selectedDate, 'PPP') : '...'}
+              {translations.calendar.tasks_for} {selectedDate ? format(selectedDate, 'PPP') : '...'}
             </h3>
             {selectedDayActivities.length > 0 ? (
               <div className="space-y-3">
@@ -125,7 +127,7 @@ export default function CalendarPage() {
                 ))}
               </div>
             ) : (
-              <p className="text-sm text-muted-foreground pt-4">No activities scheduled for this day.</p>
+              <p className="text-sm text-muted-foreground pt-4">{translations.calendar.no_activities}</p>
             )}
           </div>
         </CardContent>

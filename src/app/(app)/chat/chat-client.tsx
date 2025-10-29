@@ -59,36 +59,14 @@ export default function ChatClient({ farmerPhone }: ChatClientProps) {
 
   const recognitionRef = useRef<SpeechRecognition | null>(null);
   const { toast } = useToast();
-  const farmerPhoneRef = useRef(farmerPhone);
 
   const initialTip = translations.chat.initialTip;
 
   useEffect(() => {
-    // Show AI tip in chat on initial load
-    if (messages.length === 0) {
+    // Show AI tip in chat on initial load or language change
+    if (messages.length <= 1) { // Also updates if only initial message is present
       setMessages([{ role: 'model', content: initialTip }]);
     }
-    
-    // Function to send the initial tip via WhatsApp
-    const sendInitialWhatsAppTip = async () => {
-        if (!farmerPhoneRef.current) return;
-      try {
-        await fetch('/api/send-whatsapp', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            to: `whatsapp:${farmerPhoneRef.current}`,
-            message: initialTip,
-          }),
-        });
-        console.log('✅ Initial WhatsApp tip sent!');
-      } catch (err) {
-        console.error('❌ Failed to send WhatsApp tip:', err);
-        // We don't show a toast here to avoid bothering the user if the background task fails.
-      }
-    };
-
-    // sendInitialWhatsAppTip(); // Uncomment to send tip on load
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [initialTip]);
 
@@ -121,7 +99,7 @@ export default function ChatClient({ farmerPhone }: ChatClientProps) {
       toast({
         variant: 'destructive',
         title: 'Error',
-        description: 'Failed to get a response from the chatbot.',
+        description: translations.chat.error,
       });
     } finally {
       setIsLoading(false);
@@ -174,7 +152,7 @@ export default function ChatClient({ farmerPhone }: ChatClientProps) {
         toast({
           variant: 'destructive',
           title: 'Voice Error',
-          description: `Could not understand audio: ${event.error}`,
+          description: `${translations.chat.voice_error} ${event.error}`,
         });
       }
       setIsRecording(false);
@@ -218,7 +196,7 @@ export default function ChatClient({ farmerPhone }: ChatClientProps) {
       toast({
         variant: 'destructive',
         title: 'Audio Error',
-        description: 'Could not generate audio.',
+        description: translations.chat.tts_error,
       });
     } finally {
       setIsLoading(false);
