@@ -55,6 +55,8 @@ export default function CropRecommendationClient() {
       potassium: searchParams.get('K') ? parseFloat(searchParams.get('K')!) : undefined,
       ph: searchParams.get('pH') ? parseFloat(searchParams.get('pH')!) : undefined,
       location: '',
+      soilType: undefined,
+      season: undefined,
     },
   });
 
@@ -96,28 +98,25 @@ export default function CropRecommendationClient() {
     }
   }
 
+  // Effect to run recommendation if all params are present in URL
   useEffect(() => {
     const N = searchParams.get('N');
     const P = searchParams.get('P');
     const K = searchParams.get('K');
     const pH = searchParams.get('pH');
     
-    form.reset({
-      ...form.getValues(),
-      nitrogen: N ? parseFloat(N) : form.getValues('nitrogen'),
-      phosphorus: P ? parseFloat(P) : form.getValues('phosphorus'),
-      potassium: K ? parseFloat(K) : form.getValues('potassium'),
-      ph: pH ? parseFloat(pH) : form.getValues('ph'),
-    });
-
-    if (N && P && K && pH && form.getValues('location') && form.getValues('soilType') && form.getValues('season')) {
+    // Only auto-submit if the values in the form (from defaultValues) are ready
+    const formValues = form.getValues();
+    if (N && P && K && pH && formValues.location && formValues.soilType && formValues.season) {
+        // We use a timeout to ensure the form has fully initialized before submitting
         setTimeout(() => {
             form.handleSubmit(getRecommendations)();
         }, 100);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [searchParams]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchParams, form.getValues]); // Depend on getValues to re-check when form state might change
   
+
   // Re-fetch recommendations when language changes
   useEffect(() => {
       if(recommendation && form.formState.isSubmitted) {
@@ -491,3 +490,5 @@ const NutrientCard = ({data, icon}: {data: { heading: string, normal_range: stri
         </Card>
     )
 }
+
+    
