@@ -141,6 +141,7 @@ Based on the soil data and target crop, generate a detailed guide. The tone must
    - **practices**: [
        "Start with what you have. Don't try to make your soil 'perfect'. Just fix the biggest problem first.",
        "Reinvest profits in soil health. Use money from this harvest to buy green manure seeds or make a better compost pit for the next season.",
+       "Confirm this AI plan with an experienced local farmer or extension officer. Their on-the-ground knowledge is invaluable to adapt my recommendations perfectly to your specific field.",
        "Avoid heavy chemicals. They give a quick result but can harm your soil in the long run, costing you more later."
      ]
 `,

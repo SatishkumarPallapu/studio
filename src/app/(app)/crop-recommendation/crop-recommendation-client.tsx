@@ -415,20 +415,6 @@ export default function CropRecommendationClient() {
         </Card>
       )}
 
-      {!isLoading && recommendation && (
-        <Card className="bg-yellow-50 border-yellow-200 dark:bg-yellow-900/20 dark:border-yellow-800">
-            <CardHeader className="flex-row items-start gap-4">
-                <AlertTriangle className="h-6 w-6 text-yellow-600 dark:text-yellow-400 mt-1" />
-                <div>
-                    <CardTitle className="text-yellow-800 dark:text-yellow-300">Disclaimer</CardTitle>
-                    <CardDescription className="text-yellow-700 dark:text-yellow-500">
-                        AI recommendations are for guidance only. Always consult with local agricultural extension officers and experienced farmers before making final decisions. Market conditions and local factors can vary.
-                    </CardDescription>
-                </div>
-            </CardHeader>
-        </Card>
-      )}
-
     </div>
   );
 }
