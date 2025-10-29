@@ -1,3 +1,4 @@
+
 'use server';
 /**
  * @fileOverview Generates soil diagnosis and budget-friendly tips for a specific crop.
@@ -8,7 +9,7 @@
  */
 
 import {ai} from '@/ai/genkit';
-import {z} from 'zod';
+import {z} from 'genkit';
 
 const SoilBudgetTipsInputSchema = z.object({
   nitrogen: z.number().describe('Nitrogen content in ppm.'),
@@ -158,3 +159,5 @@ const soilBudgetTipsFlow = ai.defineFlow(
     return output!;
   }
 );
+
+    
