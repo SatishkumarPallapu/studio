@@ -1,106 +1,176 @@
 
 'use client';
 
-import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
+import React, { createContext, useContext, useState, ReactNode, useEffect, useCallback, useMemo } from 'react';
+import { useFirebase, useUser, useMemoFirebase } from '@/firebase';
+import { collection, doc, onSnapshot, setDoc, query, orderBy } from 'firebase/firestore';
+import type { CropRoadmapOutput, Activity } from '@/ai/flows/crop-roadmap-flow';
 import { useToast } from '@/hooks/use-toast';
+import { generateCropRoadmap } from '@/ai/flows/crop-roadmap-flow';
+import { setDocumentNonBlocking, updateDocumentNonBlocking } from '@/firebase/non-blocking-updates';
 
-export interface Crop {
-  id: string;
+export interface TrackedCrop {
+  id: string; // e.g., 'tomato-1678886400000'
   name: string;
+  startDate: string; // ISO string
+  roadmap: CropRoadmapOutput;
+  activities: (Activity & { status: 'pending' | 'completed' | 'skipped'; feedback?: string; date: string })[];
 }
 
-interface ActiveCropContextType {
-  activeCrop: Crop | null;
-  trackedCrops: Crop[];
-  addTrackedCrop: (crop: Crop) => boolean; // Returns true if already tracked
-  setActiveCrop: (cropId: string) => void;
+interface CropLifecycleContextType {
+  trackedCrops: TrackedCrop[];
+  activeCrop: TrackedCrop | null;
+  setActiveCrop: (id: string | null) => void;
+  startTrackingCrop: (cropName: string, farmingType: 'Open Field' | 'Indoor/Soilless' | 'Both') => Promise<void>;
+  updateActivity: (cropId: string, activityDay: number, status: 'completed' | 'skipped', feedback?: string) => void;
+  isLoading: boolean;
 }
 
-const ActiveCropContext = createContext<ActiveCropContextType | undefined>(undefined);
+const CropLifecycleContext = createContext<CropLifecycleContextType | undefined>(undefined);
 
-const getDefaultCrops = (): Crop[] => [{ id: 'tomato-default', name: 'Tomato' }];
-
-export function ActiveCropProvider({ children }: { children: ReactNode }) {
-  const [trackedCrops, setTrackedCrops] = useState<Crop[]>([]);
-  const [activeCrop, _setActiveCrop] = useState<Crop | null>(null);
-  const [isLoaded, setIsLoaded] = useState(false);
+export function CropLifecycleProvider({ children }: { children: ReactNode }) {
+  const { firestore } = useFirebase();
+  const { user } = useUser();
   const { toast } = useToast();
 
-  // Effect to load from localStorage only on the client side
-  useEffect(() => {
-    try {
-      const item = window.localStorage.getItem('trackedCrops');
-      const loadedCrops = item ? JSON.parse(item) : getDefaultCrops();
-      if (loadedCrops.length > 0) {
-        setTrackedCrops(loadedCrops);
-        _setActiveCrop(loadedCrops[0]);
-      } else {
-        // Ensure there's always at least one default crop if storage is empty
-        setTrackedCrops(getDefaultCrops());
-        _setActiveCrop(getDefaultCrops()[0]);
-      }
-    } catch (error) {
-      console.error(error);
-      const defaultCrops = getDefaultCrops();
-      setTrackedCrops(defaultCrops);
-      _setActiveCrop(defaultCrops[0]);
-    }
-    setIsLoaded(true);
-  }, []);
+  const [trackedCrops, setTrackedCrops] = useState<TrackedCrop[]>([]);
+  const [activeCropId, setActiveCropId] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
-  // Effect to save to localStorage whenever trackedCrops changes
+  // Subscribe to the user's tracked crops in Firestore
   useEffect(() => {
-    if (!isLoaded) return; // Don't save until loaded from storage
-    try {
-      window.localStorage.setItem('trackedCrops', JSON.stringify(trackedCrops));
-    } catch (error) {
-      console.error("Could not save tracked crops to localStorage", error);
+    if (!user || !firestore) {
+      setTrackedCrops([]);
+      setIsLoading(false);
+      return;
     }
-  }, [trackedCrops, isLoaded]);
 
-  const addTrackedCrop = (crop: Crop): boolean => {
-    let alreadyTracked = false;
-    setTrackedCrops((prevCrops) => {
-      const isAlreadyTracked = prevCrops.some(c => c.name.toLowerCase() === crop.name.toLowerCase());
-      if (isAlreadyTracked) {
-        const existingCrop = prevCrops.find(c => c.name.toLowerCase() === crop.name.toLowerCase())!;
-        _setActiveCrop(existingCrop);
-        alreadyTracked = true;
-        return prevCrops;
+    const q = query(collection(firestore, `users/${user.uid}/trackedCrops`), orderBy('startDate', 'desc'));
+    
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const crops: TrackedCrop[] = [];
+      snapshot.forEach(doc => {
+        crops.push({ id: doc.id, ...doc.data() } as TrackedCrop);
+      });
+      setTrackedCrops(crops);
+      
+      // If no active crop is set, or the active one is deleted, set to the latest one
+      if (crops.length > 0 && (!activeCropId || !crops.some(c => c.id === activeCropId))) {
+        setActiveCropId(crops[0].id);
+      } else if (crops.length === 0) {
+        setActiveCropId(null);
       }
-      const newCrops = [...prevCrops, crop];
-      _setActiveCrop(crop);
-      return newCrops;
+      setIsLoading(false);
+    }, (error) => {
+        console.error("Error fetching tracked crops: ", error);
+        setIsLoading(false);
     });
-    return alreadyTracked;
-  };
-  
-  const setActiveCrop = (cropId: string) => {
-    const cropToActivate = trackedCrops.find(c => c.id === cropId);
-    if(cropToActivate) {
-        _setActiveCrop(cropToActivate);
-    }
-  };
 
+    return () => unsubscribe();
+  }, [user, firestore, activeCropId]);
+
+  const startTrackingCrop = useCallback(async (cropName: string, farmingType: 'Open Field' | 'Indoor/Soilless' | 'Both') => {
+    if (!user || !firestore) {
+      toast({ variant: 'destructive', title: 'User not authenticated' });
+      return;
+    }
+
+    const isAlreadyTracked = trackedCrops.some(c => c.name.toLowerCase() === cropName.toLowerCase());
+    if (isAlreadyTracked) {
+        toast({ title: 'Crop Already Tracked', description: `You are already tracking ${cropName}.` });
+        const existingCrop = trackedCrops.find(c => c.name.toLowerCase() === cropName.toLowerCase());
+        if (existingCrop) setActiveCropId(existingCrop.id);
+        return;
+    }
+
+    setIsLoading(true);
+    try {
+      // 1. Generate the roadmap with intercropping
+      const roadmap = await generateCropRoadmap({ cropName, farmingType });
+      const startDate = new Date();
+
+      // 2. Prepare the activities with dates and default status
+      const activities = roadmap.activities.map(activity => {
+        const activityDate = new Date(startDate);
+        activityDate.setDate(startDate.getDate() + activity.day - 1);
+        return {
+          ...activity,
+          date: activityDate.toISOString(),
+          status: 'pending' as const,
+        };
+      });
+
+      // 3. Create the new TrackedCrop object
+      const newCropId = `${cropName.toLowerCase().replace(/ /g, '-')}-${Date.now()}`;
+      const newTrackedCrop: Omit<TrackedCrop, 'id'> = {
+        name: cropName,
+        startDate: startDate.toISOString(),
+        roadmap,
+        activities,
+      };
+
+      // 4. Save to Firestore
+      const docRef = doc(firestore, `users/${user.uid}/trackedCrops`, newCropId);
+      await setDoc(docRef, newTrackedCrop);
+
+      toast({ title: 'Started Tracking Crop!', description: `A full lifecycle plan for ${cropName} has been generated.` });
+      setActiveCropId(newCropId);
+
+    } catch (error) {
+      console.error('Failed to start tracking crop:', error);
+      toast({ variant: 'destructive', title: 'Error', description: 'Could not generate the crop lifecycle plan.' });
+    } finally {
+      setIsLoading(false);
+    }
+  }, [user, firestore, toast, trackedCrops]);
+  
+  const updateActivity = useCallback((cropId: string, activityDay: number, status: 'completed' | 'skipped', feedback?: string) => {
+    if(!user || !firestore) return;
+
+    const crop = trackedCrops.find(c => c.id === cropId);
+    if (!crop) return;
+
+    const activityIndex = crop.activities.findIndex(a => a.day === activityDay);
+    if (activityIndex === -1) return;
+
+    const updatedActivities = [...crop.activities];
+    updatedActivities[activityIndex] = {
+      ...updatedActivities[activityIndex],
+      status,
+      ...(feedback && { feedback }),
+    };
+
+    const docRef = doc(firestore, `users/${user.uid}/trackedCrops`, cropId);
+    // Non-blocking update for better UI responsiveness
+    updateDocumentNonBlocking(docRef, { activities: updatedActivities });
+
+    toast({ title: 'Feedback Logged', description: 'Your response has been saved.' });
+
+  }, [user, firestore, trackedCrops, toast]);
+
+
+  const activeCrop = useMemo(() => trackedCrops.find(c => c.id === activeCropId) || null, [trackedCrops, activeCropId]);
 
   const value = {
-    activeCrop,
     trackedCrops,
-    addTrackedCrop,
-    setActiveCrop,
+    activeCrop,
+    setActiveCrop: setActiveCropId,
+    startTrackingCrop,
+    updateActivity,
+    isLoading,
   };
 
   return (
-    <ActiveCropContext.Provider value={value}>
+    <CropLifecycleContext.Provider value={value}>
       {children}
-    </ActiveCropContext.Provider>
+    </CropLifecycleContext.Provider>
   );
 }
 
-export function useActiveCrop() {
-  const context = useContext(ActiveCropContext);
+export function useCropLifecycle() {
+  const context = useContext(CropLifecycleContext);
   if (context === undefined) {
-    throw new Error('useActiveCrop must be used within an ActiveCropProvider');
+    throw new Error('useCropLifecycle must be used within a CropLifecycleProvider');
   }
   return context;
 }

@@ -15,7 +15,7 @@ import {
 import { Bot, Loader2, Send, Mic, User, Pause, Play } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useLanguage } from '@/contexts/language-context';
-import { useActiveCrop } from '@/contexts/active-crop-context';
+import { useCropLifecycle } from '@/contexts/active-crop-context';
 
 type Message = {
   role: 'user' | 'model';
@@ -46,7 +46,7 @@ const WhatsAppIcon = () => (
 
 export default function ChatClient({ farmerPhone }: ChatClientProps) {
   const { language, translations } = useLanguage();
-  const { activeCrop } = useActiveCrop();
+  const { activeCrop } = useCropLifecycle();
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);

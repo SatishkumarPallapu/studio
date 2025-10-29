@@ -37,7 +37,7 @@ import {
   SidebarTrigger,
   useSidebar,
 } from '@/components/ui/sidebar';
-import { ActiveCropProvider } from '@/contexts/active-crop-context';
+import { CropLifecycleProvider } from '@/contexts/active-crop-context';
 
 
 function AppLayoutClient({ children }: { children: React.ReactNode }) {
@@ -88,9 +88,9 @@ function AppLayoutClient({ children }: { children: React.ReactNode }) {
 export default function AppLayout({ children }: { children: React.ReactNode }) {
     return (
         <LanguageProvider>
-            <ActiveCropProvider>
+            <CropLifecycleProvider>
                 <AppLayoutClient>{children}</AppLayoutClient>
-            </ActiveCropProvider>
+            </CropLifecycleProvider>
         </LanguageProvider>
     );
 }

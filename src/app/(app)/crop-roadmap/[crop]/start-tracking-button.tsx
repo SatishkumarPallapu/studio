@@ -2,36 +2,21 @@
 'use client';
 
 import { Button } from "@/components/ui/button";
-import { useToast } from "@/hooks/use-toast";
-import { useActiveCrop } from "@/contexts/active-crop-context";
-import { useRouter } from "next/navigation";
+import { useCropLifecycle } from "@/contexts/active-crop-context";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useLanguage } from "@/contexts/language-context";
 
+type FarmingType = 'Open Field' | 'Indoor/Soilless' | 'Both';
+
 export default function StartTrackingButton({ cropName }: { cropName: string }) {
-    const { toast } = useToast();
-    const { addTrackedCrop } = useActiveCrop();
+    const { startTrackingCrop } = useCropLifecycle();
     const router = useRouter();
     const { translations } = useLanguage();
+    const searchParams = useSearchParams();
+    const farmingType = (searchParams.get('farmingType') as FarmingType) || 'Open Field';
 
-    const handleStartTracking = () => {
-        const newCrop = {
-            id: `${cropName.toLowerCase().replace(/ /g, '-')}-${Date.now()}`,
-            name: cropName,
-        };
-        const alreadyTracked = addTrackedCrop(newCrop);
-
-        if (alreadyTracked) {
-          toast({
-              title: translations.crop_roadmap.already_tracking,
-              description: translations.crop_roadmap.already_tracking_desc.replace('{cropName}', cropName),
-          });
-        } else {
-          toast({
-              title: translations.crop_roadmap.tracking_enabled,
-              description: translations.crop_roadmap.tracking_desc.replace('{cropName}', cropName),
-          });
-        }
-
+    const handleStartTracking = async () => {
+        await startTrackingCrop(cropName, farmingType);
         router.push('/crop-dashboard');
     };
 

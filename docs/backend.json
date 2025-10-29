@@ -395,6 +395,40 @@
         "location": { "type": "string" }
       },
       "required": ["id", "cropName", "harvestDate", "farmerId"]
+    },
+    "CropActivity": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "CropActivity",
+      "type": "object",
+      "description": "A single task in a crop's lifecycle.",
+      "properties": {
+        "day": { "type": "number", "description": "The day in the crop cycle." },
+        "stage": { "type": "string" },
+        "activity": { "type": "string", "description": "Title of the activity." },
+        "details": { "type": "string", "description": "Description of the activity." },
+        "status": { "type": "string", "enum": ["pending", "completed", "skipped"], "description": "Farmer-reported status." },
+        "feedback": { "type": "string", "description": "Farmer's reason for skipping a task." },
+        "date": { "type": "string", "format": "date-time", "description": "The scheduled date of the activity." }
+      },
+      "required": ["day", "stage", "activity", "details", "status", "date"]
+    },
+    "TrackedCrop": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "TrackedCrop",
+      "type": "object",
+      "description": "A crop a user is actively tracking, with its AI-generated lifecycle plan.",
+      "properties": {
+        "id": { "type": "string" },
+        "userId": { "type": "string" },
+        "name": { "type": "string", "description": "The name of the crop." },
+        "startDate": { "type": "string", "format": "date-time", "description": "The date tracking began." },
+        "roadmap": { "type": "object", "description": "The full AI-generated roadmap object." },
+        "activities": {
+          "type": "array",
+          "items": { "$ref": "#/entities/CropActivity" }
+        }
+      },
+      "required": ["id", "userId", "name", "startDate", "roadmap", "activities"]
     }
   },
   "auth": {
@@ -408,6 +442,10 @@
         "$ref": "#/entities/User"
       },
       "description": "Stores user profile information. User ID is used for path-based ownership."
+    },
+     "/users/{userId}/trackedCrops/{trackedCropId}": {
+      "schema": { "$ref": "#/entities/TrackedCrop" },
+      "description": "Stores the complete lifecycle plan for a crop a user is actively tracking."
     },
     "/users/{userId}/soil_reports/{soilReportId}": {
       "schema": {

@@ -11,7 +11,7 @@ import {
 import Link from 'next/link';
 import type { WeatherData, WeatherCondition } from '@/lib/weather-data';
 import { format } from 'date-fns';
-import { useActiveCrop } from '@/contexts/active-crop-context';
+import { useCropLifecycle } from '@/contexts/active-crop-context';
 import { useLanguage } from '@/contexts/language-context';
 
 const soilData = {
@@ -44,7 +44,7 @@ const getIconForCondition = (condition: WeatherCondition | undefined, className:
 };
 
 export default function DashboardPage() {
-  const { activeCrop } = useActiveCrop();
+  const { activeCrop } = useCropLifecycle();
   const [weatherData, setWeatherData] = React.useState<WeatherData | null>(null);
   const [loading, setLoading] = React.useState(true);
   const [error, setError] = React.useState<string | null>(null);
