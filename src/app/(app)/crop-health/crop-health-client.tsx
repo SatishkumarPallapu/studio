@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState } from 'react';
@@ -37,7 +38,7 @@ const WhatsAppIcon = () => (
 export default function CropHealthClient() {
   const [diagnosis, setDiagnosis] = useState<Diagnosis | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [preview, setPreview] useState<string | null>(null);
+  const [preview, setPreview] = useState<string | null>(null);
   const [file, setFile] = useState<File | null>(null);
   const { toast } = useToast();
   const { translations } = useLanguage();
