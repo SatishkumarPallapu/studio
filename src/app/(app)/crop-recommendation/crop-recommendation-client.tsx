@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -14,6 +14,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
 import { Bot, Loader2, Sprout, Leaf, Heart, Calendar, TrendingUp, Flame, Droplets, Wallet, Brain, Clock, Zap, Star, Home } from 'lucide-react';
 import Image from 'next/image';
@@ -26,6 +27,8 @@ const formSchema = z.object({
   potassium: z.coerce.number().min(0, 'Potassium must be positive.'),
   ph: z.coerce.number().min(0).max(14, 'pH must be between 0 and 14.'),
   location: z.string().min(3, 'Location is required.'),
+  soilType: z.string({ required_error: "Please select a soil type."}),
+  season: z.string({ required_error: "Please select a season." }),
 });
 
 type CropInfo = CropRecommendationFromSoilOutput['top_soil_matches'][0];
@@ -62,11 +65,7 @@ export default function CropRecommendationClient() {
     setFlippedCards({});
     try {
       const result = await cropRecommendationFromSoil({
-          nitrogen: values.nitrogen!,
-          phosphorus: values.phosphorus!,
-          potassium: values.potassium!,
-          ph: values.ph!,
-          location: values.location,
+          ...values,
           language: language === 'te' ? 'Telugu' : language === 'hi' ? 'Hindi' : 'English',
       });
       setRecommendation(result);
@@ -104,14 +103,14 @@ export default function CropRecommendationClient() {
     const pH = searchParams.get('pH');
     
     form.reset({
-      nitrogen: N ? parseFloat(N) : undefined,
-      phosphorus: P ? parseFloat(P) : undefined,
-      potassium: K ? parseFloat(K) : undefined,
-      ph: pH ? parseFloat(pH) : undefined,
-      location: form.getValues('location') || '',
+      ...form.getValues(),
+      nitrogen: N ? parseFloat(N) : form.getValues('nitrogen'),
+      phosphorus: P ? parseFloat(P) : form.getValues('phosphorus'),
+      potassium: K ? parseFloat(K) : form.getValues('potassium'),
+      ph: pH ? parseFloat(pH) : form.getValues('ph'),
     });
 
-    if (N && P && K && pH && form.getValues('location')) {
+    if (N && P && K && pH && form.getValues('location') && form.getValues('soilType') && form.getValues('season')) {
         setTimeout(() => {
             form.handleSubmit(getRecommendations)();
         }, 100);
@@ -190,6 +189,21 @@ export default function CropRecommendationClient() {
     </Card>
   );
 
+  const soilTypes = useMemo(() => [
+    { value: 'Alluvial', label: translations.crop_recommendation.soil_alluvial },
+    { value: 'Black', label: translations.crop_recommendation.soil_black },
+    { value: 'Red', label: translations.crop_recommendation.soil_red },
+    { value: 'Laterite', label: translations.crop_recommendation.soil_laterite },
+    { value: 'Desert', label: translations.crop_recommendation.soil_desert },
+    { value: 'Mountain', label: translations.crop_recommendation.soil_mountain },
+  ], [translations]);
+
+  const seasons = useMemo(() => [
+    { value: 'Kharif', label: translations.crop_recommendation.season_kharif },
+    { value: 'Rabi', label: translations.crop_recommendation.season_rabi },
+    { value: 'Zaid', label: translations.crop_recommendation.season_zaid },
+  ], [translations]);
+
 
   return (
     <div className="space-y-8">
@@ -233,6 +247,48 @@ export default function CropRecommendationClient() {
                       <FormMessage />
                     </FormItem>
                   )} />
+                </div>
+                 <div className="grid grid-cols-2 gap-4">
+                    <FormField
+                      control={form.control}
+                      name="soilType"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>{translations.crop_recommendation.soil_type}</FormLabel>
+                          <Select onValueChange={field.onChange} defaultValue={field.value}>
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue placeholder={translations.crop_recommendation.soil_type_placeholder} />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              {soilTypes.map(type => <SelectItem key={type.value} value={type.value}>{type.label}</SelectItem>)}
+                            </SelectContent>
+                          </Select>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                     <FormField
+                      control={form.control}
+                      name="season"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>{translations.crop_recommendation.season}</FormLabel>
+                          <Select onValueChange={field.onChange} defaultValue={field.value}>
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue placeholder={translations.crop_recommendation.season_placeholder} />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              {seasons.map(season => <SelectItem key={season.value} value={season.value}>{season.label}</SelectItem>)}
+                            </SelectContent>
+                          </Select>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
                 </div>
                 <FormField control={form.control} name="location" render={({ field }) => (
                     <FormItem>

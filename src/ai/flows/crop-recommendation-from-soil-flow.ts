@@ -17,6 +17,8 @@ const CropRecommendationFromSoilInputSchema = z.object({
   potassium: z.number().describe('Potassium content in ppm.'),
   ph: z.number().describe('Soil pH level.'),
   location: z.string().describe('The geographical location of the farm (e.g., "Anantapur, Andhra Pradesh").'),
+  soilType: z.string().describe('The type of soil (e.g., "Red Soil", "Black Cotton Soil").'),
+  season: z.string().describe('The current farming season (e.g., "Kharif", "Rabi").'),
   language: z.enum(['English', 'Telugu', 'Hindi']).describe('The language for the response.'),
 });
 export type CropRecommendationFromSoilInput = z.infer<typeof CropRecommendationFromSoilInputSchema>;
@@ -61,6 +63,8 @@ Today's date is {{Date}}.
 - Potassium: {{{potassium}}} ppm
 - pH: {{{ph}}}
 - Location: {{{location}}}
+- Soil Type: {{{soilType}}}
+- Season: {{{season}}}
 - Language: {{{language}}}
 
 **Your Task:**
@@ -95,19 +99,19 @@ Other common crops: Tomato, Mint, Marigold, Maize, Paddy, Onion, Chilli, Gourds,
 ---
 
 **Category 1: Top Soil Matches**
-Recommend 4 crops that are the absolute best fit for the provided soil data (N, P, K, pH) and location, based on your general agricultural knowledge. Do not be limited by the reference list above for this category.
+Recommend 4 crops that are the absolute best fit for the provided soil data (N, P, K, pH), location, soil type and season, based on your general agricultural knowledge. Do not be limited by the reference list above for this category.
 
 **Category 2: Fastest ROI Crops**
-Recommend 4 crops *from the reference list* with the shortest harvest durations (30-90 days) that are suitable for the farmer's location.
+Recommend 4 crops *from the reference list* with the shortest harvest durations (30-90 days) that are suitable for the farmer's location, soil type, and season.
 
 **Category 3: High-Demand at Harvest**
-1.  Select 4 suitable crops for the location.
+1.  Select 4 suitable crops for the location, soil type, and season.
 2.  Calculate their harvest month if planted today.
 3.  Based on general Indian market trends, predict which will have high demand in their harvest month. **Crucially, consider seasonal demand (e.g., watermelon in summer, gourds in winter) and festival demand (e.g., marigolds/flowers for Diwali/Dussehra, sugarcane for Sankranti).**
 4.  Recommend these 4 crops, explaining *why* their demand will be high (e.g., "Watermelon demand peaks in May due to summer heat.").
 
 **Category 4: Highest Profit & Huge Demand**
-Select 4 crops from the reference list or your general knowledge that represent the best combination of high profitability (ROI) and consistent, huge market demand. These are the "star performer" crops.
+Select 4 crops from the reference list or your general knowledge that represent the best combination of high profitability (ROI) and consistent, huge market demand, suitable for the given context. These are the "star performer" crops.
 
 **Category 5: Indoor Farming Champions**
 Recommend 4 crops ideal for indoor or soilless farming. Focus on options with easy setup, high demand in urban markets, and suitability for small spaces (e.g., less than 1 acre). Use the reference data for crops like Microgreens and Mushrooms.
