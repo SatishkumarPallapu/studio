@@ -15,7 +15,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
-import { Bot, Loader2, Info, Sprout, Leaf, Heart, Calendar, TrendingUp, CheckCircle, Flame, Droplets, Wallet, Brain, Clock, Zap, Star, Home } from 'lucide-react';
+import { Bot, Loader2, Info, Sprout, Leaf, Heart, Calendar, TrendingUp, CheckCircle, Flame, Droplets, Wallet, Brain, Clock, Zap, Star, Home, AlertTriangle } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
@@ -412,6 +412,20 @@ export default function CropRecommendationClient() {
               </Accordion>
             )}
           </CardContent>
+        </Card>
+      )}
+
+      {!isLoading && recommendation && (
+        <Card className="bg-yellow-50 border-yellow-200 dark:bg-yellow-900/20 dark:border-yellow-800">
+            <CardHeader className="flex-row items-start gap-4">
+                <AlertTriangle className="h-6 w-6 text-yellow-600 dark:text-yellow-400 mt-1" />
+                <div>
+                    <CardTitle className="text-yellow-800 dark:text-yellow-300">Disclaimer</CardTitle>
+                    <CardDescription className="text-yellow-700 dark:text-yellow-500">
+                        AI recommendations are for guidance only. Always consult with local agricultural extension officers and experienced farmers before making final decisions. Market conditions and local factors can vary.
+                    </CardDescription>
+                </div>
+            </CardHeader>
         </Card>
       )}
 
