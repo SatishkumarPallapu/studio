@@ -114,7 +114,7 @@ export default function CropRecommendationClient() {
         }, 100);
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [searchParams, form.getValues]); // Depend on getValues to re-check when form state might change
+  }, []);
   
 
   // Re-fetch recommendations when language changes
@@ -417,53 +417,10 @@ export default function CropRecommendationClient() {
                 <Loader2 className="w-8 h-8 animate-spin text-primary" />
               </div>
             ) : budgetTips && (
-              <Accordion type="single" collapsible defaultValue="item-1">
-                <AccordionItem value="item-1">
-                  <AccordionTrigger className="text-lg font-semibold">{budgetTips.interpretation_guide.title}</AccordionTrigger>
-                  <AccordionContent className="space-y-4 pt-2">
-                    <p className="text-muted-foreground">{budgetTips.interpretation_guide.intro}</p>
-                    <div className="grid md:grid-cols-2 gap-4">
-                        <NutrientCard data={budgetTips.interpretation_guide.nitrogen} icon={<Leaf className="text-green-500" />}/>
-                        <NutrientCard data={budgetTips.interpretation_guide.phosphorus} icon={<Sprout className="text-purple-500" />}/>
-                        <NutrientCard data={budgetTips.interpretation_guide.potassium} icon={<Flame className="text-orange-500" />}/>
-                        <NutrientCard data={budgetTips.interpretation_guide.ph} icon={<Droplets className="text-blue-500" />}/>
-                    </div>
-                  </AccordionContent>
-                </AccordionItem>
-                <AccordionItem value="item-2">
-                  <AccordionTrigger className="text-lg font-semibold">{budgetTips.balancing_recommendations.title}</AccordionTrigger>
-                  <AccordionContent className="prose prose-sm max-w-none text-card-foreground">
-                    <h4>If Nitrogen is low:</h4><p>{budgetTips.balancing_recommendations.nitrogen_low}</p>
-                    <h4>If Phosphorus is low:</h4><p>{budgetTips.balancing_recommendations.phosphorus_low}</p>
-                    <h4>If Potassium is low:</h4><p>{budgetTips.balancing_recommendations.potassium_low}</p>
-                    <h4>If pH is imbalanced:</h4><p>{budgetTips.balancing_recommendations.ph_imbalance}</p>
-                  </AccordionContent>
-                </AccordionItem>
-                <AccordionItem value="item-3">
-                  <AccordionTrigger className="text-lg font-semibold">{budgetTips.dosing_advice.title}</AccordionTrigger>
-                  <AccordionContent className="prose prose-sm max-w-none text-card-foreground">
-                     <p>{budgetTips.dosing_advice.intro}</p>
-                     <h4>Micro-dosing:</h4><p>{budgetTips.dosing_advice.micro_dosing}</p>
-                     <h4>Natural Alternatives:</h4><p>{budgetTips.dosing_advice.natural_alternatives}</p>
-                  </AccordionContent>
-                </AccordionItem>
-                 <AccordionItem value="item-4">
-                  <AccordionTrigger className="text-lg font-semibold flex items-center gap-2"><Wallet/> {translations.crop_recommendation.budget_rules_title}</AccordionTrigger>
-                  <AccordionContent>
-                    <ul className="list-disc pl-5 space-y-2 text-muted-foreground">
-                        {budgetTips.budget_principles.principles.map((p, i) => <li key={i}>{p}</li>)}
-                    </ul>
-                  </AccordionContent>
-                </AccordionItem>
-                 <AccordionItem value="item-5">
-                  <AccordionTrigger className="text-lg font-semibold flex items-center gap-2"><Brain /> {translations.crop_recommendation.farmer_mindset_title}</AccordionTrigger>
-                  <AccordionContent>
-                    <ul className="list-disc pl-5 space-y-2 text-muted-foreground">
-                       {budgetTips.best_practices.practices.map((p, i) => <li key={i}>{p}</li>)}
-                    </ul>
-                  </AccordionContent>
-                </AccordionItem>
-              </Accordion>
+              <div
+                className="prose prose-sm max-w-none text-card-foreground"
+                dangerouslySetInnerHTML={{ __html: budgetTips.report.replace(/\n/g, '<br />') }}
+              />
             )}
           </CardContent>
         </Card>
@@ -472,23 +429,3 @@ export default function CropRecommendationClient() {
     </div>
   );
 }
-
-
-const NutrientCard = ({data, icon}: {data: { heading: string, normal_range: string, diy_check: string, visual_clues: string }, icon: React.ReactNode}) => {
-    return (
-        <Card className="bg-muted/30">
-            <CardHeader className="pb-3">
-                <CardTitle className="text-base flex items-center gap-2">
-                    {icon} {data.heading}
-                </CardTitle>
-            </CardHeader>
-            <CardContent className="text-xs space-y-2">
-                <p><strong>Normal Range:</strong> {data.normal_range}</p>
-                <p><strong>DIY Check:</strong> {data.diy_check}</p>
-                <p><strong>Visual Clues:</strong> {data.visual_clues}</p>
-            </CardContent>
-        </Card>
-    )
-}
-
-    
