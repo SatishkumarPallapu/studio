@@ -20,6 +20,7 @@ import {
   CheckCircle,
   Thermometer,
   Bell,
+  HardHat,
 } from 'lucide-react';
 import { Icons } from '@/components/icons';
 import { LanguageProvider, useLanguage } from '@/contexts/language-context';
@@ -49,6 +50,7 @@ function AppLayoutClient({ children }: { children: React.ReactNode }) {
         { href: '/crop-recommendation', icon: Leaf, label: translations.nav.crop_recs },
         { href: '/crop-planner', icon: Tangent, label: translations.nav.multi_crop_planner },
         { href: '/crop-dashboard', icon: Calendar, label: translations.nav.crop_lifecycle },
+        { href: '/crop-dashboard/satellite-health', icon: ScanEye, label: translations.nav.satellite_health },
         { href: '/drone-hub', icon: Wind, label: translations.nav.drone_hub },
         { href: '/reports', icon: FileText, label: translations.nav.weekly_reports },
         { href: '/traceability', icon: ScanEye, label: translations.nav.traceability },

@@ -4,8 +4,10 @@
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
-import { AlertCircle, CheckCircle, TrendingUp, Zap } from 'lucide-react';
-import { useFirebase, useUser, useMemoFirebase } from '@/firebase';
+import { AlertCircle, CheckCircle, TrendingUp, Zap, ScanEye } from 'lucide-react';
+import { useFirebase } from '@/firebase/provider';
+import { useUser } from '@/firebase/provider';
+import { useMemoFirebase } from '@/firebase/provider';
 import { useCollection } from '@/firebase/firestore/use-collection';
 import { collection, query, orderBy, limit } from 'firebase/firestore';
 import { useLanguage } from '@/contexts/language-context';
@@ -19,11 +21,11 @@ type SatelliteHealthData = {
 
 // Mock data to use when no live data is available
 const mockSatelliteData: SatelliteHealthData[] = [
-    { date: '2024-06-01', ndvi: 0.68, healthStatus: 'Moderate Stress', advice: 'Stress detected. Check irrigation or nutrient levels.' },
-    { date: '2024-06-08', ndvi: 0.75, healthStatus: 'Healthy', advice: 'Crop appears healthy. Maintain current practices.' },
-    { date: '2024-06-15', ndvi: 0.72, healthStatus: 'Healthy', advice: 'Slight dip in health, monitor closely.' },
-    { date: '2024-06-22', ndvi: 0.81, healthStatus: 'Healthy', advice: 'Excellent health. Crop is thriving.' },
-    { date: '2024-06-29', ndvi: 0.79, healthStatus: 'Healthy', advice: 'Stable and healthy. Continue monitoring.' },
+    { date: '2024-06-01', ndvi: 0.68, healthStatus: 'Moderate Stress', advice: 'Stress detected. Check irrigation or nutrient levels for early intervention.' },
+    { date: '2024-06-08', ndvi: 0.75, healthStatus: 'Healthy', advice: 'Crop appears healthy. Current input utilization is optimal. Maintain practices.' },
+    { date: '2024-06-15', ndvi: 0.72, healthStatus: 'Healthy', advice: 'Slight dip in health, monitor for potential weed outbreaks or pests.' },
+    { date: '2024-06-22', ndvi: 0.81, healthStatus: 'Healthy', advice: 'Excellent health. Optimized management is improving yield potential.' },
+    { date: '2024-06-29', ndvi: 0.79, healthStatus: 'Healthy', advice: 'Stable and healthy. Continue optimized management to ensure profitability.' },
 ];
 
 const getStatusInfo = (status: SatelliteHealthData['healthStatus']) => {
@@ -123,7 +125,8 @@ export default function SatelliteHealthPage() {
                         <p className="text-xs text-muted-foreground">{latestData.advice}</p>
                     </CardContent>
                 </Card>
-            )}
+            </Card>
+        )}
 
             <Card>
                 <CardHeader>
@@ -161,6 +164,21 @@ export default function SatelliteHealthPage() {
                             </AreaChart>
                         </ResponsiveContainer>
                     </div>
+                </CardContent>
+            </Card>
+             <Card>
+                <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                        <ScanEye className="w-5 h-5" />
+                        Benefits of Monitoring
+                    </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4 text-sm text-muted-foreground">
+                   <ul className="list-disc pl-5 space-y-2">
+                        <li>Early detection of threats (weed outbreaks, pest damage, nutrient deficiencies) so interventions can be timely, avoiding larger losses.</li>
+                        <li>Better utilisation of inputs: knowing exactly where and when to apply fertiliser/chemicals instead of blanket application → cost savings, environmental benefit.</li>
+                        <li>Improved yield and profitability: by reducing losses and optimising management, growers can improve bottom-line.</li>
+                   </ul>
                 </CardContent>
             </Card>
         </div>

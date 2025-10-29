@@ -1,3 +1,4 @@
+
 export const translations = {
   en: {
     nav: {
@@ -6,6 +7,7 @@ export const translations = {
       crop_recs: 'Crop Recs',
       multi_crop_planner: 'Multi-Crop Planner',
       crop_lifecycle: 'Crop Lifecycle',
+      satellite_health: 'Satellite Health',
       drone_hub: 'Drone Hub',
       weekly_reports: 'Weekly Reports',
       traceability: 'Traceability',
@@ -388,6 +390,7 @@ export const translations = {
       crop_recs: 'పంట సిఫార్సులు',
       multi_crop_planner: 'బహుళ-పంటల ప్లానర్',
       crop_lifecycle: 'పంట జీవితచక్రం',
+      satellite_health: 'శాటిలైట్ ఆరోగ్యం',
       drone_hub: 'డ్రోన్ హబ్',
       weekly_reports: 'వారపు నివేదికలు',
       traceability: 'గుర్తించే విధానం',
@@ -770,6 +773,7 @@ export const translations = {
       crop_recs: 'फसल सिफारिशें',
       multi_crop_planner: 'बहु-फसल योजनाकार',
       crop_lifecycle: 'फसल जीवनचक्र',
+      satellite_health: 'सैटेलाइट स्वास्थ्य',
       drone_hub: 'ड्रोन हब',
       weekly_reports: 'साप्ताहिक रिपोर्ट',
       traceability: 'पता लगाने की क्षमता',
@@ -991,7 +995,7 @@ export const translations = {
         mission_type_label: 'मिशन का प्रकार',
         mission_type_placeholder: 'एक मिशन प्रकार चुनें',
         mission_type_ndvi: 'NDVI स्कैन',
-        mission_type_spraying: 'कीटनाशक छिड़काव',
+        mission_type_spraying: 'कीटनाशक छिड़काв',
         date_label: 'दिनांक',
         schedule_button: 'मिशन शेड्यूल करें',
         history_title: 'मिशन इतिहास',
