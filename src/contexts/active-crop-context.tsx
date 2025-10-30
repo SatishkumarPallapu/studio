@@ -2,12 +2,11 @@
 'use client';
 
 import React, { createContext, useContext, useState, ReactNode, useEffect, useCallback, useMemo } from 'react';
-import { useFirebase, useUser, useMemoFirebase } from '@/firebase';
-import { collection, doc, onSnapshot, setDoc, query, orderBy } from 'firebase/firestore';
+import { useFirebase, useUser } from '@/firebase';
+import { collection, doc, onSnapshot, setDoc, query, orderBy, updateDoc } from 'firebase/firestore';
 import type { CropRoadmapOutput, Activity } from '@/ai/flows/crop-roadmap-flow';
 import { useToast } from '@/hooks/use-toast';
 import { generateCropRoadmap } from '@/ai/flows/crop-roadmap-flow';
-import { setDocumentNonBlocking, updateDocumentNonBlocking } from '@/firebase/non-blocking-updates';
 
 export interface TrackedCrop {
   id: string; // e.g., 'tomato-1678886400000'
@@ -32,6 +31,7 @@ export function CropLifecycleProvider({ children }: { children: ReactNode }) {
   const { firestore } = useFirebase();
   const { user } = useUser();
   const { toast } = useToast();
+  const { translations } = useLanguage();
 
   const [trackedCrops, setTrackedCrops] = useState<TrackedCrop[]>([]);
   const [activeCropId, setActiveCropId] = useState<string | null>(null);
@@ -74,18 +74,10 @@ export function CropLifecycleProvider({ children }: { children: ReactNode }) {
       toast({ variant: 'destructive', title: 'User not authenticated' });
       return;
     }
-
-    const isAlreadyTracked = trackedCrops.some(c => c.name.toLowerCase() === cropName.toLowerCase());
-    if (isAlreadyTracked) {
-        toast({ title: 'Crop Already Tracked', description: `You are already tracking ${cropName}.` });
-        const existingCrop = trackedCrops.find(c => c.name.toLowerCase() === cropName.toLowerCase());
-        if (existingCrop) setActiveCropId(existingCrop.id);
-        return;
-    }
-
+    
     setIsLoading(true);
     try {
-      // 1. Generate the roadmap with intercropping
+      // 1. Generate the roadmap
       const roadmap = await generateCropRoadmap({ cropName, farmingType });
       const startDate = new Date();
 
@@ -113,7 +105,7 @@ export function CropLifecycleProvider({ children }: { children: ReactNode }) {
       const docRef = doc(firestore, `users/${user.uid}/trackedCrops`, newCropId);
       await setDoc(docRef, newTrackedCrop);
 
-      toast({ title: 'Started Tracking Crop!', description: `A full lifecycle plan for ${cropName} has been generated.` });
+      toast({ title: translations.crop_roadmap.tracking_enabled, description: translations.crop_roadmap.tracking_desc.replace('{cropName}', cropName) });
       setActiveCropId(newCropId);
 
     } catch (error) {
@@ -122,9 +114,9 @@ export function CropLifecycleProvider({ children }: { children: ReactNode }) {
     } finally {
       setIsLoading(false);
     }
-  }, [user, firestore, toast, trackedCrops]);
+  }, [user, firestore, toast, translations]);
   
-  const updateActivity = useCallback((cropId: string, activityDay: number, status: 'completed' | 'skipped', feedback?: string) => {
+  const updateActivity = useCallback(async (cropId: string, activityDay: number, status: 'completed' | 'skipped', feedback?: string) => {
     if(!user || !firestore) return;
 
     const crop = trackedCrops.find(c => c.id === cropId);
@@ -141,10 +133,15 @@ export function CropLifecycleProvider({ children }: { children: ReactNode }) {
     };
 
     const docRef = doc(firestore, `users/${user.uid}/trackedCrops`, cropId);
-    // Non-blocking update for better UI responsiveness
-    updateDocumentNonBlocking(docRef, { activities: updatedActivities });
-
-    toast({ title: 'Feedback Logged', description: 'Your response has been saved.' });
+    
+    try {
+        await updateDoc(docRef, { activities: updatedActivities });
+        toast({ title: 'Feedback Logged', description: 'Your response has been saved.' });
+    } catch(e) {
+        console.error("Failed to update activity", e);
+        toast({ variant: 'destructive', title: 'Error', description: 'Could not save your feedback.' });
+    }
+    
 
   }, [user, firestore, trackedCrops, toast]);
 
@@ -174,3 +171,6 @@ export function useCropLifecycle() {
   }
   return context;
 }
+
+// Re-add useLanguage to avoid breaking other components
+import { useLanguage } from './language-context';
