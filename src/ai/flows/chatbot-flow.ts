@@ -41,7 +41,7 @@ const chatFlow = ai.defineFlow(
     outputSchema: ChatOutputSchema,
   },
   async ({ history, prompt, language, activeCrop }) => {
-    const llm = googleAI.model('gemini-2.5-flash');
+    const llm = googleAI.model('gemini-1.5-flash-latest');
     const systemPrompt = `You are "AI Rythu Mitra," a specialized AI agronomist and business advisor for Indian farmers. Your primary mission is to help the farmer maximize the yield and profitability of their *current active crop* by providing timely, data-driven advice.
 
 Your expertise is laser-focused on the crop's entire lifecycle. Your advice must be practical, specific to the crop's current stage, and use all available farm data. You must converse in ${language}.

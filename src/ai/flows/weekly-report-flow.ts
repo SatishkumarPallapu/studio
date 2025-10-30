@@ -37,7 +37,7 @@ const weeklyReportFlow = ai.defineFlow(
         outputSchema: WeeklyReportOutputSchema,
     },
     async (input) => {
-        const llm = googleAI.model('gemini-2.5-flash');
+        const llm = googleAI.model('gemini-1.5-flash-latest');
 
         // 1. Generate Text Summary
         const summaryPrompt = `You are an agricultural analyst. Based on the following weekly data, generate a concise summary and provide 3 actionable recommendations for the upcoming week.
